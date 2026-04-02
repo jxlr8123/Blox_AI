@@ -1,0 +1,3219 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Blox-style — 3D character & map</title>
+  <style>
+    * { margin: 0; box-sizing: border-box; }
+    html, body {
+      height: 100%;
+      overflow: hidden;
+      background: #1a1a22;
+    }
+
+    canvas.game-canvas {
+      display: block;
+      position: fixed;
+      inset: 0;
+      width: 100%;
+      height: 100%;
+      z-index: 0;
+    }
+
+    /* Hotbar above the game (like the example: slot on bottom-center) */
+    #hud-root {
+      position: fixed;
+      inset: 0;
+      pointer-events: none;
+      z-index: 10;
+    }
+
+    .hotbar-slot {
+      position: absolute;
+      left: 50%;
+      bottom: 0;
+      transform: translateX(-50%);
+      width: 76px;
+      height: 76px;
+      background: #000000;
+      border: 2px solid #1a1a1a;
+      border-radius: 0;
+      transition: box-shadow 0.15s ease, border-color 0.15s ease;
+    }
+
+    .hotbar-slot__key {
+      position: absolute;
+      top: 6px;
+      left: 8px;
+      font-family: system-ui, "Segoe UI", sans-serif;
+      font-size: 15px;
+      font-weight: 700;
+      color: #ffffff;
+      line-height: 1;
+      user-select: none;
+    }
+
+    .hotbar-slot--halo {
+      border-color: #2563eb;
+      box-shadow:
+        0 0 0 2px rgba(37, 99, 235, 0.95),
+        0 0 16px 4px rgba(59, 130, 246, 0.75),
+        0 0 32px 8px rgba(96, 165, 250, 0.45);
+    }
+
+    .life-bar {
+      position: absolute;
+      left: 16px;
+      bottom: 16px;
+      width: 200px;
+      font-family: system-ui, "Segoe UI", sans-serif;
+    }
+
+    .level-bar {
+      position: absolute;
+      left: 16px;
+      bottom: 68px;
+      width: 200px;
+      font-family: system-ui, "Segoe UI", sans-serif;
+    }
+
+    .level-bar__label {
+      display: flex;
+      justify-content: space-between;
+      align-items: baseline;
+      gap: 10px;
+      font-size: 12px;
+      font-weight: 700;
+      color: #c4b5fd;
+      text-shadow: 0 0 6px rgba(139, 92, 246, 0.45);
+      margin-bottom: 4px;
+      letter-spacing: 0.02em;
+    }
+
+    .level-bar__xp {
+      font-size: 11px;
+      font-weight: 600;
+      color: #ddd6fe;
+      font-variant-numeric: tabular-nums;
+      white-space: nowrap;
+    }
+
+    .level-bar__track {
+      height: 14px;
+      background: #0f172a;
+      border: 2px solid #5b21b6;
+      border-radius: 3px;
+      overflow: hidden;
+      box-shadow: inset 0 1px 3px rgba(0, 0, 0, 0.5);
+    }
+
+    .level-bar__fill {
+      height: 100%;
+      width: 0%;
+      background: linear-gradient(180deg, #a78bfa 0%, #7c3aed 45%, #5b21b6 100%);
+      border-radius: 1px;
+      transition: width 0.2s ease;
+    }
+
+    .money-bar {
+      position: absolute;
+      left: 16px;
+      bottom: 120px;
+      font-family: system-ui, "Segoe UI", sans-serif;
+      font-size: 13px;
+      font-weight: 700;
+      color: #fde68a;
+      text-shadow: 0 0 6px rgba(251, 191, 36, 0.5);
+      padding: 4px 8px;
+      border: 1px solid rgba(251, 191, 36, 0.45);
+      border-radius: 4px;
+      background: rgba(0, 0, 0, 0.5);
+    }
+
+    .life-bar__label {
+      font-size: 13px;
+      font-weight: 700;
+      color: #4ade80;
+      text-shadow: 0 0 6px rgba(74, 222, 128, 0.45);
+      margin-bottom: 4px;
+      letter-spacing: 0.02em;
+    }
+
+    .life-bar__track {
+      height: 16px;
+      background: #0f172a;
+      border: 2px solid #14532d;
+      border-radius: 3px;
+      overflow: hidden;
+      box-shadow: inset 0 1px 3px rgba(0, 0, 0, 0.5);
+    }
+
+    .life-bar__fill {
+      height: 100%;
+      width: 100%;
+      background: linear-gradient(180deg, #4ade80 0%, #22c55e 45%, #15803d 100%);
+      border-radius: 1px;
+      transition: width 0.2s ease;
+    }
+
+    .shop-hint {
+      position: absolute;
+      left: 50%;
+      bottom: 140px;
+      transform: translateX(-50%);
+      font-family: system-ui, "Segoe UI", sans-serif;
+      font-size: 13px;
+      font-weight: 600;
+      color: #fef3c7;
+      text-shadow: 0 1px 3px rgba(0, 0, 0, 0.85);
+      padding: 6px 12px;
+      background: rgba(0, 0, 0, 0.55);
+      border: 1px solid rgba(251, 191, 36, 0.45);
+      border-radius: 4px;
+      opacity: 0;
+      visibility: hidden;
+      transition: opacity 0.15s ease, visibility 0.15s;
+      pointer-events: none;
+      white-space: nowrap;
+    }
+
+    .shop-hint.shop-hint--visible {
+      opacity: 1;
+      visibility: visible;
+    }
+
+    .boat-hint {
+      position: absolute;
+      left: 50%;
+      bottom: 158px;
+      transform: translateX(-50%);
+      font-family: system-ui, "Segoe UI", sans-serif;
+      font-size: 13px;
+      font-weight: 600;
+      color: #bae6fd;
+      text-shadow: 0 1px 3px rgba(0, 0, 0, 0.85);
+      padding: 6px 12px;
+      background: rgba(0, 0, 0, 0.55);
+      border: 1px solid rgba(56, 189, 248, 0.5);
+      border-radius: 4px;
+      opacity: 0;
+      visibility: hidden;
+      transition: opacity 0.15s ease, visibility 0.15s;
+      pointer-events: none;
+      white-space: nowrap;
+    }
+
+    .boat-hint.boat-hint--visible {
+      opacity: 1;
+      visibility: visible;
+    }
+
+    .boat-enter-hint {
+      position: absolute;
+      left: 50%;
+      bottom: 194px;
+      transform: translateX(-50%);
+      font-family: system-ui, "Segoe UI", sans-serif;
+      font-size: 13px;
+      font-weight: 600;
+      color: #fed7aa;
+      text-shadow: 0 1px 3px rgba(0, 0, 0, 0.85);
+      padding: 6px 12px;
+      background: rgba(0, 0, 0, 0.55);
+      border: 1px solid rgba(251, 146, 60, 0.5);
+      border-radius: 4px;
+      opacity: 0;
+      visibility: hidden;
+      transition: opacity 0.15s ease, visibility 0.15s;
+      pointer-events: none;
+      white-space: nowrap;
+    }
+
+    .boat-enter-hint.boat-enter-hint--visible {
+      opacity: 1;
+      visibility: visible;
+    }
+
+    .shop-layer {
+      position: fixed;
+      inset: 0;
+      z-index: 100;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      padding: 24px;
+      pointer-events: none;
+      opacity: 0;
+      visibility: hidden;
+      transition: opacity 0.2s ease, visibility 0.2s;
+    }
+
+    .shop-layer.shop-layer--open {
+      pointer-events: auto;
+      opacity: 1;
+      visibility: visible;
+    }
+
+    .shop-backdrop {
+      position: absolute;
+      inset: 0;
+      background: rgba(15, 23, 42, 0.72);
+      cursor: pointer;
+    }
+
+    .shop-panel {
+      position: relative;
+      z-index: 1;
+      width: min(420px, 100%);
+      max-height: min(520px, 90vh);
+      display: flex;
+      flex-direction: column;
+      background: linear-gradient(165deg, #1e293b 0%, #0f172a 100%);
+      border: 2px solid #334155;
+      border-radius: 10px;
+      box-shadow:
+        0 24px 48px rgba(0, 0, 0, 0.5),
+        inset 0 1px 0 rgba(255, 255, 255, 0.06);
+      font-family: system-ui, "Segoe UI", sans-serif;
+      overflow: hidden;
+    }
+
+    .shop-panel__head {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      padding: 14px 16px;
+      background: rgba(30, 41, 59, 0.9);
+      border-bottom: 1px solid #334155;
+    }
+
+    .shop-panel__title {
+      margin: 0;
+      font-size: 18px;
+      font-weight: 700;
+      color: #fbbf24;
+      letter-spacing: 0.04em;
+    }
+
+    .shop-panel__body {
+      padding: 20px 16px 16px;
+      flex: 1;
+      min-height: 120px;
+      display: flex;
+      flex-direction: column;
+    }
+
+    .shop-panel__foot {
+      padding: 12px 16px 16px;
+      border-top: 1px solid #334155;
+    }
+
+    .shop-close {
+      width: 100%;
+      padding: 10px 16px;
+      font-size: 14px;
+      font-weight: 600;
+      color: #e2e8f0;
+      background: #334155;
+      border: 1px solid #475569;
+      border-radius: 6px;
+      cursor: pointer;
+    }
+
+    .shop-close:hover {
+      background: #3f4f63;
+    }
+
+    .shop-items {
+      display: flex;
+      flex-direction: column;
+      gap: 12px;
+    }
+
+    .shop-row {
+      display: flex;
+      flex-wrap: wrap;
+      align-items: center;
+      justify-content: space-between;
+      gap: 12px;
+      padding: 12px 14px;
+      background: rgba(15, 23, 42, 0.65);
+      border: 1px solid #475569;
+      border-radius: 8px;
+    }
+
+    .shop-row--owned {
+      border-color: #22c55e;
+      opacity: 0.85;
+    }
+
+    .shop-row__name {
+      display: block;
+      font-size: 16px;
+      font-weight: 700;
+      color: #f8fafc;
+      margin-bottom: 4px;
+    }
+
+    .shop-row__desc {
+      font-size: 12px;
+      color: #94a3b8;
+      line-height: 1.4;
+      max-width: 240px;
+    }
+
+    .shop-row__meta {
+      display: flex;
+      flex-direction: column;
+      align-items: flex-end;
+      gap: 8px;
+    }
+
+    .shop-row__price {
+      font-size: 14px;
+      font-weight: 700;
+      color: #fbbf24;
+    }
+
+    .shop-row__price--free {
+      color: #4ade80;
+    }
+
+    .shop-buy {
+      padding: 8px 18px;
+      font-size: 13px;
+      font-weight: 700;
+      color: #0f172a;
+      background: linear-gradient(180deg, #4ade80 0%, #22c55e 100%);
+      border: 1px solid #16a34a;
+      border-radius: 6px;
+      cursor: pointer;
+    }
+
+    .shop-buy:hover:not(:disabled) {
+      filter: brightness(1.08);
+    }
+
+    .shop-buy:disabled {
+      cursor: default;
+      background: #334155;
+      color: #94a3b8;
+      border-color: #475569;
+    }
+
+    .fruit-hud {
+      position: absolute;
+      right: 16px;
+      bottom: 148px;
+      min-width: 160px;
+      font-family: system-ui, "Segoe UI", sans-serif;
+      font-size: 12px;
+      font-weight: 600;
+      color: #e2e8f0;
+      padding: 8px 12px 10px;
+      background: rgba(0, 0, 0, 0.55);
+      border: 1px solid rgba(245, 158, 11, 0.4);
+      border-radius: 6px;
+      opacity: 0;
+      visibility: hidden;
+      transition: opacity 0.15s ease, visibility 0.15s;
+      pointer-events: none;
+    }
+
+    .fruit-hud.fruit-hud--visible {
+      opacity: 1;
+      visibility: visible;
+    }
+
+    .fruit-hud__head {
+      font-size: 11px;
+      font-weight: 700;
+      text-transform: uppercase;
+      letter-spacing: 0.06em;
+      color: #fbbf24;
+      margin-bottom: 8px;
+      padding-bottom: 6px;
+      border-bottom: 1px solid rgba(251, 191, 36, 0.25);
+    }
+
+    .fruit-hud__list {
+      margin: 0;
+      padding: 0;
+      list-style: none;
+    }
+
+    .fruit-hud__list li {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      margin-bottom: 6px;
+      font-size: 12px;
+      font-weight: 500;
+      color: #cbd5e1;
+    }
+
+    .fruit-hud__list li:last-child {
+      margin-bottom: 0;
+    }
+
+    .fruit-hud kbd {
+      display: inline-block;
+      min-width: 1.5em;
+      padding: 2px 6px;
+      font-size: 11px;
+      font-family: inherit;
+      font-weight: 700;
+      text-align: center;
+      color: #0f172a;
+      background: #e2e8f0;
+      border-radius: 3px;
+      border: 1px solid #94a3b8;
+    }
+
+    .fruit-hud__m {
+      display: inline-block;
+      padding: 2px 6px;
+      font-size: 11px;
+      font-weight: 700;
+      color: #0f172a;
+      background: #e2e8f0;
+      border-radius: 3px;
+      border: 1px solid #94a3b8;
+    }
+
+    .fruit-hud__cd {
+      display: block;
+      margin-top: 4px;
+      font-size: 10px;
+      font-weight: 600;
+      color: #f97316;
+    }
+
+    .guide-hint {
+      position: absolute;
+      left: 50%;
+      bottom: 176px;
+      transform: translateX(-50%);
+      font-family: system-ui, "Segoe UI", sans-serif;
+      font-size: 13px;
+      font-weight: 600;
+      color: #ccfbf1;
+      text-shadow: 0 1px 3px rgba(0, 0, 0, 0.85);
+      padding: 6px 12px;
+      background: rgba(0, 0, 0, 0.55);
+      border: 1px solid rgba(45, 212, 191, 0.5);
+      border-radius: 4px;
+      opacity: 0;
+      visibility: hidden;
+      transition: opacity 0.15s ease, visibility 0.15s;
+      pointer-events: none;
+      white-space: nowrap;
+    }
+
+    .guide-hint.guide-hint--visible {
+      opacity: 1;
+      visibility: visible;
+    }
+
+    .mission-hud {
+      position: absolute;
+      top: 16px;
+      right: 16px;
+      width: min(280px, calc(100vw - 32px));
+      font-family: system-ui, "Segoe UI", sans-serif;
+      padding: 12px 14px;
+      background: rgba(15, 23, 42, 0.88);
+      border: 1px solid #334155;
+      border-radius: 8px;
+      pointer-events: none;
+      z-index: 11;
+      transition: opacity 0.25s ease, visibility 0.25s;
+    }
+
+    .mission-hud.mission-hud--hidden {
+      opacity: 0;
+      visibility: hidden;
+    }
+
+    .mission-hud__title {
+      font-size: 11px;
+      font-weight: 700;
+      text-transform: uppercase;
+      letter-spacing: 0.08em;
+      color: #5eead4;
+      margin: 0 0 10px;
+      padding-bottom: 8px;
+      border-bottom: 1px solid rgba(94, 234, 212, 0.25);
+    }
+
+    .mission-hud__list {
+      margin: 0;
+      padding: 0;
+      list-style: none;
+    }
+
+    .mission-hud__list li {
+      font-size: 13px;
+      line-height: 1.45;
+      color: #e2e8f0;
+      margin-bottom: 8px;
+      padding-left: 4px;
+    }
+
+    .mission-hud__list li:last-child {
+      margin-bottom: 0;
+    }
+
+    .mission-hud__list li.mission-done {
+      color: #4ade80;
+    }
+
+    .dialogue-layer {
+      position: fixed;
+      inset: 0;
+      z-index: 110;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      padding: 20px;
+      pointer-events: none;
+      opacity: 0;
+      visibility: hidden;
+      transition: opacity 0.2s ease, visibility 0.2s;
+    }
+
+    .dialogue-layer.dialogue-layer--open {
+      pointer-events: auto;
+      opacity: 1;
+      visibility: visible;
+    }
+
+    .dialogue-backdrop {
+      position: absolute;
+      inset: 0;
+      background: rgba(15, 23, 42, 0.65);
+      cursor: pointer;
+    }
+
+    .dialogue-front {
+      position: relative;
+      z-index: 1;
+      display: flex;
+      flex-direction: column;
+      align-items: stretch;
+      gap: 12px;
+      width: min(440px, 100%);
+      max-height: calc(100vh - 40px);
+    }
+
+    .dialogue-panel {
+      position: relative;
+      width: 100%;
+      padding: 18px 20px 16px;
+      background: linear-gradient(165deg, #1e293b 0%, #0f172a 100%);
+      border: 2px solid #0d9488;
+      border-radius: 10px;
+      box-shadow: 0 20px 50px rgba(0, 0, 0, 0.45);
+      font-family: system-ui, "Segoe UI", sans-serif;
+    }
+
+    .dialogue-name {
+      font-size: 15px;
+      font-weight: 700;
+      color: #5eead4;
+      margin: 0 0 12px;
+    }
+
+    .dialogue-body {
+      margin: 0 0 16px;
+      font-size: 15px;
+      line-height: 1.55;
+      color: #cbd5e1;
+    }
+
+    .dialogue-ok {
+      width: 100%;
+      padding: 10px;
+      font-size: 14px;
+      font-weight: 600;
+      color: #0f172a;
+      background: linear-gradient(180deg, #2dd4bf 0%, #14b8a6 100%);
+      border: 1px solid #0d9488;
+      border-radius: 6px;
+      cursor: pointer;
+    }
+
+    .dialogue-ok:hover {
+      filter: brightness(1.05);
+    }
+
+    .dialogue-actions {
+      display: flex;
+      flex-direction: column;
+      gap: 10px;
+    }
+
+    .gray-island-trial-choices {
+      display: flex;
+      flex-direction: column;
+      gap: 8px;
+      padding: 14px 16px 16px;
+      background: linear-gradient(165deg, #334155 0%, #1e293b 100%);
+      border: 2px solid #64748b;
+      border-radius: 10px;
+      box-shadow: 0 12px 32px rgba(0, 0, 0, 0.4);
+      font-family: system-ui, "Segoe UI", sans-serif;
+    }
+
+    .gray-island-trial-choices__title {
+      margin: 0 0 4px;
+      font-size: 12px;
+      font-weight: 700;
+      letter-spacing: 0.04em;
+      text-transform: uppercase;
+      color: #94a3b8;
+    }
+
+    .dialogue-choice-btn {
+      width: 100%;
+      padding: 10px 12px;
+      font-size: 14px;
+      font-weight: 600;
+      color: #ecfeff;
+      background: linear-gradient(180deg, #334155 0%, #1e293b 100%);
+      border: 1px solid #475569;
+      border-radius: 6px;
+      cursor: pointer;
+      text-align: left;
+    }
+
+    .dialogue-choice-btn:hover {
+      filter: brightness(1.08);
+      border-color: #5eead4;
+    }
+
+    .gray-island-dialogue-layer {
+      z-index: 111;
+    }
+
+    .gray-island-dialogue-panel {
+      border-color: #64748b;
+    }
+
+    .gray-island-dialogue-panel .dialogue-name {
+      color: #cbd5e1;
+    }
+
+  </style>
+</head>
+<body>
+  <div id="shop-layer" class="shop-layer" aria-hidden="true">
+    <div class="shop-backdrop" id="shop-backdrop" aria-label="Close shop"></div>
+    <div class="shop-panel" role="dialog" aria-labelledby="shop-title">
+      <div class="shop-panel__head">
+        <h2 class="shop-panel__title" id="shop-title">Market</h2>
+      </div>
+      <div class="shop-panel__body">
+        <div class="shop-items">
+          <div class="shop-row" id="shop-row-rubber">
+            <div>
+              <span class="shop-row__name">Rubber Fruit</span>
+              <span class="shop-row__desc">Paramecia. Your body becomes rubbery. <strong>Click</strong> quick punch · <strong>Z</strong> heavy punch (longer range, 3.5s cooldown).</span>
+            </div>
+            <div class="shop-row__meta">
+              <span class="shop-row__price">$5000</span>
+              <button type="button" class="shop-buy" id="buy-rubber">Take</button>
+            </div>
+          </div>
+        </div>
+      </div>
+      <div class="shop-panel__foot">
+        <button type="button" class="shop-close" id="shop-close">Close</button>
+      </div>
+    </div>
+  </div>
+
+  <div id="dialogue-layer" class="dialogue-layer" aria-hidden="true">
+    <div class="dialogue-backdrop" id="dialogue-backdrop"></div>
+    <div class="dialogue-front">
+      <div class="dialogue-panel" role="dialog" aria-labelledby="dialogue-name">
+        <div class="dialogue-name" id="dialogue-name">Island guide</div>
+        <p class="dialogue-body" id="dialogue-body"></p>
+        <div class="dialogue-actions">
+          <button type="button" class="dialogue-ok" id="dialogue-close">OK</button>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <div id="gray-island-dialogue-layer" class="dialogue-layer gray-island-dialogue-layer" aria-hidden="true">
+    <div class="dialogue-backdrop" id="gray-island-dialogue-backdrop"></div>
+    <div class="dialogue-front">
+      <div class="dialogue-panel gray-island-dialogue-panel" role="dialog" aria-labelledby="gray-island-dialogue-name">
+        <div class="dialogue-name" id="gray-island-dialogue-name">Gray island NPC</div>
+        <p class="dialogue-body" id="gray-island-dialogue-body"></p>
+        <div class="dialogue-actions">
+          <button type="button" class="dialogue-ok" id="gray-island-dialogue-close">OK</button>
+        </div>
+      </div>
+      <div id="gray-island-trial-choices" class="gray-island-trial-choices" hidden>
+        <p class="gray-island-trial-choices__title">Choose a trial</p>
+        <button type="button" class="dialogue-choice-btn" id="dialogue-choice-boss">One pirate captain</button>
+        <button type="button" class="dialogue-choice-btn" id="dialogue-choice-enemies">Six kills (4 pirates, respawn)</button>
+      </div>
+    </div>
+  </div>
+
+  <div id="hud-root" aria-hidden="true">
+    <div id="mission-hud" class="mission-hud mission-hud--hidden" role="region" aria-label="Missions" aria-hidden="true">
+      <h2 class="mission-hud__title">Missions</h2>
+      <ul class="mission-hud__list">
+        <li id="mission-fruit">○ Buy a fruit at the market</li>
+        <li id="mission-kills">○ Defeat 3 bandits (0/3)</li>
+        <li id="mission-boat" hidden>○ Speak with the boat seller</li>
+        <li id="mission-gray" hidden>○ Gray island — pirates</li>
+      </ul>
+    </div>
+    <div id="guide-hint" class="guide-hint">Press <strong>E</strong> — Guide</div>
+    <div id="gray-quest-hint" class="guide-hint">Press <strong>E</strong> — Gray island NPC</div>
+    <div id="shop-hint" class="shop-hint">Press <strong>E</strong> — Shop</div>
+    <div id="boat-hint" class="boat-hint">Press <strong>E</strong> — Boat seller</div>
+    <div id="boat-enter-hint" class="boat-enter-hint">Press <strong>E</strong> — Enter boat</div>
+    <div class="money-bar" role="status" aria-label="Money">
+      $<span id="money-current">0</span>
+    </div>
+    <div class="level-bar" role="status" aria-label="Level and experience">
+      <div class="level-bar__label">
+        <span>Level <span id="level-current">1</span></span>
+        <span class="level-bar__xp"><span id="level-xp-current">0</span>/<span id="level-xp-need">100</span> XP</span>
+      </div>
+      <div class="level-bar__track">
+        <div class="level-bar__fill" id="level-fill"></div>
+      </div>
+    </div>
+    <div class="life-bar" role="status" aria-label="Life">
+      <div class="life-bar__label">
+        <span id="life-current">100</span>/<span id="life-max">100</span>
+      </div>
+      <div class="life-bar__track">
+        <div class="life-bar__fill" id="life-fill"></div>
+      </div>
+    </div>
+    <div id="hotbar-slot" class="hotbar-slot" role="presentation">
+      <span class="hotbar-slot__key">1</span>
+    </div>
+    <div id="fruit-hud" class="fruit-hud" aria-hidden="true">
+      <div class="fruit-hud__head">Rubber — attacks</div>
+      <ul class="fruit-hud__list">
+        <li><span class="fruit-hud__m">Click</span> Stretch punch</li>
+        <li><kbd>Z</kbd> Heavy stretch — longer range <span class="fruit-hud__cd" id="heavy-punch-cd" hidden></span></li>
+      </ul>
+    </div>
+  </div>
+  <script type="importmap">
+    {
+      "imports": {
+        "three": "./node_modules/three/build/three.module.js"
+      }
+    }
+  </script>
+  <script type="module">
+    import * as THREE from 'three';
+
+    const scene = new THREE.Scene();
+    scene.background = new THREE.Color(0x87ceeb);
+    scene.fog = new THREE.Fog(0x87ceeb, 55, 420);
+
+    const camera = new THREE.PerspectiveCamera(55, window.innerWidth / window.innerHeight, 0.1, 20000);
+    camera.position.set(0, 12, 22);
+
+    const renderer = new THREE.WebGLRenderer({ antialias: true });
+    renderer.setSize(window.innerWidth, window.innerHeight);
+    renderer.setPixelRatio(Math.min(window.devicePixelRatio, 2));
+    renderer.shadowMap.enabled = true;
+    renderer.shadowMap.type = THREE.PCFSoftShadowMap;
+    renderer.domElement.classList.add('game-canvas');
+    document.body.appendChild(renderer.domElement);
+
+    const camTarget = new THREE.Vector3(0, 2, 0);
+    let camYaw = 0.35;
+    let camPitch = 0.42;
+    let camDist = 28;
+    let drag = false;
+    let lx = 0;
+    let ly = 0;
+    let clickStartX = 0;
+    let clickStartY = 0;
+
+    function updateCameraFromOrbit() {
+      camPitch = Math.max(0.12, Math.min(1.3, camPitch));
+      const cp = Math.cos(camPitch);
+      camera.position.set(
+        camTarget.x + Math.sin(camYaw) * cp * camDist,
+        camTarget.y + Math.sin(camPitch) * camDist,
+        camTarget.z + Math.cos(camYaw) * cp * camDist
+      );
+      camera.lookAt(camTarget);
+    }
+    updateCameraFromOrbit();
+
+    renderer.domElement.addEventListener('pointerdown', (e) => {
+      drag = true;
+      lx = e.clientX;
+      ly = e.clientY;
+      if (e.button === 0) {
+        clickStartX = e.clientX;
+        clickStartY = e.clientY;
+      }
+      renderer.domElement.setPointerCapture(e.pointerId);
+    });
+    renderer.domElement.addEventListener('pointerup', (e) => {
+      drag = false;
+      try { renderer.domElement.releasePointerCapture(e.pointerId); } catch (_) {}
+    });
+    renderer.domElement.addEventListener('pointermove', (e) => {
+      if (!drag) return;
+      const dx = e.clientX - lx;
+      const dy = e.clientY - ly;
+      lx = e.clientX;
+      ly = e.clientY;
+      camYaw -= dx * 0.005;
+      camPitch -= dy * 0.005;
+      updateCameraFromOrbit();
+    });
+    renderer.domElement.addEventListener('wheel', (e) => {
+      e.preventDefault();
+      camDist = Math.max(10, Math.min(80, camDist + e.deltaY * 0.04));
+      updateCameraFromOrbit();
+    }, { passive: false });
+
+    const clock = new THREE.Clock();
+    const moveSpeed = 14;
+
+    const ambient = new THREE.AmbientLight(0xffffff, 0.45);
+    scene.add(ambient);
+
+    const sun = new THREE.DirectionalLight(0xfff5e6, 1.1);
+    sun.position.set(25, 40, 18);
+    sun.castShadow = true;
+    sun.shadow.mapSize.setScalar(2048);
+    sun.shadow.camera.near = 1;
+    sun.shadow.camera.far = 120;
+    sun.shadow.camera.left = -56;
+    sun.shadow.camera.right = 56;
+    sun.shadow.camera.top = 56;
+    sun.shadow.camera.bottom = -56;
+    scene.add(sun);
+
+    // Flat rectangle map (wide thin box so it has thickness + receives shadows nicely)
+    const mapW = 100;
+    const mapD = 78;
+    const mapH = 0.6;
+    const mapGeo = new THREE.BoxGeometry(mapW, mapH, mapD);
+    const mapMat = new THREE.MeshStandardMaterial({
+      color: 0x3d8c40,
+      roughness: 0.92,
+      metalness: 0.05,
+    });
+    const map = new THREE.Mesh(mapGeo, mapMat);
+    map.position.y = -mapH / 2;
+    map.receiveShadow = true;
+    scene.add(map);
+
+    const edgeMat = new THREE.LineBasicMaterial({ color: 0x2a5f2e });
+    const edges = new THREE.EdgesGeometry(mapGeo);
+    const mapOutline = new THREE.LineSegments(edges, edgeMat);
+    mapOutline.position.copy(map.position);
+    scene.add(mapOutline);
+
+    // Secondary island (gray) in the ocean — wider for three open courtyard districts
+    const island2W = 188;
+    const island2D = 152;
+    const island2H = 0.6;
+    const island2Geo = new THREE.BoxGeometry(island2W, island2H, island2D);
+    const island2Mat = new THREE.MeshStandardMaterial({
+      color: 0x7a8088,
+      roughness: 0.9,
+      metalness: 0.05,
+    });
+    const island2 = new THREE.Mesh(island2Geo, island2Mat);
+    island2.position.set(0, -island2H / 2, -300);
+    island2.receiveShadow = true;
+    scene.add(island2);
+
+    const island2EdgeMat = new THREE.LineBasicMaterial({ color: 0x555b62 });
+    const island2Edges = new THREE.EdgesGeometry(island2Geo);
+    const island2Outline = new THREE.LineSegments(island2Edges, island2EdgeMat);
+    island2Outline.position.copy(island2.position);
+    scene.add(island2Outline);
+
+    // Gray island: three districts — colorful low open houses (one wall missing), tight rings around large courtyards.
+    const grayIslandBuildingsGroup = new THREE.Group();
+    scene.add(grayIslandBuildingsGroup);
+    const grayIslandColliders = [];
+    const grayHouseColliderPad = 0.18;
+
+    function addGrayHouseCollider(minX, maxX, minZ, maxZ) {
+      const p = grayHouseColliderPad;
+      grayIslandColliders.push({ minX: minX - p, maxX: maxX + p, minZ: minZ - p, maxZ: maxZ + p });
+    }
+
+    function houseMatWall(hex) {
+      return new THREE.MeshStandardMaterial({ color: hex, roughness: 0.86, metalness: 0.04 });
+    }
+    function houseMatRoof(hex) {
+      return new THREE.MeshStandardMaterial({ color: hex, roughness: 0.78, metalness: 0.06 });
+    }
+
+    /**
+     * Single-story open house: three thin walls, one open face (N/S/E/W = side without wall, compass on world +Z ≈ coast).
+     * Interior stays walkable; roof is a floating overhang slab.
+     */
+    function placeOpenHouse(cx, cz, fw, fd, wallH, wallHex, roofHex, openSide) {
+      const g = new THREE.Group();
+      g.position.set(cx, 0, cz);
+      const wm = houseMatWall(wallHex);
+      const rm = houseMatRoof(roofHex);
+      const t = 0.34;
+      const hw = fw / 2;
+      const hd = fd / 2;
+
+      function wallMesh(lox, loz, gw, gh, gd) {
+        const m = new THREE.Mesh(new THREE.BoxGeometry(gw, gh, gd), wm);
+        m.position.set(lox, gh / 2, loz);
+        m.castShadow = true;
+        m.receiveShadow = true;
+        g.add(m);
+      }
+
+      if (openSide === 'S') {
+        wallMesh(0, -hd + t / 2, fw, wallH, t);
+        wallMesh(-hw + t / 2, 0, t, wallH, fd - 2 * t);
+        wallMesh(hw - t / 2, 0, t, wallH, fd - 2 * t);
+        addGrayHouseCollider(cx - hw, cx + hw, cz - hd, cz - hd + t);
+        addGrayHouseCollider(cx - hw, cx - hw + t, cz - hd + t, cz + hd - t);
+        addGrayHouseCollider(cx + hw - t, cx + hw, cz - hd + t, cz + hd - t);
+      } else if (openSide === 'N') {
+        wallMesh(0, hd - t / 2, fw, wallH, t);
+        wallMesh(-hw + t / 2, 0, t, wallH, fd - 2 * t);
+        wallMesh(hw - t / 2, 0, t, wallH, fd - 2 * t);
+        addGrayHouseCollider(cx - hw, cx + hw, cz + hd - t, cz + hd);
+        addGrayHouseCollider(cx - hw, cx - hw + t, cz - hd + t, cz + hd - t);
+        addGrayHouseCollider(cx + hw - t, cx + hw, cz - hd + t, cz + hd - t);
+      } else if (openSide === 'W') {
+        wallMesh(0, -hd + t / 2, fw - 2 * t, wallH, t);
+        wallMesh(0, hd - t / 2, fw - 2 * t, wallH, t);
+        wallMesh(hw - t / 2, 0, t, wallH, fd);
+        addGrayHouseCollider(cx + hw - t, cx + hw, cz - hd, cz + hd);
+        addGrayHouseCollider(cx - hw + t, cx + hw - t, cz - hd, cz - hd + t);
+        addGrayHouseCollider(cx - hw + t, cx + hw - t, cz + hd - t, cz + hd);
+      } else {
+        wallMesh(0, -hd + t / 2, fw - 2 * t, wallH, t);
+        wallMesh(0, hd - t / 2, fw - 2 * t, wallH, t);
+        wallMesh(-hw + t / 2, 0, t, wallH, fd);
+        addGrayHouseCollider(cx - hw, cx - hw + t, cz - hd, cz + hd);
+        addGrayHouseCollider(cx - hw + t, cx + hw - t, cz - hd, cz - hd + t);
+        addGrayHouseCollider(cx - hw + t, cx + hw - t, cz + hd - t, cz + hd);
+      }
+
+      const roof = new THREE.Mesh(new THREE.BoxGeometry(fw + 0.75, 0.2, fd + 0.75), rm);
+      roof.position.y = wallH + 0.12;
+      roof.castShadow = true;
+      g.add(roof);
+      grayIslandBuildingsGroup.add(g);
+    }
+
+    /** Corner-open hall: two full walls (L-shape), generous chamber for a boss. */
+    function placeOpenHall(cx, cz, fw, fd, wallH, wallHex, roofHex) {
+      const g = new THREE.Group();
+      g.position.set(cx, 0, cz);
+      const wm = houseMatWall(wallHex);
+      const rm = houseMatRoof(roofHex);
+      const t = 0.4;
+      const hw = fw / 2;
+      const hd = fd / 2;
+
+      const back = new THREE.Mesh(new THREE.BoxGeometry(fw, wallH, t), wm);
+      back.position.set(0, wallH / 2, -hd + t / 2);
+      back.castShadow = true;
+      back.receiveShadow = true;
+      g.add(back);
+      const left = new THREE.Mesh(new THREE.BoxGeometry(t, wallH, fd), wm);
+      left.position.set(-hw + t / 2, wallH / 2, 0);
+      left.castShadow = true;
+      left.receiveShadow = true;
+      g.add(left);
+      addGrayHouseCollider(cx - hw, cx + hw, cz - hd, cz - hd + t);
+      addGrayHouseCollider(cx - hw, cx - hw + t, cz - hd, cz + hd);
+
+      const roof = new THREE.Mesh(new THREE.BoxGeometry(fw + 1, 0.24, fd + 1), rm);
+      roof.position.y = wallH + 0.14;
+      roof.castShadow = true;
+      g.add(roof);
+      grayIslandBuildingsGroup.add(g);
+    }
+
+    (function buildGrayIslandOpenDistricts() {
+      const gx = island2.position.x;
+      const gz = island2.position.z;
+
+      const houseColors = [
+        [0xe07a5f, 0xc1440e],
+        [0x81b29a, 0x2a4a5a],
+        [0x6d8cff, 0x312e81],
+        [0xee6c4d, 0xf4d35e],
+        [0xc77dff, 0x5a189a],
+        [0x2ec4b6, 0x1b4d3e],
+        [0xe9c46a, 0xbc6c25],
+        [0xf07167, 0x9a031e],
+      ];
+      const openCycle = ['S', 'E', 'N', 'W', 'S', 'N', 'E', 'W'];
+
+      // Gray island plaza — ring centered where grayIslandCenterMissionNpc stands.
+      const npcCx = gx;
+      const npcCz = gz;
+      const bossCx = gx - 60;
+      const bossCz = gz - 38;
+      const enCx = gx + 60;
+      const enCz = gz - 38;
+
+      placeOpenHall(bossCx, bossCz, 15.5, 13.2, 4.0, 0xa4161c, 0x2c1810);
+      for (let i = 0; i < 7; i++) {
+        const a = (i / 7) * Math.PI * 2 + 0.35;
+        const r = 11.2;
+        const [wc, rc] = houseColors[i % houseColors.length];
+        placeOpenHouse(
+          bossCx + Math.cos(a) * r,
+          bossCz + Math.sin(a) * r,
+          i % 2 === 0 ? 5.1 : 4.5,
+          i % 3 === 0 ? 4.9 : 4.2,
+          2.95,
+          wc,
+          rc,
+          openCycle[i % openCycle.length]
+        );
+      }
+
+      for (let i = 0; i < 10; i++) {
+        const a = (i / 10) * Math.PI * 2 + 0.12;
+        const r = 17.6;
+        const [wc, rc] = houseColors[(i + 2) % houseColors.length];
+        placeOpenHouse(
+          npcCx + Math.cos(a) * r,
+          npcCz + Math.sin(a) * r,
+          4.8 + (i % 2) * 0.4,
+          4.6,
+          2.95,
+          wc,
+          rc,
+          openCycle[(i + 3) % openCycle.length]
+        );
+      }
+
+      for (let i = 0; i < 9; i++) {
+        const a = (i / 9) * Math.PI * 2 + 0.08;
+        const r = 16.2;
+        const [wc, rc] = houseColors[(i + 4) % houseColors.length];
+        placeOpenHouse(
+          enCx + Math.cos(a) * r,
+          enCz + Math.sin(a) * r,
+          4.8,
+          4.3,
+          2.9,
+          wc,
+          rc,
+          openCycle[i % openCycle.length]
+        );
+      }
+    })();
+
+    // Infinite-feel ocean: large planes that follow player position.
+    const oceanSize = 2800;
+    const oceanGeo = new THREE.PlaneGeometry(oceanSize, oceanSize, 1, 1);
+    const oceanTopMat = new THREE.MeshStandardMaterial({
+      color: 0x1c7fc2,
+      emissive: 0x08263d,
+      emissiveIntensity: 0.28,
+      roughness: 0.24,
+      metalness: 0.2,
+      transparent: true,
+      opacity: 0.96,
+      side: THREE.DoubleSide,
+    });
+    const oceanTop = new THREE.Mesh(oceanGeo, oceanTopMat);
+    oceanTop.rotation.x = -Math.PI / 2;
+    oceanTop.position.y = -0.052;
+    oceanTop.receiveShadow = true;
+    scene.add(oceanTop);
+
+    const oceanDeepMat = new THREE.MeshStandardMaterial({
+      color: 0x0b3a58,
+      roughness: 0.92,
+      metalness: 0.02,
+      transparent: true,
+      opacity: 0.88,
+      side: THREE.DoubleSide,
+    });
+    const oceanDeep = new THREE.Mesh(oceanGeo, oceanDeepMat);
+    oceanDeep.rotation.x = -Math.PI / 2;
+    oceanDeep.position.y = -0.07;
+    oceanDeep.receiveShadow = true;
+    scene.add(oceanDeep);
+
+    function makeCharacter() {
+      const group = new THREE.Group();
+      const skin = new THREE.MeshStandardMaterial({ color: 0xf2c6a3, roughness: 0.6 });
+      const shirt = new THREE.MeshStandardMaterial({ color: 0x2563eb, roughness: 0.65 });
+      const pants = new THREE.MeshStandardMaterial({ color: 0x1e3a5f, roughness: 0.7 });
+
+      const legGeo = new THREE.BoxGeometry(0.42, 0.95, 0.42);
+      const legL = new THREE.Mesh(legGeo, pants);
+      legL.position.set(-0.28, 0.475, 0);
+      legL.castShadow = true;
+      const legR = legL.clone();
+      legR.position.x = 0.28;
+      group.add(legL, legR);
+
+      const bodyGeo = new THREE.BoxGeometry(0.95, 1.05, 0.5);
+      const body = new THREE.Mesh(bodyGeo, shirt);
+      body.position.y = 1.05 + 0.525;
+      body.castShadow = true;
+      group.add(body);
+
+      const armGeo = new THREE.BoxGeometry(0.32, 0.88, 0.32);
+      const armL = new THREE.Mesh(armGeo, shirt);
+      armL.position.set(-0.72, body.position.y, 0);
+      armL.castShadow = true;
+
+      const armRRig = new THREE.Group();
+      const armHalf = 0.44;
+      armRRig.position.set(0.72, body.position.y + armHalf, 0);
+      const armR = new THREE.Mesh(armGeo, shirt);
+      armR.position.set(0, -armHalf, 0);
+      armR.castShadow = true;
+      armRRig.add(armR);
+      group.add(armL, armRRig);
+
+      const headGeo = new THREE.BoxGeometry(0.72, 0.72, 0.72);
+      const headGroup = new THREE.Group();
+      headGroup.position.set(0, body.position.y + 0.525 + 0.36, 0);
+
+      const head = new THREE.Mesh(headGeo, skin);
+      head.castShadow = true;
+      headGroup.add(head);
+
+      const faceZ = 0.36 + 0.012;
+      const eyeMat = new THREE.MeshStandardMaterial({ color: 0x141414, roughness: 0.35 });
+      const eyeGeo = new THREE.BoxGeometry(0.12, 0.12, 0.04);
+      const eyeL = new THREE.Mesh(eyeGeo, eyeMat);
+      eyeL.position.set(-0.17, 0.08, faceZ);
+      eyeL.castShadow = false;
+      const eyeR = eyeL.clone();
+      eyeR.position.x = 0.17;
+      headGroup.add(eyeL, eyeR);
+
+      const browMat = new THREE.MeshStandardMaterial({ color: 0x4a3728, roughness: 0.6 });
+      const browGeo = new THREE.BoxGeometry(0.14, 0.035, 0.025);
+      const browL = new THREE.Mesh(browGeo, browMat);
+      browL.position.set(-0.17, 0.17, faceZ);
+      const browR = browL.clone();
+      browR.position.x = 0.17;
+      headGroup.add(browL, browR);
+
+      const mouthMat = new THREE.MeshStandardMaterial({ color: 0x6b4545, roughness: 0.5 });
+      const mouth = new THREE.Mesh(new THREE.BoxGeometry(0.24, 0.05, 0.03), mouthMat);
+      mouth.position.set(0, -0.15, faceZ);
+      headGroup.add(mouth);
+
+      const noseMat = new THREE.MeshStandardMaterial({ color: 0xd4a08c, roughness: 0.55 });
+      const nose = new THREE.Mesh(new THREE.BoxGeometry(0.08, 0.07, 0.05), noseMat);
+      nose.position.set(0, 0.01, faceZ + 0.01);
+      headGroup.add(nose);
+
+      group.add(headGroup);
+
+      group.position.set(0, 0, 0);
+      return { group, armRRig, armR };
+    }
+
+    const playerRig = makeCharacter();
+    const player = playerRig.group;
+    const playerArmRRig = playerRig.armRRig;
+    const playerArmR = playerRig.armR;
+    const playerParts = [];
+    player.traverse((obj) => {
+      if (obj.isMesh) playerParts.push(obj);
+    });
+    scene.add(player);
+    const playerArmRRigBasePos = playerArmRRig.position.clone();
+
+    function makeEnemyRig() {
+      const group = new THREE.Group();
+      const skin = new THREE.MeshStandardMaterial({ color: 0xe8b896, roughness: 0.6 });
+      const shirt = new THREE.MeshStandardMaterial({ color: 0x9f1239, roughness: 0.65 });
+      const pants = new THREE.MeshStandardMaterial({ color: 0x1c1917, roughness: 0.75 });
+      const bodyY = 1.575;
+
+      const legGeo = new THREE.BoxGeometry(0.42, 0.95, 0.42);
+      const legL = new THREE.Mesh(legGeo, pants);
+      legL.position.set(-0.28, 0.475, 0);
+      legL.castShadow = true;
+      const legR = legL.clone();
+      legR.position.x = 0.28;
+      group.add(legL, legR);
+
+      const body = new THREE.Mesh(new THREE.BoxGeometry(0.95, 1.05, 0.5), shirt);
+      body.position.y = bodyY;
+      body.castShadow = true;
+      group.add(body);
+
+      const armGeo = new THREE.BoxGeometry(0.32, 0.88, 0.32);
+      const armL = new THREE.Mesh(armGeo, shirt);
+      armL.position.set(-0.72, bodyY, 0);
+      armL.castShadow = true;
+
+      const armHalf = 0.44;
+      const armRRig = new THREE.Group();
+      armRRig.position.set(0.72, bodyY + armHalf, 0);
+      const armR = new THREE.Mesh(armGeo, shirt);
+      armR.position.set(0, -armHalf, 0);
+      armR.castShadow = true;
+      armRRig.add(armR);
+      group.add(armL, armRRig);
+
+      const headGeo = new THREE.BoxGeometry(0.72, 0.72, 0.72);
+      const headGroup = new THREE.Group();
+      headGroup.position.set(0, bodyY + 0.525 + 0.36, 0);
+
+      const head = new THREE.Mesh(headGeo, skin);
+      head.castShadow = true;
+      headGroup.add(head);
+
+      const faceZ = 0.36 + 0.012;
+      const eyeMat = new THREE.MeshStandardMaterial({ color: 0x141414, roughness: 0.35 });
+      const eyeGeo = new THREE.BoxGeometry(0.12, 0.12, 0.04);
+      const eyeL = new THREE.Mesh(eyeGeo, eyeMat);
+      eyeL.position.set(-0.17, 0.08, faceZ);
+      eyeL.castShadow = false;
+      const eyeR = eyeL.clone();
+      eyeR.position.x = 0.17;
+      headGroup.add(eyeL, eyeR);
+
+      const browMat = new THREE.MeshStandardMaterial({ color: 0x3d2818, roughness: 0.6 });
+      const browGeo = new THREE.BoxGeometry(0.14, 0.035, 0.025);
+      const browL = new THREE.Mesh(browGeo, browMat);
+      browL.position.set(-0.17, 0.17, faceZ);
+      const browR = browL.clone();
+      browR.position.x = 0.17;
+      headGroup.add(browL, browR);
+
+      const mouthMat = new THREE.MeshStandardMaterial({ color: 0x5c3d3d, roughness: 0.5 });
+      const mouth = new THREE.Mesh(new THREE.BoxGeometry(0.22, 0.045, 0.03), mouthMat);
+      mouth.position.set(0, -0.15, faceZ);
+      headGroup.add(mouth);
+
+      const noseMat = new THREE.MeshStandardMaterial({ color: 0xd4a08c, roughness: 0.55 });
+      const nose = new THREE.Mesh(new THREE.BoxGeometry(0.08, 0.07, 0.05), noseMat);
+      nose.position.set(0, 0.01, faceZ + 0.01);
+      headGroup.add(nose);
+
+      group.add(headGroup);
+
+      return { group, armRRig, armR };
+    }
+
+    function makeGuideNpc() {
+      const group = new THREE.Group();
+      const skin = new THREE.MeshStandardMaterial({ color: 0xf2c6a3, roughness: 0.6 });
+      const shirt = new THREE.MeshStandardMaterial({ color: 0x0d9488, roughness: 0.65 });
+      const pants = new THREE.MeshStandardMaterial({ color: 0x292524, roughness: 0.75 });
+      const bodyY = 1.575;
+
+      const legGeo = new THREE.BoxGeometry(0.42, 0.95, 0.42);
+      const legL = new THREE.Mesh(legGeo, pants);
+      legL.position.set(-0.28, 0.475, 0);
+      legL.castShadow = true;
+      const legR = legL.clone();
+      legR.position.x = 0.28;
+      group.add(legL, legR);
+
+      const body = new THREE.Mesh(new THREE.BoxGeometry(0.95, 1.05, 0.5), shirt);
+      body.position.y = bodyY;
+      body.castShadow = true;
+      group.add(body);
+
+      const armGeo = new THREE.BoxGeometry(0.32, 0.88, 0.32);
+      const armL = new THREE.Mesh(armGeo, shirt);
+      armL.position.set(-0.72, bodyY, 0);
+      armL.castShadow = true;
+      const armR = armL.clone();
+      armR.position.x = 0.72;
+      group.add(armL, armR);
+
+      const headGeo = new THREE.BoxGeometry(0.72, 0.72, 0.72);
+      const headGroup = new THREE.Group();
+      headGroup.position.set(0, bodyY + 0.525 + 0.36, 0);
+      const head = new THREE.Mesh(headGeo, skin);
+      head.castShadow = true;
+      headGroup.add(head);
+
+      const faceZ = 0.36 + 0.012;
+      const eyeMat = new THREE.MeshStandardMaterial({ color: 0x141414, roughness: 0.35 });
+      const eyeGeo = new THREE.BoxGeometry(0.12, 0.12, 0.04);
+      const eyeL = new THREE.Mesh(eyeGeo, eyeMat);
+      eyeL.position.set(-0.17, 0.08, faceZ);
+      const eyeR = eyeL.clone();
+      eyeR.position.x = 0.17;
+      headGroup.add(eyeL, eyeR);
+
+      const browMat = new THREE.MeshStandardMaterial({ color: 0x4a3728, roughness: 0.6 });
+      const browGeo = new THREE.BoxGeometry(0.14, 0.035, 0.025);
+      const browL = new THREE.Mesh(browGeo, browMat);
+      browL.position.set(-0.17, 0.17, faceZ);
+      const browR = browL.clone();
+      browR.position.x = 0.17;
+      headGroup.add(browL, browR);
+
+      const mouthMat = new THREE.MeshStandardMaterial({ color: 0x6b4545, roughness: 0.5 });
+      const mouth = new THREE.Mesh(new THREE.BoxGeometry(0.22, 0.05, 0.03), mouthMat);
+      mouth.position.set(0, -0.15, faceZ);
+      headGroup.add(mouth);
+
+      const noseMat = new THREE.MeshStandardMaterial({ color: 0xd4a08c, roughness: 0.55 });
+      const nose = new THREE.Mesh(new THREE.BoxGeometry(0.08, 0.07, 0.05), noseMat);
+      nose.position.set(0, 0.01, faceZ + 0.01);
+      headGroup.add(nose);
+
+      group.add(headGroup);
+      return group;
+    }
+
+    function makeBoatSellerNpc() {
+      const group = new THREE.Group();
+      const skin = new THREE.MeshStandardMaterial({ color: 0xf2c6a3, roughness: 0.6 });
+      const shirt = new THREE.MeshStandardMaterial({ color: 0x1e40af, roughness: 0.65 });
+      const pants = new THREE.MeshStandardMaterial({ color: 0x292524, roughness: 0.75 });
+      const bodyY = 1.575;
+
+      const legGeo = new THREE.BoxGeometry(0.42, 0.95, 0.42);
+      const legL = new THREE.Mesh(legGeo, pants);
+      legL.position.set(-0.28, 0.475, 0);
+      legL.castShadow = true;
+      const legR = legL.clone();
+      legR.position.x = 0.28;
+      group.add(legL, legR);
+
+      const body = new THREE.Mesh(new THREE.BoxGeometry(0.95, 1.05, 0.5), shirt);
+      body.position.y = bodyY;
+      body.castShadow = true;
+      group.add(body);
+
+      const armGeo = new THREE.BoxGeometry(0.32, 0.88, 0.32);
+      const armL = new THREE.Mesh(armGeo, shirt);
+      armL.position.set(-0.72, bodyY, 0);
+      armL.castShadow = true;
+      const armR = armL.clone();
+      armR.position.x = 0.72;
+      group.add(armL, armR);
+
+      const headGeo = new THREE.BoxGeometry(0.72, 0.72, 0.72);
+      const headGroup = new THREE.Group();
+      headGroup.position.set(0, bodyY + 0.525 + 0.36, 0);
+      const head = new THREE.Mesh(headGeo, skin);
+      head.castShadow = true;
+      headGroup.add(head);
+
+      const faceZ = 0.36 + 0.012;
+      const eyeMat = new THREE.MeshStandardMaterial({ color: 0x141414, roughness: 0.35 });
+      const eyeGeo = new THREE.BoxGeometry(0.12, 0.12, 0.04);
+      const eyeL = new THREE.Mesh(eyeGeo, eyeMat);
+      eyeL.position.set(-0.17, 0.08, faceZ);
+      const eyeR = eyeL.clone();
+      eyeR.position.x = 0.17;
+      headGroup.add(eyeL, eyeR);
+
+      const browMat = new THREE.MeshStandardMaterial({ color: 0x4a3728, roughness: 0.6 });
+      const browGeo = new THREE.BoxGeometry(0.14, 0.035, 0.025);
+      const browL = new THREE.Mesh(browGeo, browMat);
+      browL.position.set(-0.17, 0.17, faceZ);
+      const browR = browL.clone();
+      browR.position.x = 0.17;
+      headGroup.add(browL, browR);
+
+      const mouthMat = new THREE.MeshStandardMaterial({ color: 0x6b4545, roughness: 0.5 });
+      const mouth = new THREE.Mesh(new THREE.BoxGeometry(0.22, 0.05, 0.03), mouthMat);
+      mouth.position.set(0, -0.15, faceZ);
+      headGroup.add(mouth);
+
+      const noseMat = new THREE.MeshStandardMaterial({ color: 0xd4a08c, roughness: 0.55 });
+      const nose = new THREE.Mesh(new THREE.BoxGeometry(0.08, 0.07, 0.05), noseMat);
+      nose.position.set(0, 0.01, faceZ + 0.01);
+      headGroup.add(nose);
+
+      group.add(headGroup);
+      return group;
+    }
+
+    const enemyRadius = 0.46;
+    const enemyMaxHp = 50;
+    const enemyPunchDamage = 33;
+    const enemyMoveSpeed = 4.2;
+    const enemyVisionRange = 13;
+    const enemyAttackRange = 1.48;
+    const enemyHitRange = 1.38;
+    const pirateEnemyMaxHp = 80;
+    const pirateEnemyPunchDamage = 50;
+    const pirateEnemyAttackRange = 2.15;
+    const pirateEnemyHitRange = 2.02;
+    const enemyAttackCooldown = 1.2;
+    const ePunchP1 = 0.12;
+    const ePunchP2 = 0.08;
+    const ePunchP3 = 0.07;
+    const ePunchP4 = 0.08;
+    const ePunchP5 = 0.1;
+    const enemyPunchTotal = ePunchP1 + ePunchP2 + ePunchP3 + ePunchP4 + ePunchP5;
+    const enemyPunchReach = 0.52;
+
+    const enemies = [];
+
+    function resetEnemyPunchPose(e) {
+      e.armRRig.rotation.set(0, 0, 0);
+      e.armRRig.position.copy(e.armRRigBasePos);
+      e.armR.position.set(0, -0.44, 0);
+    }
+
+    function makeEnemyHpBar() {
+      const root = new THREE.Group();
+      root.position.set(0, 3.15, 0);
+
+      const bg = new THREE.Mesh(
+        new THREE.PlaneGeometry(1.2, 0.14),
+        new THREE.MeshBasicMaterial({ color: 0x111827, transparent: true, opacity: 0.9 })
+      );
+      root.add(bg);
+
+      const fill = new THREE.Mesh(
+        new THREE.PlaneGeometry(1.14, 0.08),
+        new THREE.MeshBasicMaterial({ color: 0x22c55e })
+      );
+      fill.position.z = 0.002;
+      fill.position.x = -(1.14 / 2) * 0.5;
+      root.add(fill);
+
+      return { root, fill, maxWidth: 1.14 };
+    }
+
+    function updateEnemyHpBar(e) {
+      if (!e.hpFill) return;
+      const maxH = e.maxHp != null ? e.maxHp : enemyMaxHp;
+      const hp01 = Math.max(0, Math.min(1, e.hp / maxH));
+      e.hpFill.scale.x = hp01;
+      e.hpFill.position.x = -(e.hpBarWidth / 2) * (1 - hp01);
+      const mat = e.hpFill.material;
+      if (hp01 > 0.6) mat.color.setHex(0x22c55e);
+      else if (hp01 > 0.3) mat.color.setHex(0xf59e0b);
+      else mat.color.setHex(0xef4444);
+    }
+
+    function respawnEnemy(e) {
+      if (e.noRespawn) return;
+      e.hp = e.maxHp != null ? e.maxHp : enemyMaxHp;
+      e.alive = true;
+      e.respawnT = 0;
+      e.mesh.position.copy(e.spawn);
+      e.mesh.visible = true;
+      resetEnemyPunchPose(e);
+      e.attackCD = 0.6;
+      updateEnemyHpBar(e);
+    }
+
+    function revivePirateCaptain(e) {
+      if (e.grayQuestRole !== 'boss') return;
+      e.hp = e.maxHp != null ? e.maxHp : enemyMaxHp;
+      e.alive = true;
+      e.mesh.visible = true;
+      e.mesh.position.copy(e.spawn);
+      e.respawnT = 0;
+      e.punchT = 0;
+      e.attackCD = 0.4;
+      resetEnemyPunchPose(e);
+      updateEnemyHpBar(e);
+      e.grayQuestFrozen = false;
+    }
+
+    function spawnEnemyAt(x, z, opts = {}) {
+      const scale = opts.scale != null ? opts.scale : 1;
+      const grayQuestRole = opts.grayQuestRole != null ? opts.grayQuestRole : null;
+      const isPirate = grayQuestRole != null;
+      const maxHp =
+        opts.maxHp != null ? opts.maxHp : isPirate ? pirateEnemyMaxHp : enemyMaxHp;
+      const punchDamage =
+        opts.punchDamage != null
+          ? opts.punchDamage
+          : isPirate
+            ? pirateEnemyPunchDamage
+            : enemyPunchDamage;
+      const attackRange =
+        opts.attackRange != null
+          ? opts.attackRange
+          : isPirate
+            ? pirateEnemyAttackRange
+            : enemyAttackRange;
+      const hitRange =
+        opts.hitRange != null ? opts.hitRange : isPirate ? pirateEnemyHitRange : enemyHitRange;
+      const countsForMission = opts.countsForMission !== false;
+      const collisionR = opts.collisionR != null ? opts.collisionR : enemyRadius * scale;
+      const noRespawn = !!opts.noRespawn;
+      const grayQuestFrozen = grayQuestRole != null;
+
+      const rig = makeEnemyRig();
+      const hpBar = makeEnemyHpBar();
+      rig.group.scale.setScalar(scale);
+      hpBar.root.position.y = 3.15 * scale;
+      if (scale > 1.35) {
+        hpBar.root.scale.setScalar(1.15);
+        hpBar.root.position.y = 3.35 * scale;
+      }
+      rig.group.add(hpBar.root);
+      rig.group.position.set(x, 0, z);
+      scene.add(rig.group);
+      const e = {
+        mesh: rig.group,
+        spawn: new THREE.Vector3(x, 0, z),
+        hp: maxHp,
+        maxHp,
+        alive: true,
+        respawnT: 0,
+        attackCD: 0.4,
+        punchT: 0,
+        punchDidDamage: false,
+        armRRig: rig.armRRig,
+        armR: rig.armR,
+        armRRigBasePos: rig.armRRig.position.clone(),
+        hpFill: hpBar.fill,
+        hpBarWidth: hpBar.maxWidth,
+        countsForMission,
+        collisionR,
+        grayQuestRole,
+        noRespawn,
+        grayQuestFrozen,
+        punchDamage,
+        attackRange,
+        hitRange,
+      };
+      enemies.push(e);
+      updateEnemyHpBar(e);
+    }
+
+    spawnEnemyAt(-22, 34);
+    spawnEnemyAt(22, 34);
+    spawnEnemyAt(0, 40);
+
+    const grayBossZ = island2.position.z - 38;
+    spawnEnemyAt(island2.position.x - 60, grayBossZ, {
+      scale: 2.08,
+      countsForMission: false,
+      collisionR: enemyRadius * 2.08,
+      grayQuestRole: 'boss',
+      noRespawn: true,
+    });
+    const gex = island2.position.x + 60;
+    const gez = grayBossZ;
+    const swarmRingR = 14.2;
+    for (let i = 0; i < 4; i++) {
+      const a = (i / 4) * Math.PI * 2 + 0.18;
+      spawnEnemyAt(gex + Math.cos(a) * swarmRingR, gez + Math.sin(a) * swarmRingR, {
+        countsForMission: false,
+        grayQuestRole: 'swarm',
+        noRespawn: false,
+      });
+    }
+
+    function makeMarketStall() {
+      const g = new THREE.Group();
+      const wood = new THREE.MeshStandardMaterial({ color: 0x5c4033, roughness: 0.88 });
+      const awningMat = new THREE.MeshStandardMaterial({ color: 0xb91c1c, roughness: 0.65 });
+      const apron = new THREE.MeshStandardMaterial({ color: 0xf5f5dc, roughness: 0.78 });
+      const skin = new THREE.MeshStandardMaterial({ color: 0xe8b896, roughness: 0.62 });
+      const pantsMat = new THREE.MeshStandardMaterial({ color: 0x374151, roughness: 0.75 });
+
+      const counter = new THREE.Mesh(new THREE.BoxGeometry(3.5, 1.12, 1.08), wood);
+      counter.position.set(0, 0.56, 1.02);
+      counter.castShadow = true;
+      counter.receiveShadow = true;
+      g.add(counter);
+
+      const awning = new THREE.Mesh(new THREE.BoxGeometry(3.85, 0.14, 1.65), awningMat);
+      awning.position.set(0, 2.28, 0.98);
+      awning.castShadow = true;
+      g.add(awning);
+
+      const legGeo = new THREE.BoxGeometry(0.36, 0.82, 0.36);
+      const legL = new THREE.Mesh(legGeo, pantsMat);
+      legL.position.set(-0.24, 0.41, -0.12);
+      legL.castShadow = true;
+      const legR = legL.clone();
+      legR.position.x = 0.24;
+      g.add(legL, legR);
+
+      const body = new THREE.Mesh(new THREE.BoxGeometry(0.88, 1.02, 0.46), apron);
+      body.position.set(0, 1.25, -0.12);
+      body.castShadow = true;
+      g.add(body);
+
+      const armGeo = new THREE.BoxGeometry(0.28, 0.55, 0.28);
+      const armL = new THREE.Mesh(armGeo, apron);
+      armL.position.set(-0.62, 1.15, 0.55);
+      armL.castShadow = true;
+      const armR = armL.clone();
+      armR.position.set(0.62, 1.15, 0.55);
+      g.add(armL, armR);
+
+      const headGeo = new THREE.BoxGeometry(0.68, 0.68, 0.68);
+      const headGroup = new THREE.Group();
+      headGroup.position.set(0, 2.02, -0.12);
+      const head = new THREE.Mesh(headGeo, skin);
+      head.castShadow = true;
+      headGroup.add(head);
+
+      const faceZ = 0.34 + 0.012;
+      const eyeMat = new THREE.MeshStandardMaterial({ color: 0x141414, roughness: 0.35 });
+      const eyeGeo = new THREE.BoxGeometry(0.11, 0.11, 0.035);
+      const eyeL = new THREE.Mesh(eyeGeo, eyeMat);
+      eyeL.position.set(-0.16, 0.07, faceZ);
+      eyeL.castShadow = false;
+      const eyeR = eyeL.clone();
+      eyeR.position.x = 0.16;
+      headGroup.add(eyeL, eyeR);
+
+      const browMat = new THREE.MeshStandardMaterial({ color: 0x4a3728, roughness: 0.6 });
+      const browGeo = new THREE.BoxGeometry(0.13, 0.032, 0.022);
+      const browL = new THREE.Mesh(browGeo, browMat);
+      browL.position.set(-0.16, 0.15, faceZ);
+      const browR = browL.clone();
+      browR.position.x = 0.16;
+      headGroup.add(browL, browR);
+
+      const mouthMat = new THREE.MeshStandardMaterial({ color: 0x6b4545, roughness: 0.5 });
+      const mouth = new THREE.Mesh(new THREE.BoxGeometry(0.22, 0.045, 0.028), mouthMat);
+      mouth.position.set(0, -0.14, faceZ);
+      headGroup.add(mouth);
+
+      const noseMat = new THREE.MeshStandardMaterial({ color: 0xd4a08c, roughness: 0.55 });
+      const nose = new THREE.Mesh(new THREE.BoxGeometry(0.07, 0.065, 0.045), noseMat);
+      nose.position.set(0, 0.01, faceZ + 0.01);
+      headGroup.add(nose);
+
+      g.add(headGroup);
+
+      return g;
+    }
+
+    function makeGuideExclaimMark() {
+      const g = new THREE.Group();
+      const mat = new THREE.MeshStandardMaterial({
+        color: 0xffcd38,
+        emissive: 0xffa000,
+        emissiveIntensity: 0.55,
+        roughness: 0.38,
+        metalness: 0.12,
+      });
+      const stem = new THREE.Mesh(new THREE.BoxGeometry(0.15, 0.52, 0.15), mat);
+      stem.position.y = 0.38;
+      stem.castShadow = false;
+      const dot = new THREE.Mesh(new THREE.BoxGeometry(0.15, 0.15, 0.15), mat);
+      dot.position.y = -0.12;
+      dot.castShadow = false;
+      g.add(stem, dot);
+      return g;
+    }
+
+    function makeSimpleBoat() {
+      const g = new THREE.Group();
+      const wood = new THREE.MeshStandardMaterial({ color: 0x6e4522, roughness: 0.9 });
+      const darkWood = new THREE.MeshStandardMaterial({ color: 0x4a2f18, roughness: 0.92 });
+      const midWood = new THREE.MeshStandardMaterial({ color: 0x7b4d2a, roughness: 0.86 });
+
+      const keel = new THREE.Mesh(new THREE.BoxGeometry(0.34, 0.22, 2.95), darkWood);
+      keel.position.y = -0.06;
+      keel.castShadow = true;
+      keel.receiveShadow = true;
+      g.add(keel);
+
+      const hull = new THREE.Mesh(new THREE.BoxGeometry(1.08, 0.28, 2.55), wood);
+      hull.position.y = 0.06;
+      hull.castShadow = true;
+      hull.receiveShadow = true;
+      g.add(hull);
+
+      const railL = new THREE.Mesh(new THREE.BoxGeometry(0.13, 0.22, 2.45), darkWood);
+      railL.position.set(0.53, 0.23, 0.06);
+      railL.castShadow = true;
+      g.add(railL);
+
+      const railR = railL.clone();
+      railR.position.x = -0.61;
+      g.add(railR);
+
+      const prow = new THREE.Mesh(new THREE.BoxGeometry(0.8, 0.3, 0.48), midWood);
+      prow.position.set(0, 0.16, 1.5);
+      prow.castShadow = true;
+      g.add(prow);
+
+      const stern = new THREE.Mesh(new THREE.BoxGeometry(0.92, 0.24, 0.42), darkWood);
+      stern.position.set(0, 0.14, -1.44);
+      stern.castShadow = true;
+      g.add(stern);
+
+      const seat = new THREE.Mesh(new THREE.BoxGeometry(0.72, 0.11, 0.34), midWood);
+      seat.position.set(0, 0.22, -0.18);
+      seat.castShadow = true;
+      g.add(seat);
+
+      const backSeat = new THREE.Mesh(new THREE.BoxGeometry(0.62, 0.1, 0.3), midWood);
+      backSeat.position.set(0, 0.22, -0.78);
+      backSeat.castShadow = true;
+      seat.castShadow = true;
+      g.add(backSeat);
+
+      return g;
+    }
+
+    const marketStall = makeMarketStall();
+    marketStall.position.set(16, 0, -14);
+    marketStall.rotation.y = 0;
+    scene.add(marketStall);
+
+    marketStall.updateMatrixWorld(true);
+    const stallColliderBox = new THREE.Box3().setFromObject(marketStall);
+    stallColliderBox.expandByScalar(0.1);
+
+    const guideNpc = makeGuideNpc();
+    guideNpc.position.set(4.5, 0, 5.8);
+    guideNpc.rotation.y = Math.atan2(-4.5, -5.8);
+    scene.add(guideNpc);
+
+    const guideExclaimMark = makeGuideExclaimMark();
+    guideExclaimMark.position.set(0, 3.22, 0);
+    guideNpc.add(guideExclaimMark);
+
+    const boatSellerNpc = makeBoatSellerNpc();
+    boatSellerNpc.position.set(-24, 0, -32);
+    boatSellerNpc.rotation.y = Math.atan2(24, 32);
+    scene.add(boatSellerNpc);
+
+    const grayIslandBoatSellerNpc = makeBoatSellerNpc();
+    const grayCoastInset = 5.5;
+    grayIslandBoatSellerNpc.position.set(
+      island2.position.x,
+      0,
+      island2.position.z + island2D / 2 - grayCoastInset
+    );
+    grayIslandBoatSellerNpc.rotation.y = Math.PI;
+    scene.add(grayIslandBoatSellerNpc);
+
+    const grayIslandCenterMissionNpc = makeGuideNpc();
+    grayIslandCenterMissionNpc.position.set(island2.position.x, 0, island2.position.z);
+    grayIslandCenterMissionNpc.rotation.y = Math.PI;
+    const grayGuideExclaimMark = makeGuideExclaimMark();
+    grayGuideExclaimMark.position.set(0, 3.22, 0);
+    grayIslandCenterMissionNpc.add(grayGuideExclaimMark);
+    scene.add(grayIslandCenterMissionNpc);
+
+    const boatDockSpawn = new THREE.Vector3(-50.4, 0.06, -32.2);
+    const grayIslandBoatDockSpawn = new THREE.Vector3(
+      island2.position.x,
+      0.06,
+      island2.position.z + island2D / 2 - grayCoastInset
+    );
+
+    const playerBoat = makeSimpleBoat();
+    playerBoat.position.copy(boatDockSpawn);
+    playerBoat.rotation.y = Math.PI * 0.2;
+    playerBoat.visible = false;
+    scene.add(playerBoat);
+
+    const boatWakeGroup = new THREE.Group();
+    scene.add(boatWakeGroup);
+    const boatWakeParticles = [];
+    const wakeMat = new THREE.MeshStandardMaterial({
+      color: 0xcffafe,
+      emissive: 0x67e8f9,
+      emissiveIntensity: 0.3,
+      roughness: 0.35,
+      metalness: 0.02,
+      transparent: true,
+      opacity: 0.8,
+    });
+    for (let i = 0; i < 26; i++) {
+      const m = new THREE.Mesh(new THREE.SphereGeometry(0.08, 6, 6), wakeMat.clone());
+      m.visible = false;
+      boatWakeGroup.add(m);
+      boatWakeParticles.push({ mesh: m, life: 0, vx: 0, vz: 0 });
+    }
+
+    const playerRadius = 0.46;
+
+    const walkIslands = [
+      { cx: 0, cz: 0, w: mapW, d: mapD },
+      { cx: island2.position.x, cz: island2.position.z, w: island2W, d: island2D },
+    ];
+
+    function clampPosToIsland(pos, island, pad = 0.85) {
+      const halfW = island.w / 2 - pad;
+      const halfD = island.d / 2 - pad;
+      pos.x = Math.max(island.cx - halfW, Math.min(island.cx + halfW, pos.x));
+      pos.z = Math.max(island.cz - halfD, Math.min(island.cz + halfD, pos.z));
+    }
+
+    function islandOutsideDistSq(x, z, island) {
+      const ox = Math.max(0, Math.abs(x - island.cx) - island.w / 2);
+      const oz = Math.max(0, Math.abs(z - island.cz) - island.d / 2);
+      return ox * ox + oz * oz;
+    }
+
+    function clampPlayerToLandBounds() {
+      let best = walkIslands[0];
+      let bestD = islandOutsideDistSq(player.position.x, player.position.z, best);
+      for (let i = 1; i < walkIslands.length; i++) {
+        const d = islandOutsideDistSq(player.position.x, player.position.z, walkIslands[i]);
+        if (d < bestD) {
+          bestD = d;
+          best = walkIslands[i];
+        }
+      }
+      clampPosToIsland(player.position, best);
+    }
+
+    function clampEntityToNearestIsland(pos) {
+      let best = walkIslands[0];
+      let bestD = islandOutsideDistSq(pos.x, pos.z, best);
+      for (let i = 1; i < walkIslands.length; i++) {
+        const d = islandOutsideDistSq(pos.x, pos.z, walkIslands[i]);
+        if (d < bestD) {
+          bestD = d;
+          best = walkIslands[i];
+        }
+      }
+      clampPosToIsland(pos, best);
+    }
+
+    function clampBoatToOcean() {
+      const coastPad = 2.2;
+      for (const island of walkIslands) {
+        const halfW = island.w / 2 + coastPad;
+        const halfD = island.d / 2 + coastPad;
+        const relX = playerBoat.position.x - island.cx;
+        const relZ = playerBoat.position.z - island.cz;
+        if (Math.abs(relX) >= halfW || Math.abs(relZ) >= halfD) continue;
+
+        const pushX = halfW - Math.abs(relX);
+        const pushZ = halfD - Math.abs(relZ);
+        if (pushX < pushZ) {
+          playerBoat.position.x = island.cx + (relX >= 0 ? halfW : -halfW);
+        } else {
+          playerBoat.position.z = island.cz + (relZ >= 0 ? halfD : -halfD);
+        }
+      }
+    }
+
+    function isBoatNearCoast() {
+      const px = playerBoat.position.x;
+      const pz = playerBoat.position.z;
+      for (const island of walkIslands) {
+        const relX = Math.abs(px - island.cx);
+        const relZ = Math.abs(pz - island.cz);
+        const distToXCoast = Math.abs(relX - island.w / 2);
+        const distToZCoast = Math.abs(relZ - island.d / 2);
+        if (Math.min(distToXCoast, distToZCoast) <= 2.8) return true;
+      }
+      return false;
+    }
+
+    function pushCircleOutOfXZBox(pos, r, bx0, bx1, bz0, bz1) {
+      let px = pos.x;
+      let pz = pos.z;
+      const cx = Math.max(bx0, Math.min(bx1, px));
+      const cz = Math.max(bz0, Math.min(bz1, pz));
+      const dx = px - cx;
+      const dz = pz - cz;
+      const d2 = dx * dx + dz * dz;
+      if (d2 >= r * r) return false;
+
+      if (d2 < 1e-10) {
+        const dMinX = px - bx0;
+        const dMaxX = bx1 - px;
+        const dMinZ = pz - bz0;
+        const dMaxZ = bz1 - pz;
+        const m = Math.min(dMinX, dMaxX, dMinZ, dMaxZ);
+        if (m === dMinX) px = bx0 - r;
+        else if (m === dMaxX) px = bx1 + r;
+        else if (m === dMinZ) pz = bz0 - r;
+        else pz = bz1 + r;
+      } else {
+        const d = Math.sqrt(d2);
+        px = cx + (dx / d) * r;
+        pz = cz + (dz / d) * r;
+      }
+      pos.x = px;
+      pos.z = pz;
+      return true;
+    }
+
+    function resolveGrayIslandBuildingCollisionsFor(pos, r) {
+      for (let pass = 0; pass < 2; pass++) {
+        for (const b of grayIslandColliders) {
+          pushCircleOutOfXZBox(pos, r, b.minX, b.maxX, b.minZ, b.maxZ);
+        }
+      }
+    }
+
+    function resolveStallCollisionXZFor(pos, r) {
+      const bx0 = stallColliderBox.min.x;
+      const bx1 = stallColliderBox.max.x;
+      const bz0 = stallColliderBox.min.z;
+      const bz1 = stallColliderBox.max.z;
+      pushCircleOutOfXZBox(pos, r, bx0, bx1, bz0, bz1);
+      resolveGrayIslandBuildingCollisionsFor(pos, r);
+    }
+
+    function resolveStallCollisionXZ() {
+      resolveStallCollisionXZFor(player.position, playerRadius);
+    }
+
+    const shopNpcPos = new THREE.Vector3();
+    const shopInteractRadius = 4.2;
+    const guideInteractRadius = 4.8;
+    const boatInteractRadius = 4.8;
+    const MISSION_KILLS_TARGET = 3;
+    const GREEN_ISLAND_DEFEAT_THREE_ENEMIES_XP = 300;
+    const GRAY_ISLAND_PIRATES_MISSION_XP = 1200;
+    let shopOpen = false;
+    let dialogueOpen = false;
+    let enemyKillCount = 0;
+    let greenMissionRunKills = 0;
+    let greenMissionNeedsNpcTurnIn = false;
+    let grayQuestChoice = null;
+    let grayBossKills = 0;
+    let graySwarmKills = 0;
+    let grayMissionNeedsNpcTurnIn = false;
+    const GRAY_SWARM_TARGET = 6;
+    const grayQuestInteractRadius = 5.2;
+
+    const keys = new Set();
+    let vy = 0;
+    const gravity = -46;
+    const jumpSpeed = 15;
+    const groundY = 0;
+
+    window.addEventListener('keydown', (e) => {
+      if (playerDead) return;
+      if (['KeyW', 'KeyA', 'KeyS', 'KeyD'].includes(e.code)) {
+        keys.add(e.code);
+        e.preventDefault();
+        return;
+      }
+      if (e.code === 'Space') {
+        e.preventDefault();
+        if (e.repeat) return;
+        const grounded = player.position.y <= groundY + 0.02 && vy <= 0.5;
+        if (grounded) vy = jumpSpeed;
+      }
+    });
+    window.addEventListener('keyup', (e) => keys.delete(e.code));
+    window.addEventListener('blur', () => keys.clear());
+
+    const hotbarSlot = document.getElementById('hotbar-slot');
+
+    const lifeCurrentEl = document.getElementById('life-current');
+    const lifeMaxEl = document.getElementById('life-max');
+    const lifeFillEl = document.getElementById('life-fill');
+    const moneyCurrentEl = document.getElementById('money-current');
+    const levelCurrentEl = document.getElementById('level-current');
+    const levelXpCurrentEl = document.getElementById('level-xp-current');
+    const levelXpNeedEl = document.getElementById('level-xp-need');
+    const levelFillEl = document.getElementById('level-fill');
+    const rubberFruitPrice = 5000;
+
+    const LEVEL_XP_BASE = 100;
+    const LEVEL_XP_FACTOR = 2.5;
+
+    function xpRequiredToReachNextLevel(currentLevel) {
+      return Math.max(1, Math.round(LEVEL_XP_BASE * LEVEL_XP_FACTOR ** (currentLevel - 1)));
+    }
+
+    let playerLevel = 1;
+    let playerXpTowardNext = 0;
+
+    const PLAYER_BASE_MAX_HP = 100;
+    const PLAYER_MAX_HP_PER_LEVEL = 20;
+    const FRUIT_ATTACK_LEVEL_MULT = 1.5;
+
+    function computePlayerMaxHp(level) {
+      return PLAYER_BASE_MAX_HP + PLAYER_MAX_HP_PER_LEVEL * (level - 1);
+    }
+
+    /** Level 1 = ×1; each further level stacks ×1.5 (L2 ×1.5, L3 ×2.25, L4 ×3.375, …). */
+    function getFruitDamageMultiplier() {
+      let m = 1;
+      for (let lv = 2; lv <= playerLevel; lv++) m *= FRUIT_ATTACK_LEVEL_MULT;
+      return m;
+    }
+
+    /** Integer round only when the rounded value ends in 0 or 5; otherwise keep exact damage. */
+    function fruitScaledDamage(raw) {
+      const r = Math.round(raw);
+      const ones = Math.abs(r) % 10;
+      if (ones === 0 || ones === 5) return r;
+      return raw;
+    }
+
+    function updateLevelHud() {
+      const need = xpRequiredToReachNextLevel(playerLevel);
+      if (levelCurrentEl) levelCurrentEl.textContent = String(playerLevel);
+      if (levelXpCurrentEl) levelXpCurrentEl.textContent = String(Math.floor(playerXpTowardNext));
+      if (levelXpNeedEl) levelXpNeedEl.textContent = String(need);
+      if (levelFillEl) levelFillEl.style.width = `${Math.min(100, (playerXpTowardNext / need) * 100)}%`;
+    }
+
+    let playerMaxHp = computePlayerMaxHp(playerLevel);
+    let playerCurrentHp = playerMaxHp;
+    let playerDamageInvuln = 0;
+    let playerMoney = 5000;
+    let playerDead = false;
+    let playerNoDamageT = 0;
+    const playerRegenDelay = 3;
+    const playerRegenPerSec = 8;
+    const playerRespawnDelay = 3;
+    let playerRespawnT = 0;
+    const playerDeathPieces = [];
+
+    function setLife(current, max = playerMaxHp) {
+      const m = Math.max(1, max);
+      const c = Math.max(0, Math.min(m, current));
+      lifeCurrentEl.textContent = String(Math.round(c));
+      lifeMaxEl.textContent = String(Math.round(m));
+      lifeFillEl.style.width = `${(c / m) * 100}%`;
+    }
+
+    function addPlayerXp(amount) {
+      let n = Math.max(0, Math.floor(amount));
+      if (n <= 0) return;
+      playerXpTowardNext += n;
+      let cap = xpRequiredToReachNextLevel(playerLevel);
+      while (playerXpTowardNext >= cap) {
+        playerXpTowardNext -= cap;
+        playerLevel += 1;
+        const nextMax = computePlayerMaxHp(playerLevel);
+        const gained = nextMax - playerMaxHp;
+        playerMaxHp = nextMax;
+        playerCurrentHp = Math.min(playerMaxHp, playerCurrentHp + gained);
+        cap = xpRequiredToReachNextLevel(playerLevel);
+      }
+      updateLevelHud();
+      setLife(playerCurrentHp, playerMaxHp);
+    }
+
+    function setMoney(value) {
+      playerMoney = Math.max(0, Math.floor(value));
+      if (moneyCurrentEl) moneyCurrentEl.textContent = String(playerMoney);
+    }
+
+    function triggerPlayerDeath() {
+      if (playerDead) return;
+      playerDead = true;
+      playerRespawnT = playerRespawnDelay;
+      playerInBoat = false;
+      keys.clear();
+      resetPunchPose();
+      punchAnimT = 0;
+      punchCooldown = 0;
+      heavyPunchCooldown = 0;
+      player.visible = false;
+
+      const wPos = new THREE.Vector3();
+      const wQuat = new THREE.Quaternion();
+      const wScale = new THREE.Vector3();
+      for (const part of playerParts) {
+        part.getWorldPosition(wPos);
+        part.getWorldQuaternion(wQuat);
+        part.getWorldScale(wScale);
+        const chunk = new THREE.Mesh(part.geometry, part.material.clone());
+        chunk.position.copy(wPos);
+        chunk.quaternion.copy(wQuat);
+        chunk.scale.copy(wScale);
+        chunk.castShadow = true;
+        scene.add(chunk);
+        playerDeathPieces.push({
+          mesh: chunk,
+          vx: (Math.random() - 0.5) * 7.5,
+          vy: 4.8 + Math.random() * 5.2,
+          vz: (Math.random() - 0.5) * 7.5,
+          rx: (Math.random() - 0.5) * 6.5,
+          ry: (Math.random() - 0.5) * 6.5,
+          rz: (Math.random() - 0.5) * 6.5,
+        });
+      }
+    }
+
+    function respawnPlayer() {
+      for (const p of playerDeathPieces) {
+        scene.remove(p.mesh);
+      }
+      playerDeathPieces.length = 0;
+      playerDead = false;
+      playerNoDamageT = 0;
+      playerDamageInvuln = 1.1;
+      playerCurrentHp = playerMaxHp;
+      setLife(playerCurrentHp, playerMaxHp);
+      player.position.set(0, groundY, 0);
+      player.rotation.y = 0;
+      player.visible = true;
+      vy = 0;
+      syncCamTarget();
+    }
+
+    function damagePlayer(amount) {
+      if (playerDead) return;
+      if (playerDamageInvuln > 0) return;
+      playerCurrentHp = Math.max(0, playerCurrentHp - amount);
+      playerNoDamageT = 0;
+      setLife(playerCurrentHp, playerMaxHp);
+      if (playerCurrentHp > 0) playerDamageInvuln = 0.55;
+      else triggerPlayerDeath();
+    }
+
+    setLife(playerCurrentHp, playerMaxHp);
+    setMoney(playerMoney);
+    updateLevelHud();
+
+    const shopLayer = document.getElementById('shop-layer');
+    const shopBackdrop = document.getElementById('shop-backdrop');
+    const shopCloseBtn = document.getElementById('shop-close');
+    const shopHint = document.getElementById('shop-hint');
+    const buyRubberBtn = document.getElementById('buy-rubber');
+    const shopRowRubber = document.getElementById('shop-row-rubber');
+    const fruitHud = document.getElementById('fruit-hud');
+    const missionHudEl = document.getElementById('mission-hud');
+    const missionFruitEl = document.getElementById('mission-fruit');
+    const missionKillsEl = document.getElementById('mission-kills');
+    const missionBoatEl = document.getElementById('mission-boat');
+    const dialogueLayer = document.getElementById('dialogue-layer');
+    const dialogueBody = document.getElementById('dialogue-body');
+    const dialogueNameEl = document.getElementById('dialogue-name');
+    const dialogueCloseBtn = document.getElementById('dialogue-close');
+    const dialogueBackdrop = document.getElementById('dialogue-backdrop');
+    const grayIslandDialogueLayer = document.getElementById('gray-island-dialogue-layer');
+    const grayIslandDialogueBody = document.getElementById('gray-island-dialogue-body');
+    const grayIslandDialogueNameEl = document.getElementById('gray-island-dialogue-name');
+    const grayIslandDialogueCloseBtn = document.getElementById('gray-island-dialogue-close');
+    const grayIslandDialogueBackdrop = document.getElementById('gray-island-dialogue-backdrop');
+    const guideHint = document.getElementById('guide-hint');
+    const boatHint = document.getElementById('boat-hint');
+    const boatEnterHint = document.getElementById('boat-enter-hint');
+    const missionGrayEl = document.getElementById('mission-gray');
+    const grayQuestHint = document.getElementById('gray-quest-hint');
+    const grayIslandTrialChoicesEl = document.getElementById('gray-island-trial-choices');
+    const dialogueChoiceBossBtn = document.getElementById('dialogue-choice-boss');
+    const dialogueChoiceEnemiesBtn = document.getElementById('dialogue-choice-enemies');
+    const GUIDE_DIALOGUE_HTML = 'Listen carefully — <strong>three bandits</strong> are causing trouble on this island. You cannot fight them <strong>bare-handed</strong>: you need a <strong>fruit power</strong>.<br><br>Go to the <strong>market</strong> (over that way) and take the <strong>Rubber fruit</strong> from the dealer — it is <strong>free</strong>.<br><br>I am giving you <strong>two missions</strong>: <strong>buy that fruit</strong>, then <strong>defeat all three bandits</strong>. Check your list at the top-right. Good luck!';
+
+    const GUIDE_POST_MISSIONS_HTML = 'You did it — fruit in hand and all three <strong>bandits</strong> dealt with. Impressive work!<br><br>Your next step is the <strong>boat seller</strong>. Head to the <strong>dock on the west shore</strong> — he wears a <strong>navy shirt</strong>. He will set you up with passage off this island. Good sailing!';
+
+    const BOAT_SELLER_DIALOGUE_HTML = 'Ahoy! You must be the one the guide sent. I handle <strong>boats and passage</strong> here at the dock.';
+    const GRAY_ISLAND_BOAT_SELLER_INTRO = 'Out here I only handle one thing: <strong>boats</strong>.';
+    const BOAT_PRICE = 0;
+
+    let hasRubberFruit = false;
+    let hasBoat = false;
+    let playerInBoat = false;
+
+    const normalPunchDamage = 10;
+    const heavyPunchDamage = 20;
+    const normalPunchRange = 2.55;
+    const heavyPunchRange = 4.15;
+    const punchReachNormal = 1.35;
+    const punchReachHeavy = 1.95;
+    const heavyPunchCooldownMax = 3.5;
+
+    let pendingPunchDamage = normalPunchDamage;
+    let pendingPunchMaxDist = normalPunchRange;
+    let activePunchReach = punchReachNormal;
+    let heavyPunchCooldown = 0;
+
+    function tryPlayerRubberHits() {
+      if (!hasRubberFruit) return;
+      const ry = player.rotation.y;
+      const fwx = Math.sin(ry);
+      const fwz = Math.cos(ry);
+      const px = player.position.x;
+      const pz = player.position.z;
+      for (const e of enemies) {
+        if (!e.alive || e.grayQuestFrozen) continue;
+        const ex = e.mesh.position.x;
+        const ez = e.mesh.position.z;
+        const dx = ex - px;
+        const dz = ez - pz;
+        const dist = Math.sqrt(dx * dx + dz * dz);
+        if (dist > pendingPunchMaxDist || dist < 0.2) continue;
+        const ndx = dx / dist;
+        const ndz = dz / dist;
+        if (fwx * ndx + fwz * ndz < 0.2) continue;
+        const fruitDmg = fruitScaledDamage(pendingPunchDamage * getFruitDamageMultiplier());
+        e.hp -= fruitDmg;
+        updateEnemyHpBar(e);
+        if (e.hp <= 0) {
+          if (e.countsForMission !== false) {
+            enemyKillCount += 1;
+            if (!greenMissionNeedsNpcTurnIn && greenMissionRunKills < MISSION_KILLS_TARGET) {
+              greenMissionRunKills += 1;
+              if (greenMissionRunKills >= MISSION_KILLS_TARGET) greenMissionNeedsNpcTurnIn = true;
+            }
+          }
+          if (e.grayQuestRole === 'boss' && grayQuestChoice === 'boss') {
+            grayBossKills = 1;
+            grayMissionNeedsNpcTurnIn = true;
+          }
+          if (e.grayQuestRole === 'swarm' && grayQuestChoice === 'enemies' && !grayMissionNeedsNpcTurnIn) {
+            if (graySwarmKills < GRAY_SWARM_TARGET) {
+              graySwarmKills += 1;
+              if (graySwarmKills >= GRAY_SWARM_TARGET) grayMissionNeedsNpcTurnIn = true;
+            }
+          }
+          e.alive = false;
+          e.mesh.visible = false;
+          e.respawnT = e.noRespawn ? 999 : 5;
+          e.punchT = 0;
+          e.attackCD = 0;
+          resetEnemyPunchPose(e);
+          updateMissionsHUD();
+        }
+      }
+    }
+
+    let missionsHudUnlocked = false;
+    let boatSellerMet = false;
+    let activeDialogueKind = null;
+    let guideTutorialConversationsFinished = 0;
+
+    function coreMissionsComplete() {
+      return hasRubberFruit && enemyKillCount >= MISSION_KILLS_TARGET;
+    }
+
+    function updateMissionsHUD() {
+      if (!missionFruitEl || !missionKillsEl) return;
+      if (hasRubberFruit) {
+        missionFruitEl.textContent = '✓ Buy a fruit at the market';
+        missionFruitEl.classList.add('mission-done');
+      } else {
+        missionFruitEl.textContent = '○ Buy a fruit at the market';
+        missionFruitEl.classList.remove('mission-done');
+      }
+      if (greenMissionNeedsNpcTurnIn) {
+        missionKillsEl.textContent = '○ See the guide — bandits cleared';
+        missionKillsEl.classList.add('mission-done');
+      } else {
+        missionKillsEl.textContent = `○ Defeat 3 bandits (${greenMissionRunKills}/3)`;
+        missionKillsEl.classList.remove('mission-done');
+      }
+      if (missionBoatEl) {
+        missionBoatEl.hidden = false;
+        if (boatSellerMet) {
+          missionBoatEl.textContent = '✓ Speak with the boat seller';
+          missionBoatEl.classList.add('mission-done');
+        } else {
+          missionBoatEl.textContent = '○ Speak with the boat seller (west dock)';
+          missionBoatEl.classList.remove('mission-done');
+        }
+      }
+      if (missionGrayEl) {
+        if (!grayQuestChoice) {
+          missionGrayEl.hidden = true;
+        } else {
+          missionGrayEl.hidden = false;
+          if (grayMissionNeedsNpcTurnIn) {
+            missionGrayEl.textContent = '○ See gray island NPC — trial complete';
+            missionGrayEl.classList.add('mission-done');
+          } else if (grayQuestChoice === 'boss') {
+            const done = grayBossKills >= 1;
+            missionGrayEl.textContent = done
+              ? '✓ Defeat the pirate captain (1/1)'
+              : `○ Defeat the pirate captain (${grayBossKills}/1)`;
+            missionGrayEl.classList.toggle('mission-done', done);
+          } else {
+            missionGrayEl.textContent = `○ Defeat six pirates (${graySwarmKills}/${GRAY_SWARM_TARGET})`;
+            missionGrayEl.classList.remove('mission-done');
+          }
+        }
+      }
+    }
+
+    function applyGrayQuestChoice(choice) {
+      grayQuestChoice = choice;
+      grayGuideExclaimMark.visible = false;
+      for (const e of enemies) {
+        if (e.grayQuestRole === 'boss') {
+          e.grayQuestFrozen = false;
+        } else if (e.grayQuestRole === 'swarm') {
+          if (choice === 'boss') {
+            e.alive = false;
+            e.mesh.visible = false;
+            e.grayQuestFrozen = false;
+            e.noRespawn = true;
+          } else {
+            e.grayQuestFrozen = false;
+            e.noRespawn = false;
+          }
+        }
+      }
+      updateMissionsHUD();
+    }
+
+    function closeGrayIslandDialogueLayerOnly() {
+      if (grayIslandTrialChoicesEl) grayIslandTrialChoicesEl.hidden = true;
+      if (grayIslandDialogueCloseBtn) grayIslandDialogueCloseBtn.hidden = false;
+      if (grayIslandDialogueLayer) {
+        grayIslandDialogueLayer.classList.remove('dialogue-layer--open');
+        grayIslandDialogueLayer.setAttribute('aria-hidden', 'true');
+      }
+    }
+
+    function openGrayQuestDialogue() {
+      if (dialogueLayer) {
+        dialogueLayer.classList.remove('dialogue-layer--open');
+        dialogueLayer.setAttribute('aria-hidden', 'true');
+      }
+      if (grayIslandTrialChoicesEl) grayIslandTrialChoicesEl.hidden = true;
+      if (grayIslandDialogueCloseBtn) grayIslandDialogueCloseBtn.hidden = false;
+      dialogueOpen = true;
+      activeDialogueKind = 'gray_quest';
+      if (grayIslandDialogueNameEl) grayIslandDialogueNameEl.textContent = 'Gray island NPC';
+      if (grayIslandDialogueBody) {
+        if (grayMissionNeedsNpcTurnIn && grayQuestChoice) {
+          addPlayerXp(GRAY_ISLAND_PIRATES_MISSION_XP);
+          grayMissionNeedsNpcTurnIn = false;
+          if (grayQuestChoice === 'boss') {
+            grayBossKills = 0;
+            for (const en of enemies) {
+              if (en.grayQuestRole === 'boss') revivePirateCaptain(en);
+            }
+          } else {
+            graySwarmKills = 0;
+          }
+          grayIslandDialogueBody.innerHTML =
+            'Trial finished — here is <strong>1200 XP</strong>. Your pact is open again: finish the same trial, then come back to me for the reward.';
+          if (grayIslandTrialChoicesEl) grayIslandTrialChoicesEl.hidden = true;
+          if (grayIslandDialogueCloseBtn) grayIslandDialogueCloseBtn.hidden = false;
+        } else if (!grayQuestChoice) {
+          grayIslandDialogueBody.innerHTML =
+            'Trials on the <strong>gray island</strong> — choose <strong>one</strong>:<br><br><strong>Pirate captain</strong> to the <strong>west</strong>.<br><strong>Pirates</strong>: <strong>six</strong> kills counted; <strong>four</strong> pirates on the <strong>east ring</strong> (they <strong>respawn</strong>).';
+          if (grayIslandTrialChoicesEl) grayIslandTrialChoicesEl.hidden = false;
+          if (grayIslandDialogueCloseBtn) grayIslandDialogueCloseBtn.hidden = true;
+        } else if (grayQuestChoice === 'boss') {
+          if (grayBossKills >= 1) {
+            grayIslandDialogueBody.innerHTML = 'The <strong>pirate captain</strong> is defeated.';
+          } else {
+            grayIslandDialogueBody.innerHTML = 'Your trial: the <strong>pirate captain</strong> to the <strong>west</strong>.';
+          }
+          if (grayIslandTrialChoicesEl) grayIslandTrialChoicesEl.hidden = true;
+          if (grayIslandDialogueCloseBtn) grayIslandDialogueCloseBtn.hidden = false;
+        } else {
+          if (graySwarmKills >= GRAY_SWARM_TARGET) {
+            grayIslandDialogueBody.innerHTML = `All <strong>${GRAY_SWARM_TARGET}</strong> pirate kills done. <strong>Four</strong> pirates still <strong>respawn</strong> on the east ring if you want practice.`;
+          } else {
+            const left = GRAY_SWARM_TARGET - graySwarmKills;
+            grayIslandDialogueBody.innerHTML = `<strong>${left}</strong> more pirate kills toward <strong>${GRAY_SWARM_TARGET}</strong>. <strong>Four</strong> on the east ring — they <strong>respawn</strong>.`;
+          }
+          if (grayIslandTrialChoicesEl) grayIslandTrialChoicesEl.hidden = true;
+          if (grayIslandDialogueCloseBtn) grayIslandDialogueCloseBtn.hidden = false;
+        }
+      }
+      if (grayIslandDialogueLayer) {
+        grayIslandDialogueLayer.classList.add('dialogue-layer--open');
+        grayIslandDialogueLayer.setAttribute('aria-hidden', 'false');
+      }
+      if (!missionsHudUnlocked && missionHudEl) {
+        missionsHudUnlocked = true;
+        missionHudEl.classList.remove('mission-hud--hidden');
+        missionHudEl.setAttribute('aria-hidden', 'false');
+      }
+      updateMissionsHUD();
+    }
+
+    function openGuideDialogue() {
+      closeGrayIslandDialogueLayerOnly();
+      if (dialogueCloseBtn) dialogueCloseBtn.hidden = false;
+      dialogueOpen = true;
+      activeDialogueKind = 'guide';
+      if (dialogueNameEl) dialogueNameEl.textContent = 'Island guide';
+      if (greenMissionNeedsNpcTurnIn) {
+        addPlayerXp(GREEN_ISLAND_DEFEAT_THREE_ENEMIES_XP);
+        greenMissionNeedsNpcTurnIn = false;
+        greenMissionRunKills = 0;
+        dialogueBody.innerHTML =
+          'You cleared all <strong>three bandits</strong>. Here is <strong>300 XP</strong>.<br><br>Want to run it again? Defeat three more, then come back when you are done.';
+      } else {
+        dialogueBody.innerHTML = coreMissionsComplete() ? GUIDE_POST_MISSIONS_HTML : GUIDE_DIALOGUE_HTML;
+      }
+      dialogueLayer.classList.add('dialogue-layer--open');
+      dialogueLayer.setAttribute('aria-hidden', 'false');
+      if (!missionsHudUnlocked && missionHudEl) {
+        missionsHudUnlocked = true;
+        missionHudEl.classList.remove('mission-hud--hidden');
+        missionHudEl.setAttribute('aria-hidden', 'false');
+      }
+      updateMissionsHUD();
+    }
+
+    function openBoatSellerDialogue() {
+      closeGrayIslandDialogueLayerOnly();
+      if (dialogueCloseBtn) dialogueCloseBtn.hidden = false;
+      dialogueOpen = true;
+      activeDialogueKind = 'boat';
+      if (dialogueNameEl) dialogueNameEl.textContent = 'Boat seller';
+      if (hasBoat) {
+        dialogueBody.innerHTML = `${BOAT_SELLER_DIALOGUE_HTML}<br><br>Your boat is already ready at the dock.`;
+      } else if (playerMoney >= BOAT_PRICE) {
+        if (BOAT_PRICE > 0) setMoney(playerMoney - BOAT_PRICE);
+        hasBoat = true;
+        playerBoat.visible = true;
+        playerBoat.position.copy(boatDockSpawn);
+        playerBoat.rotation.y = Math.PI * 0.2;
+        dialogueBody.innerHTML = `${BOAT_SELLER_DIALOGUE_HTML}<br><br>Your boat is <strong>free</strong> — it is waiting at the dock.`;
+      } else {
+        dialogueBody.innerHTML = `${BOAT_SELLER_DIALOGUE_HTML}<br><br>You need <strong>$${BOAT_PRICE}</strong> to buy a boat.`;
+      }
+      dialogueLayer.classList.add('dialogue-layer--open');
+      dialogueLayer.setAttribute('aria-hidden', 'false');
+      if (!boatSellerMet) {
+        boatSellerMet = true;
+        updateMissionsHUD();
+      }
+    }
+
+    function openGrayIslandBoatSellerDialogue() {
+      closeGrayIslandDialogueLayerOnly();
+      if (dialogueCloseBtn) dialogueCloseBtn.hidden = false;
+      dialogueOpen = true;
+      activeDialogueKind = 'boat_gray';
+      if (dialogueNameEl) dialogueNameEl.textContent = 'Boat seller';
+      if (hasBoat) {
+        dialogueBody.innerHTML = `${GRAY_ISLAND_BOAT_SELLER_INTRO}<br><br>You already own a boat — I do not have anything else to sell.`;
+      } else if (playerMoney >= BOAT_PRICE) {
+        if (BOAT_PRICE > 0) setMoney(playerMoney - BOAT_PRICE);
+        hasBoat = true;
+        playerBoat.visible = true;
+        playerBoat.position.copy(grayIslandBoatDockSpawn);
+        playerBoat.rotation.y = Math.PI * 0.2;
+        dialogueBody.innerHTML = `${GRAY_ISLAND_BOAT_SELLER_INTRO}<br><br>Here — <strong>no charge</strong>. It is right here by the coast — take it.`;
+      } else {
+        dialogueBody.innerHTML = `${GRAY_ISLAND_BOAT_SELLER_INTRO}<br><br>A boat costs <strong>$${BOAT_PRICE}</strong>. Come back when you have the cash.`;
+      }
+      dialogueLayer.classList.add('dialogue-layer--open');
+      dialogueLayer.setAttribute('aria-hidden', 'false');
+    }
+
+    function closeGuideDialogue() {
+      if (!dialogueOpen) return;
+      if (activeDialogueKind === 'guide') {
+        guideTutorialConversationsFinished += 1;
+        if (guideTutorialConversationsFinished >= 2) guideExclaimMark.visible = false;
+      }
+      activeDialogueKind = null;
+      dialogueOpen = false;
+      closeGrayIslandDialogueLayerOnly();
+      if (dialogueCloseBtn) dialogueCloseBtn.hidden = false;
+      dialogueLayer.classList.remove('dialogue-layer--open');
+      dialogueLayer.setAttribute('aria-hidden', 'true');
+    }
+
+    dialogueBackdrop.addEventListener('click', closeGuideDialogue);
+    dialogueCloseBtn.addEventListener('click', closeGuideDialogue);
+    if (grayIslandDialogueBackdrop) grayIslandDialogueBackdrop.addEventListener('click', closeGuideDialogue);
+    if (grayIslandDialogueCloseBtn) grayIslandDialogueCloseBtn.addEventListener('click', closeGuideDialogue);
+    if (dialogueChoiceBossBtn) {
+      dialogueChoiceBossBtn.addEventListener('click', () => {
+        if (
+          activeDialogueKind !== 'gray_quest' ||
+          grayQuestChoice ||
+          !grayIslandTrialChoicesEl ||
+          grayIslandTrialChoicesEl.hidden
+        ) {
+          return;
+        }
+        applyGrayQuestChoice('boss');
+        closeGuideDialogue();
+      });
+    }
+    if (dialogueChoiceEnemiesBtn) {
+      dialogueChoiceEnemiesBtn.addEventListener('click', () => {
+        if (
+          activeDialogueKind !== 'gray_quest' ||
+          grayQuestChoice ||
+          !grayIslandTrialChoicesEl ||
+          grayIslandTrialChoicesEl.hidden
+        ) {
+          return;
+        }
+        applyGrayQuestChoice('enemies');
+        closeGuideDialogue();
+      });
+    }
+
+    const playerEnemyMinDist = playerRadius + enemyRadius - 0.03;
+    const enemyEnemyMinDist = enemyRadius * 2 - 0.03;
+
+    function resolvePlayerEnemyCollisions() {
+      for (const e of enemies) {
+        if (!e.alive || e.grayQuestFrozen) continue;
+        const ex = e.mesh.position.x;
+        const ez = e.mesh.position.z;
+        const dx = player.position.x - ex;
+        const dz = player.position.z - ez;
+        const distSq = dx * dx + dz * dz;
+        const mdSq = playerEnemyMinDist * playerEnemyMinDist;
+        if (distSq >= mdSq || distSq < 1e-10) continue;
+        const dist = Math.sqrt(distSq);
+        const nx = dx / dist;
+        const nz = dz / dist;
+        const half = (playerEnemyMinDist - dist) * 0.5;
+        player.position.x += nx * half;
+        player.position.z += nz * half;
+        e.mesh.position.x -= nx * half;
+        e.mesh.position.z -= nz * half;
+      }
+    }
+
+    function resolvePlayerGuideCollision() {
+      const minD = playerRadius + 0.48;
+      const ex = guideNpc.position.x;
+      const ez = guideNpc.position.z;
+      const dx = player.position.x - ex;
+      const dz = player.position.z - ez;
+      const distSq = dx * dx + dz * dz;
+      const mdSq = minD * minD;
+      if (distSq >= mdSq || distSq < 1e-10) return;
+      const dist = Math.sqrt(distSq);
+      const nx = dx / dist;
+      const nz = dz / dist;
+      const push = minD - dist;
+      player.position.x += nx * push;
+      player.position.z += nz * push;
+    }
+
+    function resolvePlayerNpcCylinderCollision(npc) {
+      const minD = playerRadius + 0.48;
+      const ex = npc.position.x;
+      const ez = npc.position.z;
+      const dx = player.position.x - ex;
+      const dz = player.position.z - ez;
+      const distSq = dx * dx + dz * dz;
+      const mdSq = minD * minD;
+      if (distSq >= mdSq || distSq < 1e-10) return;
+      const dist = Math.sqrt(distSq);
+      const nx = dx / dist;
+      const nz = dz / dist;
+      const push = minD - dist;
+      player.position.x += nx * push;
+      player.position.z += nz * push;
+    }
+
+    function resolvePlayerBoatSellerCollision() {
+      resolvePlayerNpcCylinderCollision(boatSellerNpc);
+      resolvePlayerNpcCylinderCollision(grayIslandBoatSellerNpc);
+      resolvePlayerNpcCylinderCollision(grayIslandCenterMissionNpc);
+    }
+
+    function resolveEnemyEnemyCollisions() {
+      for (let i = 0; i < enemies.length; i++) {
+        const a = enemies[i];
+        if (!a.alive || a.grayQuestFrozen) continue;
+        for (let j = i + 1; j < enemies.length; j++) {
+          const b = enemies[j];
+          if (!b.alive || b.grayQuestFrozen) continue;
+          const dx = b.mesh.position.x - a.mesh.position.x;
+          const dz = b.mesh.position.z - a.mesh.position.z;
+          const distSq = dx * dx + dz * dz;
+          const mdSq = enemyEnemyMinDist * enemyEnemyMinDist;
+          if (distSq >= mdSq || distSq < 1e-10) continue;
+          const dist = Math.sqrt(distSq);
+          const nx = dx / dist;
+          const nz = dz / dist;
+          const half = (enemyEnemyMinDist - dist) * 0.5;
+          a.mesh.position.x -= nx * half;
+          a.mesh.position.z -= nz * half;
+          b.mesh.position.x += nx * half;
+          b.mesh.position.z += nz * half;
+        }
+      }
+    }
+
+    function updateEnemies(dt) {
+      for (const e of enemies) {
+        if (!e.alive) {
+          if (e.noRespawn) continue;
+          e.respawnT -= dt;
+          if (e.respawnT <= 0) respawnEnemy(e);
+          continue;
+        }
+
+        if (e.grayQuestFrozen) continue;
+
+        if (e.attackCD > 0) e.attackCD -= dt;
+
+        if (e.punchT > 0) {
+          e.punchT += dt;
+          const t = e.punchT;
+          if (t >= enemyPunchTotal) {
+            e.punchT = 0;
+            resetEnemyPunchPose(e);
+            e.attackCD = enemyAttackCooldown;
+          } else if (t < ePunchP1) {
+            const u = t / ePunchP1;
+            e.armRRig.rotation.x = (-Math.PI / 2) * u;
+            e.armRRig.position.copy(e.armRRigBasePos);
+          } else if (t < ePunchP1 + ePunchP2) {
+            const u = (t - ePunchP1) / ePunchP2;
+            e.armRRig.rotation.x = -Math.PI / 2;
+            e.armRRig.position.z = e.armRRigBasePos.z + enemyPunchReach * u;
+          } else if (t < ePunchP1 + ePunchP2 + ePunchP3) {
+            e.armRRig.rotation.x = -Math.PI / 2;
+            e.armRRig.position.z = e.armRRigBasePos.z + enemyPunchReach;
+            if (!e.punchDidDamage) {
+              e.punchDidDamage = true;
+              const dx = player.position.x - e.mesh.position.x;
+              const dz = player.position.z - e.mesh.position.z;
+              const dist = Math.sqrt(dx * dx + dz * dz);
+              const hr = e.hitRange != null ? e.hitRange : enemyHitRange;
+              const pd = e.punchDamage != null ? e.punchDamage : enemyPunchDamage;
+              if (dist <= hr) damagePlayer(pd);
+            }
+          } else if (t < ePunchP1 + ePunchP2 + ePunchP3 + ePunchP4) {
+            const u = (t - ePunchP1 - ePunchP2 - ePunchP3) / ePunchP4;
+            e.armRRig.rotation.x = -Math.PI / 2;
+            e.armRRig.position.z = e.armRRigBasePos.z + enemyPunchReach * (1 - u);
+          } else {
+            const u = (t - ePunchP1 - ePunchP2 - ePunchP3 - ePunchP4) / ePunchP5;
+            e.armRRig.rotation.x = (-Math.PI / 2) * (1 - u);
+            e.armRRig.position.copy(e.armRRigBasePos);
+          }
+          continue;
+        }
+
+        const ex = e.mesh.position.x;
+        const ez = e.mesh.position.z;
+        const dx = player.position.x - ex;
+        const dz = player.position.z - ez;
+        const dist = Math.sqrt(dx * dx + dz * dz);
+
+        const canSeePlayer = dist <= enemyVisionRange;
+
+        const ar = e.attackRange != null ? e.attackRange : enemyAttackRange;
+        if (canSeePlayer && dist <= ar && e.attackCD <= 0 && dist > 0.2) {
+          e.punchT = 1e-6;
+          e.punchDidDamage = false;
+          e.mesh.rotation.y = Math.atan2(dx, dz);
+          continue;
+        }
+
+        if (canSeePlayer && dist > 0.12) {
+          const sp = (enemyMoveSpeed * dt) / dist;
+          e.mesh.position.x += dx * sp;
+          e.mesh.position.z += dz * sp;
+          e.mesh.rotation.y = Math.atan2(dx, dz);
+        }
+
+        const er = e.collisionR != null ? e.collisionR : enemyRadius;
+        resolveStallCollisionXZFor(e.mesh.position, er);
+        clampEntityToNearestIsland(e.mesh.position);
+      }
+
+      resolveEnemyEnemyCollisions();
+      for (const e of enemies) {
+        if (!e.alive) continue;
+        const er = e.collisionR != null ? e.collisionR : enemyRadius;
+        resolveStallCollisionXZFor(e.mesh.position, er);
+        clampEntityToNearestIsland(e.mesh.position);
+      }
+    }
+
+    function syncAttackListVisible() {
+      const slotOn = hotbarSlot.classList.contains('hotbar-slot--halo');
+      const show = hasRubberFruit && slotOn;
+      fruitHud.classList.toggle('fruit-hud--visible', show);
+      fruitHud.setAttribute('aria-hidden', show ? 'false' : 'true');
+    }
+
+    window.addEventListener('keydown', (e) => {
+      if (e.code !== 'Digit1' && e.code !== 'Numpad1') return;
+      e.preventDefault();
+      if (e.repeat) return;
+      hotbarSlot.classList.toggle('hotbar-slot--halo');
+      syncAttackListVisible();
+    });
+    let punchAnimT = 0;
+    const punchP1 = 0.12;
+    const punchP2 = 0.11;
+    const punchP3 = 0.05;
+    const punchP4 = 0.1;
+    const punchP5 = 0.14;
+    const punchTotal = punchP1 + punchP2 + punchP3 + punchP4 + punchP5;
+    const punchArmAngle = Math.PI / 2;
+    let punchCooldown = 0;
+    let punchHitThisSwing = false;
+    const boatEnterRadius = 5.2;
+    const boatCollisionRadius = 1.45;
+    const boatMoveSpeed = 10.5;
+    const boatStrafeSpeed = 6.2;
+    const boatTurnSpeed = 2.25;
+    const boatWakeLifeMax = 0.75;
+    let boatWakeEmitAcc = 0;
+
+    const heavyPunchCdEl = document.getElementById('heavy-punch-cd');
+
+    function tryStartPunch(isHeavy) {
+      if (playerDead) return false;
+      if (playerInBoat) return false;
+      if (shopOpen || dialogueOpen || !hasRubberFruit) return false;
+      if (punchAnimT > 0 || punchCooldown > 0) return false;
+      if (isHeavy && heavyPunchCooldown > 0) return false;
+      pendingPunchDamage = isHeavy ? heavyPunchDamage : normalPunchDamage;
+      pendingPunchMaxDist = isHeavy ? heavyPunchRange : normalPunchRange;
+      activePunchReach = isHeavy ? punchReachHeavy : punchReachNormal;
+      punchHitThisSwing = false;
+      punchAnimT = 1e-6;
+      if (isHeavy) heavyPunchCooldown = heavyPunchCooldownMax;
+      return true;
+    }
+
+    function punchSmooth(u) {
+      const x = Math.min(1, Math.max(0, u));
+      return x * x * (3 - 2 * x);
+    }
+
+    function resetPunchPose() {
+      playerArmRRig.rotation.set(0, 0, 0);
+      playerArmRRig.position.copy(playerArmRRigBasePos);
+      playerArmR.position.set(0, -0.44, 0);
+    }
+
+    function mountBoat() {
+      if (!hasBoat || !playerBoat.visible) return;
+      playerInBoat = true;
+      const bx = Math.sin(playerBoat.rotation.y);
+      const bz = Math.cos(playerBoat.rotation.y);
+      player.position.set(playerBoat.position.x - bx * 0.25, playerBoat.position.y + 0.25, playerBoat.position.z - bz * 0.25);
+      player.rotation.y = playerBoat.rotation.y;
+      vy = 0;
+      resetPunchPose();
+      punchAnimT = 0;
+    }
+
+    function dismountBoat() {
+      if (!playerInBoat) return;
+      playerInBoat = false;
+      const sideX = Math.cos(playerBoat.rotation.y) * 1.2;
+      const sideZ = -Math.sin(playerBoat.rotation.y) * 1.2;
+      player.position.set(playerBoat.position.x + sideX, groundY, playerBoat.position.z + sideZ);
+      clampPlayerToLandBounds();
+    }
+
+    function spawnBoatWakeParticle(px, pz, bvx, bvz) {
+      for (const p of boatWakeParticles) {
+        if (p.life > 0) continue;
+        p.life = boatWakeLifeMax;
+        p.mesh.visible = true;
+        p.mesh.position.set(px + (Math.random() - 0.5) * 0.45, -0.01, pz + (Math.random() - 0.5) * 0.45);
+        p.mesh.scale.setScalar(0.8 + Math.random() * 0.6);
+        p.mesh.material.opacity = 0.75;
+        p.vx = -bvx * (1.6 + Math.random() * 1.5) + (Math.random() - 0.5) * 0.5;
+        p.vz = -bvz * (1.6 + Math.random() * 1.5) + (Math.random() - 0.5) * 0.5;
+        return;
+      }
+    }
+
+    function updateRubberShopUI() {
+      const canAffordRubber = playerMoney >= rubberFruitPrice;
+      buyRubberBtn.disabled = hasRubberFruit || !canAffordRubber;
+      buyRubberBtn.textContent = hasRubberFruit ? 'Owned' : (canAffordRubber ? 'Buy' : 'Need $5000');
+      shopRowRubber.classList.toggle('shop-row--owned', hasRubberFruit);
+      syncAttackListVisible();
+      updateMissionsHUD();
+    }
+
+    buyRubberBtn.addEventListener('click', (e) => {
+      e.stopPropagation();
+      if (hasRubberFruit) return;
+      if (playerMoney < rubberFruitPrice) return;
+      setMoney(playerMoney - rubberFruitPrice);
+      hasRubberFruit = true;
+      updateRubberShopUI();
+    });
+
+    function openShop() {
+      if (shopOpen) return;
+      shopOpen = true;
+      shopLayer.classList.add('shop-layer--open');
+      shopLayer.setAttribute('aria-hidden', 'false');
+    }
+
+    function closeShop() {
+      if (!shopOpen) return;
+      shopOpen = false;
+      shopLayer.classList.remove('shop-layer--open');
+      shopLayer.setAttribute('aria-hidden', 'true');
+    }
+
+    shopBackdrop.addEventListener('click', closeShop);
+    shopCloseBtn.addEventListener('click', closeShop);
+
+    window.addEventListener('keydown', (e) => {
+      if (e.code !== 'KeyE' || e.repeat) return;
+      if (playerDead) return;
+      marketStall.getWorldPosition(shopNpcPos);
+      const px = player.position.x;
+      const pz = player.position.z;
+      const dxShop = px - shopNpcPos.x;
+      const dzShop = pz - shopNpcPos.z;
+      const distShop = Math.sqrt(dxShop * dxShop + dzShop * dzShop);
+      const nearShop = distShop <= shopInteractRadius;
+
+      const dxGuide = px - guideNpc.position.x;
+      const dzGuide = pz - guideNpc.position.z;
+      const distGuide = Math.sqrt(dxGuide * dxGuide + dzGuide * dzGuide);
+      const nearGuide = distGuide <= guideInteractRadius;
+
+      const dxBoat = px - boatSellerNpc.position.x;
+      const dzBoat = pz - boatSellerNpc.position.z;
+      const distBoat = Math.sqrt(dxBoat * dxBoat + dzBoat * dzBoat);
+      const dxGrayBoat = px - grayIslandBoatSellerNpc.position.x;
+      const dzGrayBoat = pz - grayIslandBoatSellerNpc.position.z;
+      const distGrayBoat = Math.sqrt(dxGrayBoat * dxGrayBoat + dzGrayBoat * dzGrayBoat);
+      const dxGrayQuest = px - grayIslandCenterMissionNpc.position.x;
+      const dzGrayQuest = pz - grayIslandCenterMissionNpc.position.z;
+      const distGrayQuest = Math.sqrt(dxGrayQuest * dxGrayQuest + dzGrayQuest * dzGrayQuest);
+      const nearGreenBoatSeller = distBoat <= boatInteractRadius;
+      const nearGrayBoatSeller = distGrayBoat <= boatInteractRadius;
+      const nearGrayQuest = distGrayQuest <= grayQuestInteractRadius;
+      const ownBoatDist = Math.hypot(px - playerBoat.position.x, pz - playerBoat.position.z);
+      const nearOwnBoat = hasBoat && playerBoat.visible && ownBoatDist <= boatEnterRadius;
+
+      if (shopOpen) {
+        e.preventDefault();
+        closeShop();
+        return;
+      }
+      if (dialogueOpen) {
+        e.preventDefault();
+        closeGuideDialogue();
+        return;
+      }
+      if (playerInBoat) {
+        e.preventDefault();
+        dismountBoat();
+        return;
+      }
+      if (nearOwnBoat) {
+        e.preventDefault();
+        mountBoat();
+        return;
+      }
+      const eCandidates = [];
+      if (nearGuide) eCandidates.push({ dist: distGuide, open: openGuideDialogue });
+      if (nearShop) eCandidates.push({ dist: distShop, open: openShop });
+      if (nearGrayQuest) eCandidates.push({ dist: distGrayQuest, open: openGrayQuestDialogue });
+      if (nearGreenBoatSeller) eCandidates.push({ dist: distBoat, open: openBoatSellerDialogue });
+      if (nearGrayBoatSeller) eCandidates.push({ dist: distGrayBoat, open: openGrayIslandBoatSellerDialogue });
+      if (!eCandidates.length) return;
+      eCandidates.sort((a, b) => a.dist - b.dist);
+      e.preventDefault();
+      eCandidates[0].open();
+    });
+
+    window.addEventListener('keydown', (e) => {
+      if (e.code !== 'Escape') return;
+      if (playerInBoat && isBoatNearCoast()) {
+        e.preventDefault();
+        dismountBoat();
+        return;
+      }
+      if (dialogueOpen) {
+        e.preventDefault();
+        closeGuideDialogue();
+        return;
+      }
+      if (!shopOpen) return;
+      e.preventDefault();
+      closeShop();
+    });
+
+    window.addEventListener('keydown', (e) => {
+      if (e.code !== 'KeyZ' || e.repeat) return;
+      if (playerDead) return;
+      if (tryStartPunch(true)) e.preventDefault();
+    });
+
+    renderer.domElement.addEventListener('pointerup', (e) => {
+      if (e.button !== 0) return;
+      if (playerDead) return;
+      const mx = e.clientX - clickStartX;
+      const my = e.clientY - clickStartY;
+      if (mx * mx + my * my > 14 * 14) return;
+      tryStartPunch(false);
+    });
+
+    updateRubberShopUI();
+    updateMissionsHUD();
+
+    const up = new THREE.Vector3(0, 1, 0);
+    const _forward = new THREE.Vector3();
+    const _right = new THREE.Vector3();
+    const _move = new THREE.Vector3();
+
+    function syncCamTarget() {
+      camTarget.copy(player.position);
+      camTarget.y += 1.85;
+    }
+
+    function animate() {
+      requestAnimationFrame(animate);
+      const dt = Math.min(clock.getDelta(), 0.05);
+      syncCamTarget();
+
+      if (playerDamageInvuln > 0) playerDamageInvuln = Math.max(0, playerDamageInvuln - dt);
+      if (playerCurrentHp > 0 && playerCurrentHp < playerMaxHp) {
+        playerNoDamageT += dt;
+        if (playerNoDamageT >= playerRegenDelay) {
+          playerCurrentHp = Math.min(playerMaxHp, playerCurrentHp + playerRegenPerSec * dt);
+          setLife(playerCurrentHp, playerMaxHp);
+        }
+      }
+      if (playerDead) {
+        playerRespawnT -= dt;
+        for (const p of playerDeathPieces) {
+          p.vy += gravity * 0.65 * dt;
+          p.mesh.position.x += p.vx * dt;
+          p.mesh.position.y += p.vy * dt;
+          p.mesh.position.z += p.vz * dt;
+          p.mesh.rotation.x += p.rx * dt;
+          p.mesh.rotation.y += p.ry * dt;
+          p.mesh.rotation.z += p.rz * dt;
+          if (p.mesh.position.y < -3.2) {
+            p.mesh.position.y = -3.2;
+            p.vx *= 0.9;
+            p.vz *= 0.9;
+            p.vy = 0;
+          }
+        }
+        if (playerRespawnT <= 0) respawnPlayer();
+        updateCameraFromOrbit();
+        renderer.render(scene, camera);
+        return;
+      }
+
+      updateEnemies(dt);
+      if (!playerInBoat) {
+        resolvePlayerEnemyCollisions();
+        resolvePlayerGuideCollision();
+      }
+
+      if (punchCooldown > 0) punchCooldown = Math.max(0, punchCooldown - dt);
+      if (heavyPunchCooldown > 0) {
+        heavyPunchCooldown = Math.max(0, heavyPunchCooldown - dt);
+        if (heavyPunchCdEl) {
+          if (heavyPunchCooldown > 0) {
+            heavyPunchCdEl.hidden = false;
+            heavyPunchCdEl.textContent = `(cooldown ${heavyPunchCooldown.toFixed(1)}s)`;
+          } else {
+            heavyPunchCdEl.hidden = true;
+            heavyPunchCdEl.textContent = '';
+          }
+        }
+      }
+
+      if (punchAnimT > 0) {
+        punchAnimT += dt;
+        const t = punchAnimT;
+        if (t >= punchTotal) {
+          punchAnimT = 0;
+          punchHitThisSwing = false;
+          resetPunchPose();
+          punchCooldown = 0.3;
+        } else if (t < punchP1) {
+          const u = punchSmooth(t / punchP1);
+          playerArmRRig.rotation.x = -punchArmAngle * u;
+          playerArmRRig.position.copy(playerArmRRigBasePos);
+        } else if (t < punchP1 + punchP2) {
+          const u = punchSmooth((t - punchP1) / punchP2);
+          playerArmRRig.rotation.x = -punchArmAngle;
+          playerArmRRig.position.z = playerArmRRigBasePos.z + activePunchReach * u;
+        } else if (t < punchP1 + punchP2 + punchP3) {
+          playerArmRRig.rotation.x = -punchArmAngle;
+          playerArmRRig.position.z = playerArmRRigBasePos.z + activePunchReach;
+          if (!punchHitThisSwing) {
+            punchHitThisSwing = true;
+            tryPlayerRubberHits();
+          }
+        } else if (t < punchP1 + punchP2 + punchP3 + punchP4) {
+          const u = punchSmooth((t - punchP1 - punchP2 - punchP3) / punchP4);
+          playerArmRRig.rotation.x = -punchArmAngle;
+          playerArmRRig.position.z = playerArmRRigBasePos.z + activePunchReach * (1 - u);
+        } else {
+          const u = punchSmooth((t - punchP1 - punchP2 - punchP3 - punchP4) / punchP5);
+          playerArmRRig.rotation.x = -punchArmAngle * (1 - u);
+          playerArmRRig.position.copy(playerArmRRigBasePos);
+        }
+      }
+
+      let fwd = 0;
+      let str = 0;
+      if (keys.has('KeyW')) fwd += 1;
+      if (keys.has('KeyS')) fwd -= 1;
+      if (keys.has('KeyD')) str += 1;
+      if (keys.has('KeyA')) str -= 1;
+
+      if (playerInBoat) {
+        if (str !== 0) playerBoat.rotation.y -= str * boatTurnSpeed * dt;
+        const bvx = Math.sin(playerBoat.rotation.y);
+        const bvz = Math.cos(playerBoat.rotation.y);
+        const brx = Math.cos(playerBoat.rotation.y);
+        const brz = -Math.sin(playerBoat.rotation.y);
+        const boatInput = Math.abs(fwd) + Math.abs(str);
+        if (fwd !== 0) {
+          playerBoat.position.x += bvx * fwd * boatMoveSpeed * dt;
+          playerBoat.position.z += bvz * fwd * boatMoveSpeed * dt;
+        }
+        if (str !== 0) {
+          playerBoat.position.x += brx * str * boatStrafeSpeed * dt;
+          playerBoat.position.z += brz * str * boatStrafeSpeed * dt;
+        }
+        clampBoatToOcean();
+        resolveGrayIslandBuildingCollisionsFor(playerBoat.position, boatCollisionRadius);
+        player.position.set(playerBoat.position.x - bvx * 0.25, playerBoat.position.y + 0.25, playerBoat.position.z - bvz * 0.25);
+        player.rotation.y = playerBoat.rotation.y;
+        vy = 0;
+
+        if (boatInput > 0.01) {
+          boatWakeEmitAcc += dt * (8 + boatInput * 4);
+          const wakeBaseX = playerBoat.position.x - bvx * 1.45;
+          const wakeBaseZ = playerBoat.position.z - bvz * 1.45;
+          while (boatWakeEmitAcc >= 1) {
+            boatWakeEmitAcc -= 1;
+            spawnBoatWakeParticle(wakeBaseX, wakeBaseZ, bvx, bvz);
+          }
+        } else {
+          boatWakeEmitAcc = 0;
+        }
+      } else {
+        if (fwd !== 0 || str !== 0) {
+          _forward.subVectors(camTarget, camera.position);
+          _forward.y = 0;
+          if (_forward.lengthSq() < 1e-8) _forward.set(0, 0, -1);
+          else _forward.normalize();
+
+          _right.crossVectors(_forward, up).normalize();
+
+          _move.set(0, 0, 0);
+          _move.addScaledVector(_forward, fwd);
+          _move.addScaledVector(_right, str);
+          _move.normalize().multiplyScalar(moveSpeed * dt);
+
+          player.position.add(_move);
+
+          clampPlayerToLandBounds();
+          resolveStallCollisionXZ();
+          resolvePlayerEnemyCollisions();
+          resolvePlayerGuideCollision();
+          resolvePlayerBoatSellerCollision();
+          clampPlayerToLandBounds();
+          resolveStallCollisionXZ();
+
+          player.rotation.y = Math.atan2(_move.x, _move.z);
+        }
+
+        vy += gravity * dt;
+        player.position.y += vy * dt;
+        if (player.position.y < groundY) {
+          player.position.y = groundY;
+          vy = 0;
+        }
+
+        resolveStallCollisionXZ();
+        resolvePlayerEnemyCollisions();
+        resolvePlayerGuideCollision();
+        resolvePlayerBoatSellerCollision();
+        clampPlayerToLandBounds();
+        resolveStallCollisionXZ();
+      }
+
+      for (const p of boatWakeParticles) {
+        if (p.life <= 0) continue;
+        p.life -= dt;
+        if (p.life <= 0) {
+          p.life = 0;
+          p.mesh.visible = false;
+          continue;
+        }
+        const t = p.life / boatWakeLifeMax;
+        p.mesh.position.x += p.vx * dt;
+        p.mesh.position.z += p.vz * dt;
+        p.mesh.position.y = -0.01 + (1 - t) * 0.08;
+        p.mesh.scale.setScalar(0.4 + t * 0.8);
+        p.mesh.material.opacity = 0.15 + t * 0.6;
+      }
+
+      oceanTop.position.x = player.position.x;
+      oceanTop.position.z = player.position.z;
+      oceanDeep.position.x = player.position.x;
+      oceanDeep.position.z = player.position.z;
+
+      marketStall.getWorldPosition(shopNpcPos);
+      shopNpcPos.y = 0;
+      const sdx = player.position.x - shopNpcPos.x;
+      const sdz = player.position.z - shopNpcPos.z;
+      const shopDist = Math.sqrt(sdx * sdx + sdz * sdz);
+      const gdx = player.position.x - guideNpc.position.x;
+      const gdz = player.position.z - guideNpc.position.z;
+      const guideDist = Math.sqrt(gdx * gdx + gdz * gdz);
+      const bdx = player.position.x - boatSellerNpc.position.x;
+      const bdz = player.position.z - boatSellerNpc.position.z;
+      const boatDist = Math.sqrt(bdx * bdx + bdz * bdz);
+      const gbdx = player.position.x - grayIslandBoatSellerNpc.position.x;
+      const gbdz = player.position.z - grayIslandBoatSellerNpc.position.z;
+      const grayBoatDist = Math.sqrt(gbdx * gbdx + gbdz * gbdz);
+      const gqdx = player.position.x - grayIslandCenterMissionNpc.position.x;
+      const gqdz = player.position.z - grayIslandCenterMissionNpc.position.z;
+      const grayQuestDist = Math.sqrt(gqdx * gqdx + gqdz * gqdz);
+      const nearGuideNow = guideDist <= guideInteractRadius;
+      const nearShopNow = shopDist <= shopInteractRadius;
+      const nearGreenBoatSellerNow = boatDist <= boatInteractRadius;
+      const nearGrayBoatSellerNow = grayBoatDist <= boatInteractRadius;
+      const nearGrayQuestNow = grayQuestDist <= grayQuestInteractRadius;
+      const nearBoatNow = nearGreenBoatSellerNow || nearGrayBoatSellerNow;
+      const nearOwnBoatNow = hasBoat && playerBoat.visible && Math.hypot(player.position.x - playerBoat.position.x, player.position.z - playerBoat.position.z) <= boatEnterRadius;
+
+      const canHint = !shopOpen && !dialogueOpen;
+      shopHint.classList.toggle('shop-hint--visible', canHint && nearShopNow);
+      guideHint.classList.toggle('guide-hint--visible', canHint && nearGuideNow);
+      if (grayQuestHint) grayQuestHint.classList.toggle('guide-hint--visible', canHint && nearGrayQuestNow);
+      boatHint.classList.toggle('boat-hint--visible', canHint && nearBoatNow);
+      boatEnterHint.classList.toggle('boat-enter-hint--visible', canHint && nearOwnBoatNow && !playerInBoat);
+
+      syncCamTarget();
+      updateCameraFromOrbit();
+      renderer.render(scene, camera);
+    }
+
+    window.addEventListener('resize', () => {
+      camera.aspect = window.innerWidth / window.innerHeight;
+      camera.updateProjectionMatrix();
+      renderer.setSize(window.innerWidth, window.innerHeight);
+    });
+
+    syncCamTarget();
+    updateCameraFromOrbit();
+    animate();
+  </script>
+</body>
+</html>

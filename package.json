@@ -1,0 +1,40 @@
+{
+  "name": "blox-fruits-lite",
+  "version": "1.0.0",
+  "description": "Simple 3D character with WASD on a flat map",
+  "main": "main.js",
+  "scripts": {
+    "start": "electron .",
+    "dist": "electron-builder --win"
+  },
+  "build": {
+    "appId": "com.bloxfruits.lite",
+    "productName": "Blox Fruits Lite",
+    "files": [
+      "main.js",
+      "index.html",
+      "package.json",
+      "node_modules/three/**/*"
+    ],
+    "directories": {
+      "output": "release"
+    },
+    "win": {
+      "target": [
+        {
+          "target": "portable",
+          "arch": [
+            "x64"
+          ]
+        }
+      ]
+    }
+  },
+  "dependencies": {
+    "three": "0.160.0"
+  },
+  "devDependencies": {
+    "electron": "^33.2.1",
+    "electron-builder": "^25.1.8"
+  }
+}
