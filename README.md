@@ -34,8 +34,9 @@ A window should open. If it says `electron is not recognized` or errors about mi
 | **Space** | Jump (on land). |
 | **Mouse wheel** | Zoom camera in/out. |
 | **E** | Talk / interact: **guide**, **shop**, **boat seller**, **boat**, gray island NPCs. Also **closes** most popups. |
-| **Left click** | Punch with the Rubber fruit (after you have it). |
-| **Z** | Heavy punch — longer range, short cooldown. |
+| **1** / **2** | Select **Rubber** (1) or **Flame** (2) on the hotbar if you own that fruit. |
+| **Left click** | Normal attack for the fruit you have equipped (Rubber stretch punch or Flame fire punch). |
+| **Z** | Heavy attack (longer range, cooldown) — Rubber heavy stretch or Flame searing strike. |
 
 On-screen hints appear when you are near something you can use (shop, guide, boat, etc.).
 
@@ -43,7 +44,7 @@ On-screen hints appear when you are near something you can use (shop, guide, boa
 
 ## What to do in the game
 
-1. **Green island** — Talk to the **guide**. Buy the **Rubber fruit** at the **market** (you start with enough money). Defeat **3 bandits**, then talk to the **guide** again for **XP**. You can repeat: clear three bandits, return to the guide for more XP.
+1. **Green island** — Talk to the **guide**. At the **market**, buy **Rubber** or **Flame** fruit — **each costs $5000** (you start with **$5000**, so you can afford **one** fruit unless you earn more). Press **1** or **2** to equip the one you own. Defeat **3 bandits**, then talk to the **guide** again for **XP**. You can repeat: clear three bandits, return to the guide for more XP.
 2. Get a **boat** from the **boat seller** at the west dock (boat is **free**). Walk to the boat and press **E** to board; sail to the **gray island**.
 3. **Gray island** — Talk to the NPC in the **center** and pick a trial (**captain** or **six pirates**). Finish it, then talk to that NPC again for **1200 XP** and a fresh run.
 

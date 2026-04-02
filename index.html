@@ -29,11 +29,18 @@
       z-index: 10;
     }
 
-    .hotbar-slot {
+    .hotbar-row {
       position: absolute;
       left: 50%;
       bottom: 0;
       transform: translateX(-50%);
+      display: flex;
+      gap: 10px;
+      pointer-events: none;
+    }
+
+    .hotbar-slot {
+      position: relative;
       width: 76px;
       height: 76px;
       background: #000000;
@@ -726,6 +733,16 @@
               <button type="button" class="shop-buy" id="buy-rubber">Take</button>
             </div>
           </div>
+          <div class="shop-row" id="shop-row-flame">
+            <div>
+              <span class="shop-row__name">Flame Fruit</span>
+              <span class="shop-row__desc">Logia. <strong>Click</strong> fire punch: <strong>10</strong> damage, bandit melee range, ignites for <strong>2</strong> DPS for <strong>5s</strong>. <strong>Z</strong> searing strike — <strong>20</strong> damage, long range, same burn.</span>
+            </div>
+            <div class="shop-row__meta">
+              <span class="shop-row__price">$5000</span>
+              <button type="button" class="shop-buy" id="buy-flame">Take</button>
+            </div>
+          </div>
         </div>
       </div>
       <div class="shop-panel__foot">
@@ -800,12 +817,17 @@
         <div class="life-bar__fill" id="life-fill"></div>
       </div>
     </div>
-    <div id="hotbar-slot" class="hotbar-slot" role="presentation">
-      <span class="hotbar-slot__key">1</span>
+    <div class="hotbar-row">
+      <div id="hotbar-slot-1" class="hotbar-slot hotbar-slot--halo" role="presentation">
+        <span class="hotbar-slot__key">1</span>
+      </div>
+      <div id="hotbar-slot-2" class="hotbar-slot" role="presentation">
+        <span class="hotbar-slot__key">2</span>
+      </div>
     </div>
     <div id="fruit-hud" class="fruit-hud" aria-hidden="true">
-      <div class="fruit-hud__head">Rubber — attacks</div>
-      <ul class="fruit-hud__list">
+      <div class="fruit-hud__head" id="fruit-hud-head">Rubber — attacks</div>
+      <ul class="fruit-hud__list" id="fruit-hud-list">
         <li><span class="fruit-hud__m">Click</span> Stretch punch</li>
         <li><kbd>Z</kbd> Heavy stretch — longer range <span class="fruit-hud__cd" id="heavy-punch-cd" hidden></span></li>
       </ul>
@@ -1248,6 +1270,34 @@
     scene.add(player);
     const playerArmRRigBasePos = playerArmRRig.position.clone();
 
+    const FIST_FIRE_N = 64;
+    const fistFireVel = [];
+    const fistFireLife = new Float32Array(FIST_FIRE_N);
+    for (let i = 0; i < FIST_FIRE_N; i++) {
+      fistFireVel.push(new THREE.Vector3());
+      fistFireLife[i] = 0;
+    }
+    const fistFireGeo = new THREE.BufferGeometry();
+    const fistFirePosArr = new Float32Array(FIST_FIRE_N * 3);
+    const fistFireColArr = new Float32Array(FIST_FIRE_N * 3);
+    fistFireGeo.setAttribute('position', new THREE.BufferAttribute(fistFirePosArr, 3));
+    fistFireGeo.setAttribute('color', new THREE.BufferAttribute(fistFireColArr, 3));
+    const fistFireMat = new THREE.PointsMaterial({
+      size: 0.16,
+      vertexColors: true,
+      transparent: true,
+      opacity: 0.95,
+      depthWrite: false,
+      blending: THREE.AdditiveBlending,
+      sizeAttenuation: true,
+    });
+    const fistFirePoints = new THREE.Points(fistFireGeo, fistFireMat);
+    fistFirePoints.visible = false;
+    fistFirePoints.frustumCulled = false;
+    fistFirePoints.renderOrder = 10;
+    fistFirePoints.position.set(0, -0.44, 0.16);
+    playerArmR.add(fistFirePoints);
+
     function makeEnemyRig() {
       const group = new THREE.Group();
       const skin = new THREE.MeshStandardMaterial({ color: 0xe8b896, roughness: 0.6 });
@@ -1511,14 +1561,23 @@
       e.hpFill.scale.x = hp01;
       e.hpFill.position.x = -(e.hpBarWidth / 2) * (1 - hp01);
       const mat = e.hpFill.material;
-      if (hp01 > 0.6) mat.color.setHex(0x22c55e);
-      else if (hp01 > 0.3) mat.color.setHex(0xf59e0b);
-      else mat.color.setHex(0xef4444);
+      const burning = e.burnTimeRemaining > 0 && hp01 > 0;
+      if (burning) {
+        mat.color.setHex(0xea580c);
+      } else if (hp01 > 0.6) {
+        mat.color.setHex(0x22c55e);
+      } else if (hp01 > 0.3) {
+        mat.color.setHex(0xf59e0b);
+      } else {
+        mat.color.setHex(0xef4444);
+      }
     }
 
     function respawnEnemy(e) {
       if (e.noRespawn) return;
       e.hp = e.maxHp != null ? e.maxHp : enemyMaxHp;
+      e.burnTimeRemaining = 0;
+      e.burnDps = 0;
       e.alive = true;
       e.respawnT = 0;
       e.mesh.position.copy(e.spawn);
@@ -1530,6 +1589,8 @@
 
     function revivePirateCaptain(e) {
       if (e.grayQuestRole !== 'boss') return;
+      e.burnTimeRemaining = 0;
+      e.burnDps = 0;
       e.hp = e.maxHp != null ? e.maxHp : enemyMaxHp;
       e.alive = true;
       e.mesh.visible = true;
@@ -1601,6 +1662,8 @@
         punchDamage,
         attackRange,
         hitRange,
+        burnTimeRemaining: 0,
+        burnDps: 0,
       };
       enemies.push(e);
       updateEnemyHpBar(e);
@@ -2024,7 +2087,9 @@
     window.addEventListener('keyup', (e) => keys.delete(e.code));
     window.addEventListener('blur', () => keys.clear());
 
-    const hotbarSlot = document.getElementById('hotbar-slot');
+    const hotbarSlot1 = document.getElementById('hotbar-slot-1');
+    const hotbarSlot2 = document.getElementById('hotbar-slot-2');
+    let hotbarFruitSelection = 1;
 
     const lifeCurrentEl = document.getElementById('life-current');
     const lifeMaxEl = document.getElementById('life-max');
@@ -2035,6 +2100,7 @@
     const levelXpNeedEl = document.getElementById('level-xp-need');
     const levelFillEl = document.getElementById('level-fill');
     const rubberFruitPrice = 5000;
+    const flameFruitPrice = 5000;
 
     const LEVEL_XP_BASE = 100;
     const LEVEL_XP_FACTOR = 2.5;
@@ -2131,6 +2197,7 @@
       punchCooldown = 0;
       heavyPunchCooldown = 0;
       player.visible = false;
+      fistFirePoints.visible = false;
 
       const wPos = new THREE.Vector3();
       const wQuat = new THREE.Quaternion();
@@ -2193,7 +2260,11 @@
     const shopCloseBtn = document.getElementById('shop-close');
     const shopHint = document.getElementById('shop-hint');
     const buyRubberBtn = document.getElementById('buy-rubber');
+    const buyFlameBtn = document.getElementById('buy-flame');
     const shopRowRubber = document.getElementById('shop-row-rubber');
+    const shopRowFlame = document.getElementById('shop-row-flame');
+    const fruitHudHead = document.getElementById('fruit-hud-head');
+    const fruitHudList = document.getElementById('fruit-hud-list');
     const fruitHud = document.getElementById('fruit-hud');
     const missionHudEl = document.getElementById('mission-hud');
     const missionFruitEl = document.getElementById('mission-fruit');
@@ -2217,7 +2288,7 @@
     const grayIslandTrialChoicesEl = document.getElementById('gray-island-trial-choices');
     const dialogueChoiceBossBtn = document.getElementById('dialogue-choice-boss');
     const dialogueChoiceEnemiesBtn = document.getElementById('dialogue-choice-enemies');
-    const GUIDE_DIALOGUE_HTML = 'Listen carefully — <strong>three bandits</strong> are causing trouble on this island. You cannot fight them <strong>bare-handed</strong>: you need a <strong>fruit power</strong>.<br><br>Go to the <strong>market</strong> (over that way) and take the <strong>Rubber fruit</strong> from the dealer — it is <strong>free</strong>.<br><br>I am giving you <strong>two missions</strong>: <strong>buy that fruit</strong>, then <strong>defeat all three bandits</strong>. Check your list at the top-right. Good luck!';
+    const GUIDE_DIALOGUE_HTML = 'Listen carefully — <strong>three bandits</strong> are causing trouble on this island. You cannot fight them <strong>bare-handed</strong>: you need a <strong>fruit power</strong>.<br><br>Go to the <strong>market</strong> (over that way) and buy the <strong>Rubber</strong> or <strong>Flame</strong> fruit from the dealer.<br><br>I am giving you <strong>two missions</strong>: <strong>buy that fruit</strong>, then <strong>defeat all three bandits</strong>. Check your list at the top-right. Good luck!';
 
     const GUIDE_POST_MISSIONS_HTML = 'You did it — fruit in hand and all three <strong>bandits</strong> dealt with. Impressive work!<br><br>Your next step is the <strong>boat seller</strong>. Head to the <strong>dock on the west shore</strong> — he wears a <strong>navy shirt</strong>. He will set you up with passage off this island. Good sailing!';
 
@@ -2226,6 +2297,7 @@
     const BOAT_PRICE = 0;
 
     let hasRubberFruit = false;
+    let hasFlameFruit = false;
     let hasBoat = false;
     let playerInBoat = false;
 
@@ -2233,6 +2305,12 @@
     const heavyPunchDamage = 20;
     const normalPunchRange = 2.55;
     const heavyPunchRange = 4.15;
+    const flameNormalPunchDamage = 10;
+    const flameHeavyPunchDamage = 20;
+    const flameNormalPunchRange = 1.48;
+    const flameHeavyPunchRange = heavyPunchRange;
+    const flameBurnDps = 2;
+    const flameBurnDuration = 5;
     const punchReachNormal = 1.35;
     const punchReachHeavy = 1.95;
     const heavyPunchCooldownMax = 3.5;
@@ -2242,8 +2320,9 @@
     let activePunchReach = punchReachNormal;
     let heavyPunchCooldown = 0;
 
-    function tryPlayerRubberHits() {
-      if (!hasRubberFruit) return;
+    function tryPlayerFruitHits() {
+      const fruit = getEquippedFruit();
+      if (!fruit) return;
       const ry = player.rotation.y;
       const fwx = Math.sin(ry);
       const fwz = Math.cos(ry);
@@ -2263,32 +2342,8 @@
         const fruitDmg = fruitScaledDamage(pendingPunchDamage * getFruitDamageMultiplier());
         e.hp -= fruitDmg;
         updateEnemyHpBar(e);
-        if (e.hp <= 0) {
-          if (e.countsForMission !== false) {
-            enemyKillCount += 1;
-            if (!greenMissionNeedsNpcTurnIn && greenMissionRunKills < MISSION_KILLS_TARGET) {
-              greenMissionRunKills += 1;
-              if (greenMissionRunKills >= MISSION_KILLS_TARGET) greenMissionNeedsNpcTurnIn = true;
-            }
-          }
-          if (e.grayQuestRole === 'boss' && grayQuestChoice === 'boss') {
-            grayBossKills = 1;
-            grayMissionNeedsNpcTurnIn = true;
-          }
-          if (e.grayQuestRole === 'swarm' && grayQuestChoice === 'enemies' && !grayMissionNeedsNpcTurnIn) {
-            if (graySwarmKills < GRAY_SWARM_TARGET) {
-              graySwarmKills += 1;
-              if (graySwarmKills >= GRAY_SWARM_TARGET) grayMissionNeedsNpcTurnIn = true;
-            }
-          }
-          e.alive = false;
-          e.mesh.visible = false;
-          e.respawnT = e.noRespawn ? 999 : 5;
-          e.punchT = 0;
-          e.attackCD = 0;
-          resetEnemyPunchPose(e);
-          updateMissionsHUD();
-        }
+        if (fruit === 'flame') applyEnemyBurn(e);
+        if (e.hp <= 0) finalizeEnemyKillFromPlayer(e);
       }
     }
 
@@ -2297,13 +2352,74 @@
     let activeDialogueKind = null;
     let guideTutorialConversationsFinished = 0;
 
+    function hasAnyFruit() {
+      return hasRubberFruit || hasFlameFruit;
+    }
+
+    function normalizeHotbarFruitSelection() {
+      if (hotbarFruitSelection === 1 && !hasRubberFruit && hasFlameFruit) hotbarFruitSelection = 2;
+      if (hotbarFruitSelection === 2 && !hasFlameFruit && hasRubberFruit) hotbarFruitSelection = 1;
+    }
+
+    function getEquippedFruit() {
+      normalizeHotbarFruitSelection();
+      if (hotbarFruitSelection === 1 && hasRubberFruit) return 'rubber';
+      if (hotbarFruitSelection === 2 && hasFlameFruit) return 'flame';
+      if (hasRubberFruit) return 'rubber';
+      if (hasFlameFruit) return 'flame';
+      return null;
+    }
+
+    function refreshHotbarHalos() {
+      if (!hotbarSlot1 || !hotbarSlot2) return;
+      normalizeHotbarFruitSelection();
+      hotbarSlot1.classList.toggle('hotbar-slot--halo', hotbarFruitSelection === 1);
+      hotbarSlot2.classList.toggle('hotbar-slot--halo', hotbarFruitSelection === 2);
+    }
+
+    function applyEnemyBurn(e) {
+      if (!e.alive) return;
+      e.burnDps = flameBurnDps;
+      e.burnTimeRemaining = flameBurnDuration;
+    }
+
+    function finalizeEnemyKillFromPlayer(e) {
+      if (!e.alive) return;
+      e.burnTimeRemaining = 0;
+      e.burnDps = 0;
+      if (e.countsForMission !== false) {
+        enemyKillCount += 1;
+        if (!greenMissionNeedsNpcTurnIn && greenMissionRunKills < MISSION_KILLS_TARGET) {
+          greenMissionRunKills += 1;
+          if (greenMissionRunKills >= MISSION_KILLS_TARGET) greenMissionNeedsNpcTurnIn = true;
+        }
+      }
+      if (e.grayQuestRole === 'boss' && grayQuestChoice === 'boss') {
+        grayBossKills = 1;
+        grayMissionNeedsNpcTurnIn = true;
+      }
+      if (e.grayQuestRole === 'swarm' && grayQuestChoice === 'enemies' && !grayMissionNeedsNpcTurnIn) {
+        if (graySwarmKills < GRAY_SWARM_TARGET) {
+          graySwarmKills += 1;
+          if (graySwarmKills >= GRAY_SWARM_TARGET) grayMissionNeedsNpcTurnIn = true;
+        }
+      }
+      e.alive = false;
+      e.mesh.visible = false;
+      e.respawnT = e.noRespawn ? 999 : 5;
+      e.punchT = 0;
+      e.attackCD = 0;
+      resetEnemyPunchPose(e);
+      updateMissionsHUD();
+    }
+
     function coreMissionsComplete() {
-      return hasRubberFruit && enemyKillCount >= MISSION_KILLS_TARGET;
+      return hasAnyFruit() && enemyKillCount >= MISSION_KILLS_TARGET;
     }
 
     function updateMissionsHUD() {
       if (!missionFruitEl || !missionKillsEl) return;
-      if (hasRubberFruit) {
+      if (hasAnyFruit()) {
         missionFruitEl.textContent = '✓ Buy a fruit at the market';
         missionFruitEl.classList.add('mission-done');
       } else {
@@ -2658,6 +2774,24 @@
           continue;
         }
 
+        if (e.burnTimeRemaining > 0) {
+          e.burnTimeRemaining -= dt;
+          const dps = e.burnDps || 0;
+          if (dps > 0 && !e.grayQuestFrozen) {
+            e.hp -= dps * dt;
+            updateEnemyHpBar(e);
+            if (e.hp <= 0) {
+              finalizeEnemyKillFromPlayer(e);
+              continue;
+            }
+          }
+          if (e.burnTimeRemaining <= 0) {
+            e.burnTimeRemaining = 0;
+            e.burnDps = 0;
+            updateEnemyHpBar(e);
+          }
+        }
+
         if (e.grayQuestFrozen) continue;
 
         if (e.attackCD > 0) e.attackCD -= dt;
@@ -2739,17 +2873,41 @@
     }
 
     function syncAttackListVisible() {
-      const slotOn = hotbarSlot.classList.contains('hotbar-slot--halo');
-      const show = hasRubberFruit && slotOn;
+      normalizeHotbarFruitSelection();
+      const fruit = getEquippedFruit();
+      const show = fruit !== null;
       fruitHud.classList.toggle('fruit-hud--visible', show);
       fruitHud.setAttribute('aria-hidden', show ? 'false' : 'true');
+      if (fruitHudHead && fruitHudList) {
+        const lis = fruitHudList.querySelectorAll('li');
+        if (fruit === 'rubber') {
+          fruitHudHead.textContent = 'Rubber — attacks';
+          if (lis[0]) lis[0].innerHTML = '<span class="fruit-hud__m">Click</span> Stretch punch';
+          if (lis[1])
+            lis[1].innerHTML =
+              '<kbd>Z</kbd> Heavy stretch — longer range <span class="fruit-hud__cd" id="heavy-punch-cd" hidden></span>';
+        } else if (fruit === 'flame') {
+          fruitHudHead.textContent = 'Flame — attacks';
+          if (lis[0])
+            lis[0].innerHTML =
+              '<span class="fruit-hud__m">Click</span> Fire punch — <strong>10</strong> dmg, burn <strong>2</strong>/s × <strong>5</strong>s';
+          if (lis[1])
+            lis[1].innerHTML =
+              '<kbd>Z</kbd> Searing strike — <strong>20</strong> dmg, same burn <span class="fruit-hud__cd" id="heavy-punch-cd" hidden></span>';
+        }
+      }
+      refreshHotbarHalos();
     }
 
     window.addEventListener('keydown', (e) => {
-      if (e.code !== 'Digit1' && e.code !== 'Numpad1') return;
+      const is1 = e.code === 'Digit1' || e.code === 'Numpad1';
+      const is2 = e.code === 'Digit2' || e.code === 'Numpad2';
+      if (!is1 && !is2) return;
       e.preventDefault();
       if (e.repeat) return;
-      hotbarSlot.classList.toggle('hotbar-slot--halo');
+      if (is1 && hasRubberFruit) hotbarFruitSelection = 1;
+      else if (is2 && hasFlameFruit) hotbarFruitSelection = 2;
+      refreshHotbarHalos();
       syncAttackListVisible();
     });
     let punchAnimT = 0;
@@ -2770,16 +2928,20 @@
     const boatWakeLifeMax = 0.75;
     let boatWakeEmitAcc = 0;
 
-    const heavyPunchCdEl = document.getElementById('heavy-punch-cd');
-
     function tryStartPunch(isHeavy) {
       if (playerDead) return false;
       if (playerInBoat) return false;
-      if (shopOpen || dialogueOpen || !hasRubberFruit) return false;
+      if (shopOpen || dialogueOpen || !getEquippedFruit()) return false;
       if (punchAnimT > 0 || punchCooldown > 0) return false;
       if (isHeavy && heavyPunchCooldown > 0) return false;
-      pendingPunchDamage = isHeavy ? heavyPunchDamage : normalPunchDamage;
-      pendingPunchMaxDist = isHeavy ? heavyPunchRange : normalPunchRange;
+      const f = getEquippedFruit();
+      if (f === 'rubber') {
+        pendingPunchDamage = isHeavy ? heavyPunchDamage : normalPunchDamage;
+        pendingPunchMaxDist = isHeavy ? heavyPunchRange : normalPunchRange;
+      } else if (f === 'flame') {
+        pendingPunchDamage = isHeavy ? flameHeavyPunchDamage : flameNormalPunchDamage;
+        pendingPunchMaxDist = isHeavy ? flameHeavyPunchRange : flameNormalPunchRange;
+      }
       activePunchReach = isHeavy ? punchReachHeavy : punchReachNormal;
       punchHitThisSwing = false;
       punchAnimT = 1e-6;
@@ -2833,23 +2995,48 @@
       }
     }
 
-    function updateRubberShopUI() {
+    function updateShopUI() {
       const canAffordRubber = playerMoney >= rubberFruitPrice;
-      buyRubberBtn.disabled = hasRubberFruit || !canAffordRubber;
-      buyRubberBtn.textContent = hasRubberFruit ? 'Owned' : (canAffordRubber ? 'Buy' : 'Need $5000');
-      shopRowRubber.classList.toggle('shop-row--owned', hasRubberFruit);
+      const canAffordFlame = playerMoney >= flameFruitPrice;
+      if (buyRubberBtn) {
+        buyRubberBtn.disabled = hasRubberFruit || !canAffordRubber;
+        buyRubberBtn.textContent = hasRubberFruit ? 'Owned' : canAffordRubber ? 'Buy' : `Need $${rubberFruitPrice}`;
+      }
+      if (buyFlameBtn) {
+        buyFlameBtn.disabled = hasFlameFruit || !canAffordFlame;
+        buyFlameBtn.textContent = hasFlameFruit ? 'Owned' : canAffordFlame ? 'Buy' : `Need $${flameFruitPrice}`;
+      }
+      if (shopRowRubber) shopRowRubber.classList.toggle('shop-row--owned', hasRubberFruit);
+      if (shopRowFlame) shopRowFlame.classList.toggle('shop-row--owned', hasFlameFruit);
+      normalizeHotbarFruitSelection();
+      refreshHotbarHalos();
       syncAttackListVisible();
       updateMissionsHUD();
     }
 
-    buyRubberBtn.addEventListener('click', (e) => {
-      e.stopPropagation();
-      if (hasRubberFruit) return;
-      if (playerMoney < rubberFruitPrice) return;
-      setMoney(playerMoney - rubberFruitPrice);
-      hasRubberFruit = true;
-      updateRubberShopUI();
-    });
+    if (buyRubberBtn) {
+      buyRubberBtn.addEventListener('click', (e) => {
+        e.stopPropagation();
+        if (hasRubberFruit) return;
+        if (playerMoney < rubberFruitPrice) return;
+        setMoney(playerMoney - rubberFruitPrice);
+        hasRubberFruit = true;
+        hotbarFruitSelection = 1;
+        updateShopUI();
+      });
+    }
+
+    if (buyFlameBtn) {
+      buyFlameBtn.addEventListener('click', (e) => {
+        e.stopPropagation();
+        if (hasFlameFruit) return;
+        if (playerMoney < flameFruitPrice) return;
+        setMoney(playerMoney - flameFruitPrice);
+        hasFlameFruit = true;
+        hotbarFruitSelection = 2;
+        updateShopUI();
+      });
+    }
 
     function openShop() {
       if (shopOpen) return;
@@ -2963,7 +3150,7 @@
       tryStartPunch(false);
     });
 
-    updateRubberShopUI();
+    updateShopUI();
     updateMissionsHUD();
 
     const up = new THREE.Vector3(0, 1, 0);
@@ -2974,6 +3161,46 @@
     function syncCamTarget() {
       camTarget.copy(player.position);
       camTarget.y += 1.85;
+    }
+
+    function updateFistFireParticles(dt) {
+      const on = getEquippedFruit() === 'flame' && punchAnimT > 0;
+      fistFirePoints.visible = on;
+      if (!on) return;
+      const posA = fistFireGeo.attributes.position.array;
+      const colA = fistFireGeo.attributes.color.array;
+      const spawnR = 0.1;
+      for (let i = 0; i < FIST_FIRE_N; i++) {
+        fistFireLife[i] -= dt;
+        const ix = i * 3;
+        if (fistFireLife[i] <= 0) {
+          fistFireLife[i] = 0.16 + Math.random() * 0.26;
+          posA[ix] = (Math.random() - 0.5) * spawnR;
+          posA[ix + 1] = (Math.random() - 0.5) * spawnR * 0.65;
+          posA[ix + 2] = (Math.random() - 0.5) * spawnR * 0.55 + 0.05;
+          fistFireVel[i].set(
+            (Math.random() - 0.5) * 0.42,
+            0.62 + Math.random() * 0.72,
+            0.32 + Math.random() * 0.52
+          );
+          colA[ix] = 1;
+          colA[ix + 1] = 0.78 + Math.random() * 0.22;
+          colA[ix + 2] = 0.08 + Math.random() * 0.18;
+        } else {
+          posA[ix] += fistFireVel[i].x * dt;
+          posA[ix + 1] += fistFireVel[i].y * dt;
+          posA[ix + 2] += fistFireVel[i].z * dt;
+          fistFireVel[i].multiplyScalar(1 - dt * 1.35);
+          fistFireVel[i].y += dt * 0.42;
+          const maxL = 0.42;
+          const br = Math.min(1, fistFireLife[i] / maxL);
+          colA[ix] = 1;
+          colA[ix + 1] = Math.max(0.12, 0.22 + 0.72 * br);
+          colA[ix + 2] = Math.max(0, 0.45 * (1 - br));
+        }
+      }
+      fistFireGeo.attributes.position.needsUpdate = true;
+      fistFireGeo.attributes.color.needsUpdate = true;
     }
 
     function animate() {
@@ -3021,6 +3248,7 @@
       if (punchCooldown > 0) punchCooldown = Math.max(0, punchCooldown - dt);
       if (heavyPunchCooldown > 0) {
         heavyPunchCooldown = Math.max(0, heavyPunchCooldown - dt);
+        const heavyPunchCdEl = document.getElementById('heavy-punch-cd');
         if (heavyPunchCdEl) {
           if (heavyPunchCooldown > 0) {
             heavyPunchCdEl.hidden = false;
@@ -3053,7 +3281,7 @@
           playerArmRRig.position.z = playerArmRRigBasePos.z + activePunchReach;
           if (!punchHitThisSwing) {
             punchHitThisSwing = true;
-            tryPlayerRubberHits();
+            tryPlayerFruitHits();
           }
         } else if (t < punchP1 + punchP2 + punchP3 + punchP4) {
           const u = punchSmooth((t - punchP1 - punchP2 - punchP3) / punchP4);
@@ -3200,6 +3428,7 @@
       boatHint.classList.toggle('boat-hint--visible', canHint && nearBoatNow);
       boatEnterHint.classList.toggle('boat-enter-hint--visible', canHint && nearOwnBoatNow && !playerInBoat);
 
+      updateFistFireParticles(dt);
       syncCamTarget();
       updateCameraFromOrbit();
       renderer.render(scene, camera);
