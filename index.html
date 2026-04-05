@@ -69,6 +69,16 @@
         0 0 32px 8px rgba(96, 165, 250, 0.45);
     }
 
+    .hotbar-slot--fruits {
+      border-color: #2d3748;
+      background: #0d0d0d;
+    }
+
+    .hotbar-slot--combat-key {
+      border-color: #1a1a1a;
+      background: #000000;
+    }
+
     .life-bar {
       position: absolute;
       left: 16px;
@@ -123,10 +133,56 @@
       transition: width 0.2s ease;
     }
 
-    .money-bar {
+    .money-bar__dmg {
+      font-weight: 600;
+      color: #fca5a5;
+      text-shadow: 0 0 5px rgba(248, 113, 113, 0.45);
+      margin-left: 6px;
+    }
+
+    .hud-money-stack {
       position: absolute;
       left: 16px;
       bottom: 120px;
+      display: flex;
+      flex-direction: column;
+      align-items: stretch;
+      gap: 6px;
+      z-index: 12;
+    }
+
+    .hud-top-actions {
+      display: flex;
+      flex-direction: row;
+      gap: 8px;
+      pointer-events: auto;
+    }
+
+    .hud-top-btn {
+      padding: 6px 14px;
+      font-family: system-ui, "Segoe UI", sans-serif;
+      font-size: 12px;
+      font-weight: 700;
+      letter-spacing: 0.04em;
+      text-transform: lowercase;
+      color: #e2e8f0;
+      background: linear-gradient(180deg, #334155 0%, #1e293b 100%);
+      border: 1px solid #475569;
+      border-radius: 6px;
+      cursor: pointer;
+      box-shadow: 0 2px 6px rgba(0, 0, 0, 0.35);
+      pointer-events: auto;
+    }
+
+    .hud-top-btn:hover {
+      filter: brightness(1.08);
+      border-color: #94a3b8;
+    }
+
+    .money-bar {
+      position: relative;
+      left: auto;
+      bottom: auto;
       font-family: system-ui, "Segoe UI", sans-serif;
       font-size: 13px;
       font-weight: 700;
@@ -290,6 +346,8 @@
       display: flex;
       align-items: center;
       justify-content: space-between;
+      gap: 12px;
+      flex-shrink: 0;
       padding: 14px 16px;
       background: rgba(30, 41, 59, 0.9);
       border-bottom: 1px solid #334155;
@@ -303,33 +361,54 @@
       letter-spacing: 0.04em;
     }
 
-    .shop-panel__body {
-      padding: 20px 16px 16px;
-      flex: 1;
-      min-height: 120px;
-      display: flex;
-      flex-direction: column;
-    }
-
-    .shop-panel__foot {
-      padding: 12px 16px 16px;
-      border-top: 1px solid #334155;
-    }
-
-    .shop-close {
-      width: 100%;
-      padding: 10px 16px;
-      font-size: 14px;
+    .shop-panel__esc-hint {
+      font-size: 12px;
       font-weight: 600;
+      color: #94a3b8;
+      white-space: nowrap;
+    }
+
+    .shop-panel__esc-hint kbd {
+      display: inline-block;
+      padding: 2px 7px;
+      font-size: 11px;
+      font-family: inherit;
       color: #e2e8f0;
       background: #334155;
       border: 1px solid #475569;
-      border-radius: 6px;
-      cursor: pointer;
+      border-radius: 4px;
     }
 
-    .shop-close:hover {
-      background: #3f4f63;
+    .shop-panel__body {
+      padding: 16px 12px 16px 16px;
+      flex: 1;
+      min-height: 0;
+      display: flex;
+      flex-direction: column;
+      overflow-x: hidden;
+      overflow-y: auto;
+      scrollbar-gutter: stable;
+      scrollbar-color: #475569 rgba(15, 23, 42, 0.55);
+      scrollbar-width: thin;
+    }
+
+    .shop-panel__body::-webkit-scrollbar {
+      width: 10px;
+    }
+
+    .shop-panel__body::-webkit-scrollbar-track {
+      background: rgba(15, 23, 42, 0.55);
+      border-radius: 6px;
+    }
+
+    .shop-panel__body::-webkit-scrollbar-thumb {
+      background: #475569;
+      border-radius: 6px;
+      border: 2px solid rgba(15, 23, 42, 0.55);
+    }
+
+    .shop-panel__body::-webkit-scrollbar-thumb:hover {
+      background: #64748b;
     }
 
     .shop-items {
@@ -439,9 +518,48 @@
       text-transform: uppercase;
       letter-spacing: 0.06em;
       color: #fbbf24;
-      margin-bottom: 8px;
+      margin-bottom: 6px;
       padding-bottom: 6px;
       border-bottom: 1px solid rgba(251, 191, 36, 0.25);
+    }
+
+    .fruit-hud__mastery {
+      margin-bottom: 8px;
+      padding-bottom: 8px;
+      border-bottom: 1px solid rgba(251, 191, 36, 0.18);
+    }
+
+    .fruit-hud__mastery-row {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 8px;
+      margin-bottom: 4px;
+      font-size: 11px;
+      font-weight: 700;
+      color: #fde68a;
+    }
+
+    .fruit-hud__mastery-xp {
+      font-size: 10px;
+      font-weight: 600;
+      color: #94a3b8;
+    }
+
+    .fruit-hud__mastery-track {
+      height: 5px;
+      border-radius: 3px;
+      background: rgba(15, 23, 42, 0.85);
+      border: 1px solid rgba(251, 191, 36, 0.2);
+      overflow: hidden;
+    }
+
+    .fruit-hud__mastery-fill {
+      height: 100%;
+      width: 0%;
+      border-radius: 2px;
+      background: linear-gradient(90deg, #f59e0b, #fbbf24);
+      transition: width 0.12s ease-out;
     }
 
     .fruit-hud__list {
@@ -462,6 +580,12 @@
 
     .fruit-hud__list li:last-child {
       margin-bottom: 0;
+    }
+
+    .fruit-hud__list--flame-only:not([hidden]),
+    .fruit-hud__list--rubber-only:not([hidden]),
+    .fruit-hud__list--court-only:not([hidden]) {
+      margin-top: 6px;
     }
 
     .fruit-hud kbd {
@@ -612,6 +736,9 @@
       gap: 12px;
       width: min(440px, 100%);
       max-height: calc(100vh - 40px);
+      overflow-y: auto;
+      overscroll-behavior: contain;
+      pointer-events: auto;
     }
 
     .dialogue-panel {
@@ -662,6 +789,9 @@
     }
 
     .gray-island-trial-choices {
+      position: relative;
+      z-index: 2;
+      flex-shrink: 0;
       display: flex;
       flex-direction: column;
       gap: 8px;
@@ -671,6 +801,7 @@
       border-radius: 10px;
       box-shadow: 0 12px 32px rgba(0, 0, 0, 0.4);
       font-family: system-ui, "Segoe UI", sans-serif;
+      pointer-events: auto;
     }
 
     .gray-island-trial-choices__title {
@@ -693,11 +824,274 @@
       border-radius: 6px;
       cursor: pointer;
       text-align: left;
+      pointer-events: auto;
+      position: relative;
+      z-index: 1;
     }
 
     .dialogue-choice-btn:hover {
       filter: brightness(1.08);
       border-color: #5eead4;
+    }
+
+    .dialogue-choice-btn:disabled {
+      opacity: 0.45;
+      cursor: not-allowed;
+      filter: grayscale(0.35);
+    }
+
+    .dialogue-choice-btn:disabled:hover {
+      filter: grayscale(0.35);
+      border-color: #475569;
+    }
+
+    .codes-layer {
+      position: fixed;
+      inset: 0;
+      z-index: 102;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      padding: 24px;
+      pointer-events: none;
+      opacity: 0;
+      visibility: hidden;
+      transition: opacity 0.2s ease, visibility 0.2s;
+    }
+
+    .codes-layer.codes-layer--open {
+      pointer-events: auto;
+      opacity: 1;
+      visibility: visible;
+    }
+
+    .codes-backdrop {
+      position: absolute;
+      inset: 0;
+      background: rgba(15, 23, 42, 0.78);
+      cursor: pointer;
+    }
+
+    .codes-panel {
+      position: relative;
+      z-index: 1;
+      width: min(380px, 100%);
+      padding: 20px 22px 18px;
+      background: linear-gradient(165deg, #1e293b 0%, #0f172a 100%);
+      border: 2px solid #fbbf24;
+      border-radius: 10px;
+      box-shadow: 0 24px 48px rgba(0, 0, 0, 0.55);
+      font-family: system-ui, "Segoe UI", sans-serif;
+    }
+
+    .codes-panel__title {
+      margin: 0 0 14px;
+      font-size: 17px;
+      font-weight: 800;
+      color: #fbbf24;
+      letter-spacing: 0.04em;
+    }
+
+    .codes-panel__input {
+      width: 100%;
+      box-sizing: border-box;
+      padding: 12px 14px;
+      font-size: 15px;
+      font-weight: 600;
+      color: #f8fafc;
+      background: #0f172a;
+      border: 2px solid #475569;
+      border-radius: 8px;
+      outline: none;
+    }
+
+    .codes-panel__input:focus {
+      border-color: #fbbf24;
+    }
+
+    .codes-panel__input::placeholder {
+      color: #64748b;
+      font-weight: 500;
+    }
+
+    .codes-panel__status {
+      min-height: 1.25em;
+      margin-top: 10px;
+      font-size: 13px;
+      font-weight: 600;
+      color: #94a3b8;
+    }
+
+    .codes-panel__status.codes-panel__status--error {
+      color: #f87171;
+    }
+
+    .codes-panel__status.codes-panel__status--ok {
+      color: #4ade80;
+    }
+
+    .codes-panel__actions {
+      display: flex;
+      gap: 10px;
+      margin-top: 16px;
+    }
+
+    .codes-panel__btn {
+      flex: 1;
+      padding: 10px 14px;
+      font-size: 14px;
+      font-weight: 700;
+      border-radius: 8px;
+      cursor: pointer;
+      border: 1px solid;
+    }
+
+    .codes-panel__btn--submit {
+      color: #0f172a;
+      background: linear-gradient(180deg, #fbbf24 0%, #f59e0b 100%);
+      border-color: #d97706;
+    }
+
+    .codes-panel__btn--submit:hover {
+      filter: brightness(1.06);
+    }
+
+    .codes-panel__btn--cancel {
+      color: #e2e8f0;
+      background: linear-gradient(180deg, #475569 0%, #334155 100%);
+      border-color: #64748b;
+    }
+
+    .codes-panel__btn--cancel:hover {
+      filter: brightness(1.08);
+    }
+
+    .inventory-layer {
+      position: fixed;
+      inset: 0;
+      z-index: 103;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      padding: 24px;
+      pointer-events: none;
+      opacity: 0;
+      visibility: hidden;
+      transition: opacity 0.2s ease, visibility 0.2s;
+    }
+
+    .inventory-layer.inventory-layer--open {
+      pointer-events: auto;
+      opacity: 1;
+      visibility: visible;
+    }
+
+    .inventory-backdrop {
+      position: absolute;
+      inset: 0;
+      background: rgba(15, 23, 42, 0.78);
+      cursor: pointer;
+    }
+
+    .inventory-panel {
+      position: relative;
+      z-index: 1;
+      width: min(400px, 100%);
+      padding: 20px 22px 18px;
+      background: linear-gradient(165deg, #1e293b 0%, #0f172a 100%);
+      border: 2px solid #34d399;
+      border-radius: 10px;
+      box-shadow: 0 24px 48px rgba(0, 0, 0, 0.55);
+      font-family: system-ui, "Segoe UI", sans-serif;
+    }
+
+    .inventory-panel__title {
+      margin: 0 0 8px;
+      font-size: 17px;
+      font-weight: 800;
+      color: #6ee7b7;
+      letter-spacing: 0.04em;
+    }
+
+    .inventory-panel__hint {
+      margin: 0 0 14px;
+      font-size: 13px;
+      line-height: 1.45;
+      color: #94a3b8;
+    }
+
+    .inventory-list {
+      list-style: none;
+      margin: 0;
+      padding: 0;
+      display: flex;
+      flex-direction: column;
+      gap: 8px;
+      min-height: 4.5em;
+    }
+
+    .inventory-row {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      padding: 12px 14px;
+      font-size: 14px;
+      font-weight: 600;
+      color: #e2e8f0;
+      background: #0f172a;
+      border: 2px solid #334155;
+      border-radius: 8px;
+      cursor: pointer;
+      transition: border-color 0.12s ease, background 0.12s ease;
+    }
+
+    .inventory-row:hover {
+      border-color: #64748b;
+    }
+
+    .inventory-row--selected {
+      border-color: #34d399;
+      background: rgba(52, 211, 153, 0.12);
+    }
+
+    .inventory-row--empty {
+      cursor: default;
+      justify-content: center;
+      color: #64748b;
+      font-weight: 500;
+    }
+
+    .inventory-row--empty:hover {
+      border-color: #334155;
+    }
+
+    .inventory-row__count {
+      font-variant-numeric: tabular-nums;
+      color: #a7f3d0;
+    }
+
+    .inventory-status {
+      min-height: 1.35em;
+      margin-top: 12px;
+      font-size: 13px;
+      font-weight: 600;
+      color: #94a3b8;
+    }
+
+    .inventory-actions {
+      display: flex;
+      gap: 10px;
+      margin-top: 16px;
+    }
+
+    .inventory-actions .codes-panel__btn {
+      flex: 1;
+    }
+
+    .inventory-eat:disabled {
+      opacity: 0.45;
+      cursor: not-allowed;
+      filter: grayscale(0.2);
     }
 
     .gray-island-dialogue-layer {
@@ -716,10 +1110,16 @@
 </head>
 <body>
   <div id="shop-layer" class="shop-layer" aria-hidden="true">
-    <div class="shop-backdrop" id="shop-backdrop" aria-label="Close shop"></div>
-    <div class="shop-panel" role="dialog" aria-labelledby="shop-title">
+    <div class="shop-backdrop" id="shop-backdrop" aria-label="Close market"></div>
+    <div
+      class="shop-panel"
+      role="dialog"
+      aria-labelledby="shop-title"
+      aria-describedby="shop-esc-hint"
+    >
       <div class="shop-panel__head">
         <h2 class="shop-panel__title" id="shop-title">Market</h2>
+        <p class="shop-panel__esc-hint" id="shop-esc-hint"><kbd>Esc</kbd> to close</p>
       </div>
       <div class="shop-panel__body">
         <div class="shop-items">
@@ -730,23 +1130,68 @@
             </div>
             <div class="shop-row__meta">
               <span class="shop-row__price">$5000</span>
-              <button type="button" class="shop-buy" id="buy-rubber">Take</button>
+              <button type="button" class="shop-buy" id="buy-rubber">Buy</button>
             </div>
           </div>
           <div class="shop-row" id="shop-row-flame">
             <div>
               <span class="shop-row__name">Flame Fruit</span>
-              <span class="shop-row__desc">Logia. <strong>Click</strong> fire punch: <strong>10</strong> damage, bandit melee range, ignites for <strong>2</strong> DPS for <strong>5s</strong>. <strong>Z</strong> searing strike — <strong>20</strong> damage, long range, same burn.</span>
+              <span class="shop-row__desc">Logia. <strong>Click</strong> fire punch: <strong>10</strong> damage, bandit melee range, ignites for <strong>2</strong> DPS for <strong>5s</strong>. <strong>Z</strong> throws a <strong>fireball</strong> — <strong>20</strong> damage, same burn (<strong>2</strong>/s × <strong>5</strong>s). <strong>X</strong> — <strong>Tornado Flame</strong> at <strong>Mastery 10+</strong> (stationary): <strong>5</strong> DPS for <strong>5s</strong>, <strong>15s</strong> cooldown — lifts enemies, reapplies burn.</span>
             </div>
             <div class="shop-row__meta">
-              <span class="shop-row__price">$5000</span>
-              <button type="button" class="shop-buy" id="buy-flame">Take</button>
+              <span class="shop-row__price">$10000</span>
+              <button type="button" class="shop-buy" id="buy-flame">Buy</button>
+            </div>
+          </div>
+          <div class="shop-row" id="shop-row-court">
+            <div>
+              <span class="shop-row__name">Court Fruit</span>
+              <span class="shop-row__desc">Paramecia. <strong>Click</strong> — <strong>Court punch</strong>: arm locks at <strong>90°</strong>; your fist shoots forward until it hits an enemy (<strong>10</strong> damage, unlimited range). <strong>Click again</strong> while the fist is out (no hit yet or after a hit) to pull it back.</span>
+            </div>
+            <div class="shop-row__meta">
+              <span class="shop-row__price">$30000</span>
+              <button type="button" class="shop-buy" id="buy-court">Buy</button>
             </div>
           </div>
         </div>
       </div>
-      <div class="shop-panel__foot">
-        <button type="button" class="shop-close" id="shop-close">Close</button>
+    </div>
+  </div>
+
+  <div id="codes-layer" class="codes-layer" aria-hidden="true">
+    <div class="codes-backdrop" id="codes-backdrop" aria-label="Close codes"></div>
+    <div class="codes-panel" role="dialog" aria-labelledby="codes-panel-title">
+      <h2 class="codes-panel__title" id="codes-panel-title">Enter code</h2>
+      <input
+        type="text"
+        class="codes-panel__input"
+        id="codes-input"
+        autocomplete="off"
+        autocapitalize="off"
+        spellcheck="false"
+        placeholder="Type your code here"
+        maxlength="64"
+      />
+      <p class="codes-panel__status" id="codes-status" aria-live="polite"></p>
+      <div class="codes-panel__actions">
+        <button type="button" class="codes-panel__btn codes-panel__btn--cancel" id="codes-btn-cancel">Cancel</button>
+        <button type="button" class="codes-panel__btn codes-panel__btn--submit" id="codes-btn-submit">Submit</button>
+      </div>
+    </div>
+  </div>
+
+  <div id="inventory-layer" class="inventory-layer" aria-hidden="true">
+    <div class="inventory-backdrop" id="inventory-backdrop" aria-label="Close inventory"></div>
+    <div class="inventory-panel" role="dialog" aria-labelledby="inventory-panel-title">
+      <h2 class="inventory-panel__title" id="inventory-panel-title">Inventory</h2>
+      <p class="inventory-panel__hint">Select a fruit in your bag, then press <strong>Eat</strong> to gain its powers.</p>
+      <ul id="inventory-list" class="inventory-list"></ul>
+      <p class="inventory-status" id="inventory-status" aria-live="polite"></p>
+      <div class="inventory-actions">
+        <button type="button" class="codes-panel__btn codes-panel__btn--cancel" id="inventory-close">Close</button>
+        <button type="button" class="codes-panel__btn codes-panel__btn--submit inventory-eat" id="inventory-eat" disabled>
+          Eat
+        </button>
       </div>
     </div>
   </div>
@@ -767,17 +1212,17 @@
   <div id="gray-island-dialogue-layer" class="dialogue-layer gray-island-dialogue-layer" aria-hidden="true">
     <div class="dialogue-backdrop" id="gray-island-dialogue-backdrop"></div>
     <div class="dialogue-front">
+      <div id="gray-island-trial-choices" class="gray-island-trial-choices" hidden>
+        <p class="gray-island-trial-choices__title">Choose a trial</p>
+        <button type="button" class="dialogue-choice-btn" id="dialogue-choice-boss">Buggy</button>
+        <button type="button" class="dialogue-choice-btn" id="dialogue-choice-enemies">Six kills (4 pirates, respawn)</button>
+      </div>
       <div class="dialogue-panel gray-island-dialogue-panel" role="dialog" aria-labelledby="gray-island-dialogue-name">
         <div class="dialogue-name" id="gray-island-dialogue-name">Gray island NPC</div>
         <p class="dialogue-body" id="gray-island-dialogue-body"></p>
         <div class="dialogue-actions">
           <button type="button" class="dialogue-ok" id="gray-island-dialogue-close">OK</button>
         </div>
-      </div>
-      <div id="gray-island-trial-choices" class="gray-island-trial-choices" hidden>
-        <p class="gray-island-trial-choices__title">Choose a trial</p>
-        <button type="button" class="dialogue-choice-btn" id="dialogue-choice-boss">One pirate captain</button>
-        <button type="button" class="dialogue-choice-btn" id="dialogue-choice-enemies">Six kills (4 pirates, respawn)</button>
       </div>
     </div>
   </div>
@@ -786,7 +1231,6 @@
     <div id="mission-hud" class="mission-hud mission-hud--hidden" role="region" aria-label="Missions" aria-hidden="true">
       <h2 class="mission-hud__title">Missions</h2>
       <ul class="mission-hud__list">
-        <li id="mission-fruit">○ Buy a fruit at the market</li>
         <li id="mission-kills">○ Defeat 3 bandits (0/3)</li>
         <li id="mission-boat" hidden>○ Speak with the boat seller</li>
         <li id="mission-gray" hidden>○ Gray island — pirates</li>
@@ -797,8 +1241,14 @@
     <div id="shop-hint" class="shop-hint">Press <strong>E</strong> — Shop</div>
     <div id="boat-hint" class="boat-hint">Press <strong>E</strong> — Boat seller</div>
     <div id="boat-enter-hint" class="boat-enter-hint">Press <strong>E</strong> — Enter boat</div>
-    <div class="money-bar" role="status" aria-label="Money">
-      $<span id="money-current">0</span>
+    <div class="hud-money-stack">
+      <div class="hud-top-actions">
+        <button type="button" class="hud-top-btn" id="hud-btn-codes">codes</button>
+        <button type="button" class="hud-top-btn" id="hud-btn-inventory">inventory</button>
+      </div>
+      <div class="money-bar" role="status" aria-label="Money and damage dealt">
+        $<span id="money-current">0</span><span class="money-bar__dmg"> · <span id="damage-dealt-total">0</span> dmg</span>
+      </div>
     </div>
     <div class="level-bar" role="status" aria-label="Level and experience">
       <div class="level-bar__label">
@@ -818,19 +1268,44 @@
       </div>
     </div>
     <div class="hotbar-row">
-      <div id="hotbar-slot-1" class="hotbar-slot hotbar-slot--halo" role="presentation">
+      <div id="hotbar-slot-1" class="hotbar-slot hotbar-slot--fruits" role="presentation" title="Fruit powers (key 1)">
         <span class="hotbar-slot__key">1</span>
       </div>
-      <div id="hotbar-slot-2" class="hotbar-slot" role="presentation">
+      <div id="hotbar-slot-2" class="hotbar-slot hotbar-slot--combat-key hotbar-slot--halo" role="presentation" title="Combat — fists (key 2)">
         <span class="hotbar-slot__key">2</span>
       </div>
     </div>
     <div id="fruit-hud" class="fruit-hud" aria-hidden="true">
       <div class="fruit-hud__head" id="fruit-hud-head">Rubber — attacks</div>
+      <div class="fruit-hud__mastery" id="fruit-mastery-block" hidden>
+        <div class="fruit-hud__mastery-row">
+          <span id="fruit-mastery-label">Mastery 1</span>
+          <span id="fruit-mastery-xp" class="fruit-hud__mastery-xp">0/100</span>
+        </div>
+        <div class="fruit-hud__mastery-track">
+          <div class="fruit-hud__mastery-fill" id="fruit-mastery-fill"></div>
+        </div>
+      </div>
       <ul class="fruit-hud__list" id="fruit-hud-list">
         <li><span class="fruit-hud__m">Click</span> Stretch punch</li>
         <li><kbd>Z</kbd> Heavy stretch — longer range <span class="fruit-hud__cd" id="heavy-punch-cd" hidden></span></li>
       </ul>
+      <ul class="fruit-hud__list fruit-hud__list--rubber-only" id="fruit-hud-rubber-only-list" hidden aria-label="Rubber-only attacks">
+        <li id="fruit-hud-rubber-flurry-li">
+          <kbd>C</kbd> Rubber flurry — requires <strong>Mastery 10</strong>
+          <span class="fruit-hud__cd" id="rubber-flurry-cd" hidden></span>
+        </li>
+      </ul>
+      <ul class="fruit-hud__list fruit-hud__list--flame-only" id="fruit-hud-flame-only-list" hidden aria-label="Flame-only attacks">
+        <li id="fruit-hud-flight-li">
+          <kbd>F</kbd> Flame flight — <strong>toggle</strong>; drag camera to steer (orbit yaw + pitch), Superman pose
+        </li>
+        <li id="fruit-hud-tornado-li">
+          <kbd>X</kbd> Tornado Flame — requires <strong>Mastery 10</strong>
+          <span class="fruit-hud__cd" id="flame-tornado-cd" hidden></span>
+        </li>
+      </ul>
+      <ul class="fruit-hud__list fruit-hud__list--court-only" id="fruit-hud-court-only-list" hidden aria-label="Court-only notes"></ul>
     </div>
   </div>
   <script type="importmap">
@@ -862,6 +1337,9 @@
     let camYaw = 0.35;
     let camPitch = 0.42;
     let camDist = 28;
+    /** Orbit angles used only for flame-flight steering (camera stays locked behind). */
+    let flameFlightSteerYaw = 0.35;
+    let flameFlightSteerPitch = 0.42;
     let drag = false;
     let lx = 0;
     let ly = 0;
@@ -878,6 +1356,25 @@
       );
       camera.lookAt(camTarget);
     }
+
+    function updateFlightChaseCamera() {
+      const pitch = Math.max(0.12, Math.min(1.3, flameFlightSteerPitch));
+      const cp = Math.cos(pitch);
+      const sp = Math.sin(pitch);
+      const yaw = flameFlightSteerYaw + Math.PI;
+      camera.position.set(
+        camTarget.x + Math.sin(yaw) * cp * camDist,
+        camTarget.y + sp * camDist,
+        camTarget.z + Math.cos(yaw) * cp * camDist
+      );
+      camera.lookAt(camTarget);
+    }
+
+    function syncOrbitCameraFromFlightSteer() {
+      camYaw = flameFlightSteerYaw;
+      camPitch = Math.max(0.12, Math.min(1.3, flameFlightSteerPitch));
+    }
+
     updateCameraFromOrbit();
 
     renderer.domElement.addEventListener('pointerdown', (e) => {
@@ -900,6 +1397,18 @@
       const dy = e.clientY - ly;
       lx = e.clientX;
       ly = e.clientY;
+      const steeringFlameFlight =
+        flameFlightActive &&
+        !playerDead &&
+        !playerInBoat &&
+        getActiveFruitForPowers() === 'flame' &&
+        flameMasteryLevel >= FLAME_FLIGHT_MIN_MASTERY;
+      if (steeringFlameFlight) {
+        flameFlightSteerYaw -= dx * 0.005;
+        flameFlightSteerPitch -= dy * 0.005;
+        flameFlightSteerPitch = Math.max(0.12, Math.min(1.3, flameFlightSteerPitch));
+        return;
+      }
       camYaw -= dx * 0.005;
       camPitch -= dy * 0.005;
       updateCameraFromOrbit();
@@ -907,11 +1416,34 @@
     renderer.domElement.addEventListener('wheel', (e) => {
       e.preventDefault();
       camDist = Math.max(10, Math.min(80, camDist + e.deltaY * 0.04));
-      updateCameraFromOrbit();
+      const chaseFlameFlight =
+        flameFlightActive &&
+        !playerDead &&
+        !playerInBoat &&
+        getActiveFruitForPowers() === 'flame' &&
+        flameMasteryLevel >= FLAME_FLIGHT_MIN_MASTERY;
+      if (chaseFlameFlight) updateFlightChaseCamera();
+      else updateCameraFromOrbit();
     }, { passive: false });
 
     const clock = new THREE.Clock();
     const moveSpeed = 14;
+    /**
+     * Flame flight: true 3D direction from orbit yaw/pitch — NOT camera.getWorldDirection()
+     * (orbit camera lookAt follows the player, so that vector keeps pointing at yourself → hover).
+     */
+    const FLAME_FLIGHT_SPEED = 36;
+    const FLAME_FLIGHT_PITCH_CENTER = 0.52;
+    const FLAME_FLIGHT_PITCH_TO_ELEV = 1.38;
+
+    function computeFlameFlightDir(out, steerYaw, steerPitch) {
+      const elevRaw = (FLAME_FLIGHT_PITCH_CENTER - steerPitch) * FLAME_FLIGHT_PITCH_TO_ELEV;
+      const elev = Math.max(-1.48, Math.min(1.48, elevRaw));
+      const cosE = Math.cos(elev);
+      out.set(Math.sin(steerYaw) * cosE, Math.sin(elev), Math.cos(steerYaw) * cosE);
+      if (out.lengthSq() < 1e-10) out.set(0, 1, 0);
+      else out.normalize();
+    }
 
     const ambient = new THREE.AmbientLight(0xffffff, 0.45);
     scene.add(ambient);
@@ -1047,9 +1579,9 @@
     }
 
     /** Corner-open hall: two full walls (L-shape), generous chamber for a boss. */
-    function placeOpenHall(cx, cz, fw, fd, wallH, wallHex, roofHex) {
+    function placeOpenHall(cx, cz, fw, fd, wallH, wallHex, roofHex, baseY = 0) {
       const g = new THREE.Group();
-      g.position.set(cx, 0, cz);
+      g.position.set(cx, baseY, cz);
       const wm = houseMatWall(wallHex);
       const rm = houseMatRoof(roofHex);
       const t = 0.4;
@@ -1100,10 +1632,11 @@
       const enCx = gx + 60;
       const enCz = gz - 38;
 
-      placeOpenHall(bossCx, bossCz, 15.5, 13.2, 4.0, 0xa4161c, 0x2c1810);
+      const buggyHallLiftY = 1.65;
+      placeOpenHall(bossCx, bossCz, 26, 22, 4.6, 0xa4161c, 0x2c1810, buggyHallLiftY);
       for (let i = 0; i < 7; i++) {
         const a = (i / 7) * Math.PI * 2 + 0.35;
-        const r = 11.2;
+        const r = 18.5;
         const [wc, rc] = houseColors[i % houseColors.length];
         placeOpenHouse(
           bossCx + Math.cos(a) * r,
@@ -1256,26 +1789,32 @@
       group.add(headGroup);
 
       group.position.set(0, 0, 0);
-      return { group, armRRig, armR };
+      return { group, armRRig, armR, armL, legL, legR };
     }
 
     const playerRig = makeCharacter();
     const player = playerRig.group;
     const playerArmRRig = playerRig.armRRig;
     const playerArmR = playerRig.armR;
+    const playerArmL = playerRig.armL;
+    const playerLegL = playerRig.legL;
+    const playerLegR = playerRig.legR;
     const playerParts = [];
     player.traverse((obj) => {
       if (obj.isMesh) playerParts.push(obj);
     });
     scene.add(player);
     const playerArmRRigBasePos = playerArmRRig.position.clone();
+    const playerArmLBasePos = playerArmL.position.clone();
 
-    const FIST_FIRE_N = 64;
+    const FIST_FIRE_N = 140;
     const fistFireVel = [];
     const fistFireLife = new Float32Array(FIST_FIRE_N);
+    const fistFireType = new Uint8Array(FIST_FIRE_N);
     for (let i = 0; i < FIST_FIRE_N; i++) {
       fistFireVel.push(new THREE.Vector3());
       fistFireLife[i] = 0;
+      fistFireType[i] = 0;
     }
     const fistFireGeo = new THREE.BufferGeometry();
     const fistFirePosArr = new Float32Array(FIST_FIRE_N * 3);
@@ -1283,10 +1822,10 @@
     fistFireGeo.setAttribute('position', new THREE.BufferAttribute(fistFirePosArr, 3));
     fistFireGeo.setAttribute('color', new THREE.BufferAttribute(fistFireColArr, 3));
     const fistFireMat = new THREE.PointsMaterial({
-      size: 0.16,
+      size: 0.26,
       vertexColors: true,
       transparent: true,
-      opacity: 0.95,
+      opacity: 1,
       depthWrite: false,
       blending: THREE.AdditiveBlending,
       sizeAttenuation: true,
@@ -1297,6 +1836,237 @@
     fistFirePoints.renderOrder = 10;
     fistFirePoints.position.set(0, -0.44, 0.16);
     playerArmR.add(fistFirePoints);
+
+    const courtUpperStubGeo = new THREE.BoxGeometry(0.32, 0.5, 0.32);
+    const courtUpperStub = new THREE.Mesh(courtUpperStubGeo, playerArmR.material);
+    courtUpperStub.position.set(0, -0.25, 0);
+    courtUpperStub.castShadow = true;
+    courtUpperStub.visible = false;
+    playerArmRRig.add(courtUpperStub);
+
+    const courtFistGeo = new THREE.BoxGeometry(0.32, 0.32, 0.32);
+    const courtFistMesh = new THREE.Mesh(courtFistGeo, playerArmR.material);
+    courtFistMesh.visible = false;
+    courtFistMesh.castShadow = true;
+    scene.add(courtFistMesh);
+
+    const FLIGHT_LEG_FIRE_N = 72;
+    function createFlightLegFireParticleSystem() {
+      const n = FLIGHT_LEG_FIRE_N;
+      const vel = [];
+      const life = new Float32Array(n);
+      const type = new Uint8Array(n);
+      for (let i = 0; i < n; i++) {
+        vel.push(new THREE.Vector3());
+        life[i] = 0;
+        type[i] = 0;
+      }
+      const geo = new THREE.BufferGeometry();
+      const posArr = new Float32Array(n * 3);
+      const colArr = new Float32Array(n * 3);
+      geo.setAttribute('position', new THREE.BufferAttribute(posArr, 3));
+      geo.setAttribute('color', new THREE.BufferAttribute(colArr, 3));
+      const points = new THREE.Points(geo, fistFireMat);
+      points.visible = false;
+      points.frustumCulled = false;
+      points.renderOrder = 9;
+      return { geo, n, vel, life, type, points };
+    }
+
+    const flightLegFireL = createFlightLegFireParticleSystem();
+    const flightLegFireR = createFlightLegFireParticleSystem();
+    flightLegFireL.points.position.set(0, -0.38, 0.05);
+    flightLegFireR.points.position.set(0, -0.38, 0.05);
+    playerLegL.add(flightLegFireL.points);
+    playerLegR.add(flightLegFireR.points);
+
+    function updateFlightLegFireParticleSystem(fx, dt) {
+      const posA = fx.geo.attributes.position.array;
+      const colA = fx.geo.attributes.color.array;
+      const spawnHot = 0.1;
+      const spawnEmber = 0.15;
+      for (let i = 0; i < fx.n; i++) {
+        fx.life[i] -= dt;
+        const ix = i * 3;
+        if (fx.life[i] <= 0) {
+          const ember = Math.random() < 0.55;
+          fx.type[i] = ember ? 1 : 0;
+          const r = ember ? spawnEmber : spawnHot;
+          posA[ix] = (Math.random() - 0.5) * r;
+          posA[ix + 1] = -0.06 + (Math.random() - 0.5) * r * 0.55;
+          posA[ix + 2] = (Math.random() - 0.5) * r * 0.55;
+          if (ember) {
+            fx.life[i] = 0.34 + Math.random() * 0.5;
+            fx.vel[i].set(
+              (Math.random() - 0.5) * 0.62,
+              -0.55 - Math.random() * 0.75,
+              (Math.random() - 0.5) * 0.62
+            );
+            colA[ix] = 0.95 + Math.random() * 0.05;
+            colA[ix + 1] = 0.26 + Math.random() * 0.22;
+            colA[ix + 2] = 0.02 + Math.random() * 0.08;
+          } else {
+            fx.life[i] = 0.06 + Math.random() * 0.12;
+            fx.vel[i].set(
+              (Math.random() - 0.5) * 0.58,
+              -1.05 - Math.random() * 1.15,
+              (Math.random() - 0.5) * 0.58
+            );
+            colA[ix] = 1;
+            colA[ix + 1] = 0.86 + Math.random() * 0.14;
+            colA[ix + 2] = 0.1 + Math.random() * 0.26;
+          }
+        } else {
+          posA[ix] += fx.vel[i].x * dt;
+          posA[ix + 1] += fx.vel[i].y * dt;
+          posA[ix + 2] += fx.vel[i].z * dt;
+          const ember = fx.type[i] === 1;
+          if (ember) fx.vel[i].multiplyScalar(1 - dt * 0.52);
+          else fx.vel[i].multiplyScalar(1 - dt * 1.45);
+          fx.vel[i].y += dt * (ember ? -0.12 : -0.35);
+          fx.vel[i].x += (Math.random() - 0.5) * dt * (ember ? 0.34 : 0.12);
+          fx.vel[i].z += (Math.random() - 0.5) * dt * (ember ? 0.26 : 0.1);
+          const maxL = ember ? 0.84 : 0.19;
+          const tLife = Math.min(1, fx.life[i] / maxL);
+          if (ember) {
+            colA[ix] = Math.max(0.24, 0.42 + 0.58 * tLife);
+            colA[ix + 1] = Math.max(0.02, 0.06 + 0.24 * tLife);
+            colA[ix + 2] = Math.max(0, 0.04 * tLife);
+          } else {
+            colA[ix] = 1;
+            colA[ix + 1] = Math.max(0.14, 0.32 + 0.62 * tLife);
+            colA[ix + 2] = Math.max(0, 0.38 * (1 - tLife));
+          }
+        }
+      }
+      fx.geo.attributes.position.needsUpdate = true;
+      fx.geo.attributes.color.needsUpdate = true;
+    }
+
+    function updateFlightLegFireParticles(dt) {
+      const on =
+        flameFlightActive &&
+        getActiveFruitForPowers() === 'flame' &&
+        flameMasteryLevel >= FLAME_FLIGHT_MIN_MASTERY &&
+        !playerDead &&
+        !playerInBoat;
+      flightLegFireL.points.visible = on;
+      flightLegFireR.points.visible = on;
+      if (!on) return;
+      updateFlightLegFireParticleSystem(flightLegFireL, dt);
+      updateFlightLegFireParticleSystem(flightLegFireR, dt);
+    }
+
+    const ENEMY_BURN_FIRE_N = 24;
+    let enemyBurnFireMaterial = null;
+    function getEnemyBurnFireMaterial() {
+      if (!enemyBurnFireMaterial) {
+        enemyBurnFireMaterial = new THREE.PointsMaterial({
+          size: 0.2,
+          vertexColors: true,
+          transparent: true,
+          opacity: 0.92,
+          depthWrite: false,
+          blending: THREE.AdditiveBlending,
+          sizeAttenuation: true,
+        });
+      }
+      return enemyBurnFireMaterial;
+    }
+
+    function createEnemyBurnFirePoints() {
+      const n = ENEMY_BURN_FIRE_N;
+      const anchor = new THREE.Group();
+      const vel = [];
+      const life = new Float32Array(n);
+      const type = new Uint8Array(n);
+      for (let i = 0; i < n; i++) {
+        vel.push(new THREE.Vector3());
+        life[i] = 0;
+        type[i] = 0;
+      }
+      const geo = new THREE.BufferGeometry();
+      const posArr = new Float32Array(n * 3);
+      const colArr = new Float32Array(n * 3);
+      geo.setAttribute('position', new THREE.BufferAttribute(posArr, 3));
+      geo.setAttribute('color', new THREE.BufferAttribute(colArr, 3));
+      const points = new THREE.Points(geo, getEnemyBurnFireMaterial());
+      points.visible = false;
+      points.frustumCulled = false;
+      points.renderOrder = 6;
+      anchor.add(points);
+      return { anchor, points, geo, n, vel, life, type, posArr, colArr };
+    }
+
+    function updateEnemyBurnFireParticles(e, dt) {
+      const bf = e.burnFire;
+      if (!bf) return;
+      const burning = e.alive && e.hp > 0 && e.burnTimeRemaining > 0;
+      bf.points.visible = burning;
+      if (!burning) return;
+
+      const n = bf.n;
+      const posA = bf.geo.attributes.position.array;
+      const colA = bf.geo.attributes.color.array;
+      const spawnHot = 0.12;
+      const spawnEmber = 0.17;
+      for (let i = 0; i < n; i++) {
+        bf.life[i] -= dt;
+        const ix = i * 3;
+        if (bf.life[i] <= 0) {
+          const ember = Math.random() < 0.55;
+          bf.type[i] = ember ? 1 : 0;
+          const r = ember ? spawnEmber : spawnHot;
+          posA[ix] = (Math.random() - 0.5) * r;
+          posA[ix + 1] = (Math.random() - 0.5) * r * 0.55;
+          posA[ix + 2] = (Math.random() - 0.5) * r * 0.58;
+          if (ember) {
+            bf.life[i] = 0.34 + Math.random() * 0.52;
+            bf.vel[i].set(
+              (Math.random() - 0.5) * 0.52,
+              0.4 + Math.random() * 0.52,
+              (Math.random() - 0.5) * 0.52
+            );
+            colA[ix] = 0.95 + Math.random() * 0.05;
+            colA[ix + 1] = 0.2 + Math.random() * 0.22;
+            colA[ix + 2] = 0.02 + Math.random() * 0.1;
+          } else {
+            bf.life[i] = 0.06 + Math.random() * 0.12;
+            bf.vel[i].set(
+              (Math.random() - 0.5) * 0.48,
+              0.72 + Math.random() * 0.92,
+              (Math.random() - 0.5) * 0.48
+            );
+            colA[ix] = 1;
+            colA[ix + 1] = 0.8 + Math.random() * 0.18;
+            colA[ix + 2] = 0.08 + Math.random() * 0.22;
+          }
+        } else {
+          posA[ix] += bf.vel[i].x * dt;
+          posA[ix + 1] += bf.vel[i].y * dt;
+          posA[ix + 2] += bf.vel[i].z * dt;
+          const ember = bf.type[i] === 1;
+          if (ember) bf.vel[i].multiplyScalar(1 - dt * 0.52);
+          else bf.vel[i].multiplyScalar(1 - dt * 1.42);
+          bf.vel[i].y += dt * (ember ? 0.2 : 0.52);
+          bf.vel[i].x += (Math.random() - 0.5) * dt * (ember ? 0.34 : 0.11);
+          bf.vel[i].z += (Math.random() - 0.5) * dt * (ember ? 0.26 : 0.09);
+          const maxL = ember ? 0.86 : 0.19;
+          const tLife = Math.min(1, bf.life[i] / maxL);
+          if (ember) {
+            colA[ix] = Math.max(0.2, 0.38 + 0.58 * tLife);
+            colA[ix + 1] = Math.max(0.02, 0.05 + 0.22 * tLife);
+            colA[ix + 2] = 0;
+          } else {
+            colA[ix] = 0.72 + 0.28 * tLife;
+            colA[ix + 1] = 0.52 + 0.38 * tLife;
+            colA[ix + 2] = 0.06 + 0.22 * tLife;
+          }
+        }
+      }
+      bf.geo.attributes.position.needsUpdate = true;
+      bf.geo.attributes.color.needsUpdate = true;
+    }
 
     function makeEnemyRig() {
       const group = new THREE.Group();
@@ -1371,6 +2141,79 @@
       group.add(headGroup);
 
       return { group, armRRig, armR };
+    }
+
+    /** Pirate captain: legs / torso+arms / head as separate groups for special attacks. */
+    function makeBossRig() {
+      const group = new THREE.Group();
+      const skin = new THREE.MeshStandardMaterial({ color: 0xe8b896, roughness: 0.6 });
+      const shirt = new THREE.MeshStandardMaterial({ color: 0x7f1d1d, roughness: 0.55 });
+      const pants = new THREE.MeshStandardMaterial({ color: 0x1c1917, roughness: 0.75 });
+      const bodyY = 1.575;
+      const armHalf = 0.44;
+      const legGeo = new THREE.BoxGeometry(0.42, 0.95, 0.42);
+      const legsRoot = new THREE.Group();
+      legsRoot.name = 'bossLegs';
+      const legL = new THREE.Mesh(legGeo, pants);
+      legL.position.set(-0.28, 0.475, 0);
+      legL.castShadow = true;
+      const legR = legL.clone();
+      legR.position.x = 0.28;
+      legsRoot.add(legL, legR);
+      group.add(legsRoot);
+
+      const torsoArmRoot = new THREE.Group();
+      torsoArmRoot.name = 'bossTorsoArms';
+      torsoArmRoot.position.set(0, bodyY, 0);
+      const body = new THREE.Mesh(new THREE.BoxGeometry(0.95, 1.05, 0.5), shirt);
+      body.castShadow = true;
+      torsoArmRoot.add(body);
+      const armGeo = new THREE.BoxGeometry(0.32, 0.88, 0.32);
+      const armL = new THREE.Mesh(armGeo, shirt);
+      armL.position.set(-0.72, 0, 0);
+      armL.castShadow = true;
+      const armRRig = new THREE.Group();
+      armRRig.position.set(0.72, armHalf, 0);
+      const armR = new THREE.Mesh(armGeo, shirt);
+      armR.position.set(0, -armHalf, 0);
+      armR.castShadow = true;
+      armRRig.add(armR);
+      torsoArmRoot.add(armL, armRRig);
+      group.add(torsoArmRoot);
+
+      const headGeo = new THREE.BoxGeometry(0.72, 0.72, 0.72);
+      const headRoot = new THREE.Group();
+      headRoot.name = 'bossHead';
+      headRoot.position.set(0, bodyY + 0.525 + 0.36, 0);
+      const head = new THREE.Mesh(headGeo, skin);
+      head.castShadow = true;
+      headRoot.add(head);
+      const faceZ = 0.36 + 0.012;
+      const eyeMat = new THREE.MeshStandardMaterial({ color: 0x141414, roughness: 0.35 });
+      const eyeGeo = new THREE.BoxGeometry(0.12, 0.12, 0.04);
+      const eyeL = new THREE.Mesh(eyeGeo, eyeMat);
+      eyeL.position.set(-0.17, 0.08, faceZ);
+      const eyeR = eyeL.clone();
+      eyeR.position.x = 0.17;
+      headRoot.add(eyeL, eyeR);
+      const browMat = new THREE.MeshStandardMaterial({ color: 0x3d2818, roughness: 0.6 });
+      const browGeo = new THREE.BoxGeometry(0.14, 0.035, 0.025);
+      const browL = new THREE.Mesh(browGeo, browMat);
+      browL.position.set(-0.17, 0.17, faceZ);
+      const browR = browL.clone();
+      browR.position.x = 0.17;
+      headRoot.add(browL, browR);
+      const mouthMat = new THREE.MeshStandardMaterial({ color: 0x5c3d3d, roughness: 0.5 });
+      const mouth = new THREE.Mesh(new THREE.BoxGeometry(0.22, 0.045, 0.03), mouthMat);
+      mouth.position.set(0, -0.15, faceZ);
+      headRoot.add(mouth);
+      const noseMat = new THREE.MeshStandardMaterial({ color: 0xd4a08c, roughness: 0.55 });
+      const nose = new THREE.Mesh(new THREE.BoxGeometry(0.08, 0.07, 0.05), noseMat);
+      nose.position.set(0, 0.01, faceZ + 0.01);
+      headRoot.add(nose);
+      group.add(headRoot);
+
+      return { group, legsRoot, torsoArmRoot, headRoot, armRRig, armR, bossBodyY: bodyY, headYOffset: 0.525 + 0.36 };
     }
 
     function makeGuideNpc() {
@@ -1525,7 +2368,40 @@
     const enemyPunchTotal = ePunchP1 + ePunchP2 + ePunchP3 + ePunchP4 + ePunchP5;
     const enemyPunchReach = 0.52;
 
+    const BOSS_SCALE = 1.12;
+    const BOSS_DISPLAY_NAME = 'Buggy';
+    const BOSS_MAX_HP = 1000;
+    const BOSS_PUNCH_DMG = 30;
+    const BOSS_PUNCH_RANGE = 5.65;
+    const BOSS_PUNCH_HIT = 5.38;
+    const BOSS_PUNCH_CD = 3;
+    const BOSS_SPIN_DURATION = 8.5;
+    const BOSS_SPIN_CD = 2;
+    const BOSS_SPIN_RADIUS = 7.9;
+    const BOSS_SPIN_DPS = 30;
+    const BOSS_CHASE_DURATION = 8.5;
+    const BOSS_CHASE_CD = 4;
+    const BOSS_CHASE_FOLLOW_SPEED = 9;
+    const BOSS_CHASE_PUNCH_HIT = 2.05;
+    const BOSS_CHASE_PUNCH_CD = 0.88;
+    /** Attack 3 (chase) punch damage per hit (separate from normal boss punch). */
+    const BOSS_CHASE_PUNCH_DMG = 20;
+    const BOSS_MOVE_SPEED_MULT = 0.78;
+    /** During attack 3 (chase), player damage only counts if it hits the legs (legs stay rooted). */
+    const BOSS_CHASE_LEG_STRIKE_MAX = 1.28;
+    const BOSS_CHASE_LEG_HIT_R = 0.72;
+
     const enemies = [];
+    let playerBossSlowMult = 1;
+    const _bossLegsWorld = new THREE.Vector3();
+
+    function bossChasePlayerShotHitsLegs(e, worldX, worldZ, extraR) {
+      if (e.grayQuestRole !== 'boss' || !(e.bossChaseRemaining > 0) || !e.bossLegsRoot) return true;
+      e.bossLegsRoot.getWorldPosition(_bossLegsWorld);
+      const sc = e.mesh.scale.x;
+      const lim = BOSS_CHASE_LEG_HIT_R * sc + (extraR || 0);
+      return Math.hypot(worldX - _bossLegsWorld.x, worldZ - _bossLegsWorld.z) <= lim;
+    }
 
     function resetEnemyPunchPose(e) {
       e.armRRig.rotation.set(0, 0, 0);
@@ -1554,6 +2430,37 @@
       return { root, fill, maxWidth: 1.14 };
     }
 
+    function makeBossNameSprite(label) {
+      const canvas = document.createElement('canvas');
+      canvas.width = 512;
+      canvas.height = 128;
+      const ctx = canvas.getContext('2d');
+      ctx.fillStyle = 'rgba(15, 23, 42, 0.88)';
+      ctx.fillRect(12, 20, 488, 92);
+      ctx.strokeStyle = '#fbbf24';
+      ctx.lineWidth = 3;
+      ctx.strokeRect(13.5, 21.5, 485, 89);
+      ctx.font = 'bold 52px system-ui, "Segoe UI", sans-serif';
+      ctx.textAlign = 'center';
+      ctx.textBaseline = 'middle';
+      const cx = 256;
+      const cy = 66;
+      ctx.strokeStyle = '#0f172a';
+      ctx.lineWidth = 8;
+      ctx.lineJoin = 'round';
+      ctx.strokeText(label, cx, cy);
+      ctx.fillStyle = '#fef9c3';
+      ctx.fillText(label, cx, cy);
+      const tex = new THREE.CanvasTexture(canvas);
+      if (THREE.SRGBColorSpace !== undefined) tex.colorSpace = THREE.SRGBColorSpace;
+      tex.needsUpdate = true;
+      const mat = new THREE.SpriteMaterial({ map: tex, transparent: true, depthTest: true });
+      const sprite = new THREE.Sprite(mat);
+      sprite.center.set(0.5, 0.5);
+      sprite.scale.set(2.15, 0.54, 1);
+      return sprite;
+    }
+
     function updateEnemyHpBar(e) {
       if (!e.hpFill) return;
       const maxH = e.maxHp != null ? e.maxHp : enemyMaxHp;
@@ -1573,70 +2480,193 @@
       }
     }
 
+    function collectEnemyDamageFlashMats(root) {
+      const list = [];
+      const seen = new Set();
+      root.traverse((obj) => {
+        if (!obj.isMesh || !obj.material) return;
+        const m = obj.material;
+        if (m.isMeshStandardMaterial && !seen.has(m)) {
+          seen.add(m);
+          list.push({
+            mat: m,
+            color: m.color.clone(),
+            emissive: m.emissive.clone(),
+            emissiveIntensity: m.emissiveIntensity,
+          });
+        }
+      });
+      return list;
+    }
+
+    function restoreEnemyDamageFlash(e) {
+      if (!e.damageFlashRest) return;
+      e.damageFlashT = 0;
+      for (const x of e.damageFlashRest) {
+        x.mat.color.copy(x.color);
+        x.mat.emissive.copy(x.emissive);
+        x.mat.emissiveIntensity = x.emissiveIntensity;
+      }
+    }
+
+    function startEnemyDamageFlash(e) {
+      if (!e.damageFlashRest || e.damageFlashRest.length === 0) return;
+      e.damageFlashT = 0.092;
+      for (const x of e.damageFlashRest) {
+        x.mat.color.setHex(0xff1c1c);
+        x.mat.emissive.setHex(0x991010);
+        x.mat.emissiveIntensity = 0.48;
+      }
+    }
+
+    function tickEnemyDamageFlash(e, dt) {
+      if (!e.damageFlashRest || e.damageFlashT <= 0) return;
+      e.damageFlashT -= dt;
+      if (e.damageFlashT <= 0) {
+        e.damageFlashT = 0;
+        for (const x of e.damageFlashRest) {
+          x.mat.color.copy(x.color);
+          x.mat.emissive.copy(x.emissive);
+          x.mat.emissiveIntensity = x.emissiveIntensity;
+        }
+      }
+    }
+
     function respawnEnemy(e) {
       if (e.noRespawn) return;
       e.hp = e.maxHp != null ? e.maxHp : enemyMaxHp;
       e.burnTimeRemaining = 0;
       e.burnDps = 0;
+      e.burnDmgFlashAccum = 0;
+      e.tornadoLiftY = 0;
+      e.tornadoBurnAcc = 0;
       e.alive = true;
       e.respawnT = 0;
       e.mesh.position.copy(e.spawn);
       e.mesh.visible = true;
       resetEnemyPunchPose(e);
       e.attackCD = 0.6;
+      restoreEnemyDamageFlash(e);
       updateEnemyHpBar(e);
+    }
+
+    function resetBossPose(e) {
+      if (!e.bossLegsRoot) return;
+      e.bossLegsRoot.position.set(0, 0, 0);
+      e.bossLegsRoot.rotation.set(0, 0, 0);
+      e.bossTorsoArmRoot.position.set(0, e.bossBodyY, 0);
+      e.bossTorsoArmRoot.rotation.set(0, 0, 0);
+      e.bossHeadRoot.position.set(0, e.bossBodyY + e.bossHeadYOffset, 0);
+      e.bossHeadRoot.rotation.set(0, 0, 0);
+      e.bossSpinRemaining = 0;
+      e.bossChaseRemaining = 0;
+      resetEnemyPunchPose(e);
     }
 
     function revivePirateCaptain(e) {
       if (e.grayQuestRole !== 'boss') return;
       e.burnTimeRemaining = 0;
       e.burnDps = 0;
-      e.hp = e.maxHp != null ? e.maxHp : enemyMaxHp;
+      e.burnDmgFlashAccum = 0;
+      e.tornadoLiftY = 0;
+      e.tornadoBurnAcc = 0;
+      e.hp = e.maxHp != null ? e.maxHp : BOSS_MAX_HP;
       e.alive = true;
       e.mesh.visible = true;
       e.mesh.position.copy(e.spawn);
       e.respawnT = 0;
       e.punchT = 0;
       e.attackCD = 0.4;
-      resetEnemyPunchPose(e);
+      e.bossCdNormal = 0;
+      e.bossCdSpin = 0;
+      e.bossCdChase = 0;
+      e.bossChasePunchCd = 0;
+      resetBossPose(e);
+      restoreEnemyDamageFlash(e);
       updateEnemyHpBar(e);
-      e.grayQuestFrozen = false;
+    }
+
+    function reviveGraySwarmPirates() {
+      for (const en of enemies) {
+        if (en.grayQuestRole !== 'swarm') continue;
+        en.noRespawn = false;
+        en.burnTimeRemaining = 0;
+        en.burnDps = 0;
+        en.burnDmgFlashAccum = 0;
+        en.tornadoLiftY = 0;
+        en.tornadoBurnAcc = 0;
+        en.hp = en.maxHp != null ? en.maxHp : enemyMaxHp;
+        en.alive = true;
+        en.mesh.visible = true;
+        en.mesh.position.copy(en.spawn);
+        en.respawnT = 0;
+        en.punchT = 0;
+        en.attackCD = 0.4;
+        resetEnemyPunchPose(en);
+        restoreEnemyDamageFlash(en);
+        updateEnemyHpBar(en);
+      }
     }
 
     function spawnEnemyAt(x, z, opts = {}) {
       const scale = opts.scale != null ? opts.scale : 1;
       const grayQuestRole = opts.grayQuestRole != null ? opts.grayQuestRole : null;
+      const isBoss = grayQuestRole === 'boss';
       const isPirate = grayQuestRole != null;
       const maxHp =
-        opts.maxHp != null ? opts.maxHp : isPirate ? pirateEnemyMaxHp : enemyMaxHp;
+        opts.maxHp != null
+          ? opts.maxHp
+          : isBoss
+            ? BOSS_MAX_HP
+            : isPirate
+              ? pirateEnemyMaxHp
+              : enemyMaxHp;
       const punchDamage =
         opts.punchDamage != null
           ? opts.punchDamage
-          : isPirate
-            ? pirateEnemyPunchDamage
-            : enemyPunchDamage;
+          : isBoss
+            ? BOSS_PUNCH_DMG
+            : isPirate
+              ? pirateEnemyPunchDamage
+              : enemyPunchDamage;
       const attackRange =
         opts.attackRange != null
           ? opts.attackRange
-          : isPirate
-            ? pirateEnemyAttackRange
-            : enemyAttackRange;
+          : isBoss
+            ? BOSS_PUNCH_RANGE
+            : isPirate
+              ? pirateEnemyAttackRange
+              : enemyAttackRange;
       const hitRange =
-        opts.hitRange != null ? opts.hitRange : isPirate ? pirateEnemyHitRange : enemyHitRange;
+        opts.hitRange != null
+          ? opts.hitRange
+          : isBoss
+            ? BOSS_PUNCH_HIT
+            : isPirate
+              ? pirateEnemyHitRange
+              : enemyHitRange;
       const countsForMission = opts.countsForMission !== false;
       const collisionR = opts.collisionR != null ? opts.collisionR : enemyRadius * scale;
       const noRespawn = !!opts.noRespawn;
-      const grayQuestFrozen = grayQuestRole != null;
 
-      const rig = makeEnemyRig();
+      const rig = isBoss ? makeBossRig() : makeEnemyRig();
       const hpBar = makeEnemyHpBar();
       rig.group.scale.setScalar(scale);
-      hpBar.root.position.y = 3.15 * scale;
-      if (scale > 1.35) {
-        hpBar.root.scale.setScalar(1.15);
-        hpBar.root.position.y = 3.35 * scale;
+      if (isBoss) {
+        rig.headRoot.add(hpBar.root);
+        hpBar.root.position.set(0, 0.46, 0);
+        hpBar.root.scale.setScalar(0.42);
+        const nameSpr = makeBossNameSprite(BOSS_DISPLAY_NAME);
+        nameSpr.position.set(0, 0.74, 0);
+        rig.headRoot.add(nameSpr);
+      } else {
+        hpBar.root.position.y = 3.15 * scale;
+        if (scale > 1.35) {
+          hpBar.root.scale.setScalar(1.15);
+          hpBar.root.position.y = 3.35 * scale;
+        }
+        rig.group.add(hpBar.root);
       }
-      rig.group.add(hpBar.root);
       rig.group.position.set(x, 0, z);
       scene.add(rig.group);
       const e = {
@@ -1658,13 +2688,41 @@
         collisionR,
         grayQuestRole,
         noRespawn,
-        grayQuestFrozen,
         punchDamage,
         attackRange,
         hitRange,
         burnTimeRemaining: 0,
         burnDps: 0,
+        burnDmgFlashAccum: 0,
+        tornadoLiftY: 0,
+        tornadoBurnAcc: 0,
+        damageFlashRest: collectEnemyDamageFlashMats(rig.group),
+        damageFlashT: 0,
       };
+      if (isBoss) {
+        e.bossLegsRoot = rig.legsRoot;
+        e.bossTorsoArmRoot = rig.torsoArmRoot;
+        e.bossHeadRoot = rig.headRoot;
+        e.bossBodyY = rig.bossBodyY;
+        e.bossHeadYOffset = rig.headYOffset;
+        e.bossSpinRemaining = 0;
+        e.bossChaseRemaining = 0;
+        e.bossSpinPhase = 0;
+        e.bossCdNormal = 0;
+        e.bossCdSpin = 0;
+        e.bossCdChase = 0;
+        e.bossChasePunchCd = 0;
+      }
+      const burnFire = createEnemyBurnFirePoints();
+      if (isBoss && e.bossTorsoArmRoot) {
+        burnFire.anchor.position.set(0, 0.38, 0.1);
+        burnFire.anchor.scale.setScalar(1.35);
+        e.bossTorsoArmRoot.add(burnFire.anchor);
+      } else {
+        burnFire.anchor.position.set(0, 1.52, 0.08);
+        e.mesh.add(burnFire.anchor);
+      }
+      e.burnFire = burnFire;
       enemies.push(e);
       updateEnemyHpBar(e);
     }
@@ -1675,9 +2733,9 @@
 
     const grayBossZ = island2.position.z - 38;
     spawnEnemyAt(island2.position.x - 60, grayBossZ, {
-      scale: 2.08,
+      scale: BOSS_SCALE,
       countsForMission: false,
-      collisionR: enemyRadius * 2.08,
+      collisionR: enemyRadius * BOSS_SCALE,
       grayQuestRole: 'boss',
       noRespawn: true,
     });
@@ -1936,6 +2994,20 @@
       return ox * ox + oz * oz;
     }
 
+    /** 0 = green (starter) island, 1 = gray island — same nearest-island rule as walking bounds. */
+    function indexOfNearestWalkIsland(x, z) {
+      let bestIdx = 0;
+      let bestD = islandOutsideDistSq(x, z, walkIslands[0]);
+      for (let i = 1; i < walkIslands.length; i++) {
+        const d = islandOutsideDistSq(x, z, walkIslands[i]);
+        if (d < bestD) {
+          bestD = d;
+          bestIdx = i;
+        }
+      }
+      return bestIdx;
+    }
+
     function clampPlayerToLandBounds() {
       let best = walkIslands[0];
       let bestD = islandOutsideDistSq(player.position.x, player.position.z, best);
@@ -2051,37 +3123,93 @@
     const boatInteractRadius = 4.8;
     const MISSION_KILLS_TARGET = 3;
     const GREEN_ISLAND_DEFEAT_THREE_ENEMIES_XP = 300;
+    const MISSION_REWARD_BANDITS_MONEY = 500;
+    const MISSION_REWARD_GRAY_PIRATES_MONEY = 1500;
+    const MISSION_REWARD_GRAY_BOSS_BUGGY_MONEY = 3000;
     const GRAY_ISLAND_PIRATES_MISSION_XP = 1200;
+    const GRAY_ISLAND_BUGGY_MISSION_XP = 2000;
     let shopOpen = false;
+    let codesPanelOpen = false;
+    let inventoryPanelOpen = false;
     let dialogueOpen = false;
     let enemyKillCount = 0;
     let greenMissionRunKills = 0;
+    /** Set after first bandit reward — no more bandit mission progress or XP from the guide. */
+    let greenBanditMissionCompleted = false;
     let greenMissionNeedsNpcTurnIn = false;
     let grayQuestChoice = null;
     let grayBossKills = 0;
     let graySwarmKills = 0;
     let grayMissionNeedsNpcTurnIn = false;
+    /** After turning in a trial, player must pick Buggy or pirates again at the NPC. */
+    let grayAwaitingNextTrialChoice = false;
     const GRAY_SWARM_TARGET = 6;
+    /** Minimum player level to accept each gray-island trial at the NPC. */
+    const GRAY_QUEST_MIN_LEVEL_PIRATES = 2;
+    const GRAY_QUEST_MIN_LEVEL_BUGGY = 4;
     const grayQuestInteractRadius = 5.2;
+
+    let missionsHudUnlocked = false;
+    let boatSellerMet = false;
+    let activeDialogueKind = null;
+    let guideTutorialConversationsFinished = 0;
 
     const keys = new Set();
     let vy = 0;
+    let flameFlightActive = false;
+    let flameFlightStoredYaw = 0;
     const gravity = -46;
     const jumpSpeed = 15;
     const groundY = 0;
 
     window.addEventListener('keydown', (e) => {
       if (playerDead) return;
+      const uiBlocksGameKeys =
+        shopOpen || codesPanelOpen || inventoryPanelOpen || dialogueOpen;
       if (['KeyW', 'KeyA', 'KeyS', 'KeyD'].includes(e.code)) {
+        const codeInputEl = document.getElementById('codes-input');
+        const typingInCodesField =
+          codesPanelOpen &&
+          codeInputEl &&
+          (e.target === codeInputEl || document.activeElement === codeInputEl);
+        if (typingInCodesField) {
+          return;
+        }
+        if (uiBlocksGameKeys) {
+          e.preventDefault();
+          return;
+        }
         keys.add(e.code);
         e.preventDefault();
         return;
       }
       if (e.code === 'Space') {
+        if (uiBlocksGameKeys) return;
         e.preventDefault();
         if (e.repeat) return;
         const grounded = player.position.y <= groundY + 0.02 && vy <= 0.5;
         if (grounded) vy = jumpSpeed;
+      }
+      if (e.code === 'KeyF') {
+        if (e.repeat) return;
+        if (shopOpen || codesPanelOpen || inventoryPanelOpen || dialogueOpen) return;
+        if (playerInBoat) return;
+        stopFlameFlightIfWrongFruit();
+        stopFlameTornadoIfWrongFruit();
+        if (getActiveFruitForPowers() !== 'flame') return;
+        if (flameMasteryLevel < FLAME_FLIGHT_MIN_MASTERY) return;
+        e.preventDefault();
+        flameFlightActive = !flameFlightActive;
+        if (flameFlightActive) {
+          flameFlightSteerYaw = camYaw;
+          flameFlightSteerPitch = camPitch;
+          flameFlightStoredYaw = player.rotation.y;
+        } else {
+          syncOrbitCameraFromFlightSteer();
+          player.quaternion.identity();
+          player.rotation.set(0, flameFlightStoredYaw, 0);
+        }
+        vy = 0;
       }
     });
     window.addEventListener('keyup', (e) => keys.delete(e.code));
@@ -2089,18 +3217,27 @@
 
     const hotbarSlot1 = document.getElementById('hotbar-slot-1');
     const hotbarSlot2 = document.getElementById('hotbar-slot-2');
-    let hotbarFruitSelection = 1;
+    let equippedFruitKind = 'rubber';
+    /** <kbd>2</kbd> combat fists (default); <kbd>1</kbd> fruit powers. */
+    let hotbarCombatSlotActive = true;
+
+    function getActiveFruitForPowers() {
+      if (hotbarCombatSlotActive) return null;
+      return getEquippedFruit();
+    }
 
     const lifeCurrentEl = document.getElementById('life-current');
     const lifeMaxEl = document.getElementById('life-max');
     const lifeFillEl = document.getElementById('life-fill');
     const moneyCurrentEl = document.getElementById('money-current');
+    const damageDealtTotalEl = document.getElementById('damage-dealt-total');
     const levelCurrentEl = document.getElementById('level-current');
     const levelXpCurrentEl = document.getElementById('level-xp-current');
     const levelXpNeedEl = document.getElementById('level-xp-need');
     const levelFillEl = document.getElementById('level-fill');
     const rubberFruitPrice = 5000;
-    const flameFruitPrice = 5000;
+    const flameFruitPrice = 10000;
+    const courtFruitPrice = 30000;
 
     const LEVEL_XP_BASE = 100;
     const LEVEL_XP_FACTOR = 2.5;
@@ -2114,16 +3251,29 @@
 
     const PLAYER_BASE_MAX_HP = 100;
     const PLAYER_MAX_HP_PER_LEVEL = 20;
-    const FRUIT_ATTACK_LEVEL_MULT = 1.5;
+
+    /** Per-fruit mastery: same XP per gain and same curve as player level (Blox Fruits–style). */
+    let rubberMasteryLevel = 1;
+    let rubberMasteryXp = 0;
+    let flameMasteryLevel = 1;
+    let flameMasteryXp = 0;
+    let courtMasteryLevel = 1;
+    let courtMasteryXp = 0;
+    /** Mastery 1 = ×1; each extra mastery level multiplies fruit damage (rubber or flame tracked separately). */
+    const FRUIT_MASTERY_PER_LEVEL_MULT = 1.12;
 
     function computePlayerMaxHp(level) {
       return PLAYER_BASE_MAX_HP + PLAYER_MAX_HP_PER_LEVEL * (level - 1);
     }
 
-    /** Level 1 = ×1; each further level stacks ×1.5 (L2 ×1.5, L3 ×2.25, L4 ×3.375, …). */
+    /** Fruit damage scales with the equipped fruit's mastery only (not player level). */
     function getFruitDamageMultiplier() {
+      const fruit = getEquippedFruit();
+      if (!fruit) return 1;
+      const mLv =
+        fruit === 'flame' ? flameMasteryLevel : fruit === 'court' ? courtMasteryLevel : rubberMasteryLevel;
       let m = 1;
-      for (let lv = 2; lv <= playerLevel; lv++) m *= FRUIT_ATTACK_LEVEL_MULT;
+      for (let lv = 2; lv <= mLv; lv++) m *= FRUIT_MASTERY_PER_LEVEL_MULT;
       return m;
     }
 
@@ -2146,14 +3296,24 @@
     let playerMaxHp = computePlayerMaxHp(playerLevel);
     let playerCurrentHp = playerMaxHp;
     let playerDamageInvuln = 0;
-    let playerMoney = 5000;
+    let playerMoney = 0;
+    let playerDamageDealtTotal = 0;
     let playerDead = false;
+    /** Nearest walk island at death (0 green, 1 gray); read in respawnPlayer. */
+    let playerRespawnIslandIdx = 0;
     let playerNoDamageT = 0;
     const playerRegenDelay = 3;
     const playerRegenPerSec = 8;
     const playerRespawnDelay = 3;
     let playerRespawnT = 0;
     const playerDeathPieces = [];
+
+    function registerPlayerDamageDealt(amount) {
+      const n = Number(amount);
+      if (!Number.isFinite(n) || n <= 0) return;
+      playerDamageDealtTotal += n;
+      if (damageDealtTotalEl) damageDealtTotalEl.textContent = String(Math.round(playerDamageDealtTotal));
+    }
 
     function setLife(current, max = playerMaxHp) {
       const m = Math.max(1, max);
@@ -2178,7 +3338,9 @@
         cap = xpRequiredToReachNextLevel(playerLevel);
       }
       updateLevelHud();
+      updateGrayTrialChoiceButtons();
       setLife(playerCurrentHp, playerMaxHp);
+      addFruitMasteryXpFromPlayerXp(n);
     }
 
     function setMoney(value) {
@@ -2188,6 +3350,7 @@
 
     function triggerPlayerDeath() {
       if (playerDead) return;
+      playerRespawnIslandIdx = indexOfNearestWalkIsland(player.position.x, player.position.z);
       playerDead = true;
       playerRespawnT = playerRespawnDelay;
       playerInBoat = false;
@@ -2196,8 +3359,20 @@
       punchAnimT = 0;
       punchCooldown = 0;
       heavyPunchCooldown = 0;
+      flameTornadoCooldown = 0;
+      clearFlameTornado();
+      rubberFlurryRemainingT = 0;
+      rubberFlurryCooldownT = 0;
+      rubberFlurryNextPunchT = 0;
+      rubberFlurryPunchAnimT = 0;
+      resetCourtPunchState();
       player.visible = false;
       fistFirePoints.visible = false;
+      clearFlameFireballs();
+      flameFlightActive = false;
+      syncOrbitCameraFromFlightSteer();
+      player.quaternion.identity();
+      player.rotation.x = 0;
 
       const wPos = new THREE.Vector3();
       const wQuat = new THREE.Quaternion();
@@ -2234,10 +3409,37 @@
       playerDamageInvuln = 1.1;
       playerCurrentHp = playerMaxHp;
       setLife(playerCurrentHp, playerMaxHp);
-      player.position.set(0, groundY, 0);
-      player.rotation.y = 0;
+      if (playerRespawnIslandIdx === 1) {
+        const tx = island2.position.x + 2.2;
+        const tz = island2.position.z + 5.5;
+        player.position.set(tx, groundY, tz);
+        player.rotation.y = Math.atan2(
+          grayIslandCenterMissionNpc.position.x - tx,
+          grayIslandCenterMissionNpc.position.z - tz
+        );
+      } else {
+        player.position.set(0, groundY, 0);
+        player.rotation.y = 0;
+      }
+      player.rotation.x = 0;
+      clampPlayerToLandBounds();
+      resolveStallCollisionXZ();
       player.visible = true;
       vy = 0;
+      flameFlightActive = false;
+      clearFlameTornado();
+      flameTornadoCooldown = 0;
+      rubberFlurryRemainingT = 0;
+      rubberFlurryCooldownT = 0;
+      rubberFlurryNextPunchT = 0;
+      rubberFlurryPunchAnimT = 0;
+      resetCourtPunchState();
+      playerInBoat = false;
+      if (hasBoat) {
+        playerBoat.visible = true;
+        playerBoat.position.copy(boatDockSpawn);
+        playerBoat.rotation.y = Math.PI * 0.2;
+      }
       syncCamTarget();
     }
 
@@ -2257,17 +3459,35 @@
 
     const shopLayer = document.getElementById('shop-layer');
     const shopBackdrop = document.getElementById('shop-backdrop');
-    const shopCloseBtn = document.getElementById('shop-close');
     const shopHint = document.getElementById('shop-hint');
     const buyRubberBtn = document.getElementById('buy-rubber');
     const buyFlameBtn = document.getElementById('buy-flame');
+    const buyCourtBtn = document.getElementById('buy-court');
     const shopRowRubber = document.getElementById('shop-row-rubber');
     const shopRowFlame = document.getElementById('shop-row-flame');
+    const shopRowCourt = document.getElementById('shop-row-court');
+    const codesLayer = document.getElementById('codes-layer');
+    const codesBackdrop = document.getElementById('codes-backdrop');
+    const codesInput = document.getElementById('codes-input');
+    const codesStatusEl = document.getElementById('codes-status');
+    const codesBtnCancel = document.getElementById('codes-btn-cancel');
+    const codesBtnSubmit = document.getElementById('codes-btn-submit');
+    const inventoryLayer = document.getElementById('inventory-layer');
+    const inventoryBackdrop = document.getElementById('inventory-backdrop');
+    const inventoryListEl = document.getElementById('inventory-list');
+    const inventoryStatusEl = document.getElementById('inventory-status');
+    const inventoryCloseBtn = document.getElementById('inventory-close');
+    const inventoryEatBtn = document.getElementById('inventory-eat');
     const fruitHudHead = document.getElementById('fruit-hud-head');
     const fruitHudList = document.getElementById('fruit-hud-list');
+    const fruitHudRubberOnlyList = document.getElementById('fruit-hud-rubber-only-list');
+    const fruitHudFlameOnlyList = document.getElementById('fruit-hud-flame-only-list');
+    const fruitHudFlightLi = document.getElementById('fruit-hud-flight-li');
+    const fruitHudTornadoLi = document.getElementById('fruit-hud-tornado-li');
+    const fruitHudRubberFlurryLi = document.getElementById('fruit-hud-rubber-flurry-li');
+    const fruitHudCourtOnlyList = document.getElementById('fruit-hud-court-only-list');
     const fruitHud = document.getElementById('fruit-hud');
     const missionHudEl = document.getElementById('mission-hud');
-    const missionFruitEl = document.getElementById('mission-fruit');
     const missionKillsEl = document.getElementById('mission-kills');
     const missionBoatEl = document.getElementById('mission-boat');
     const dialogueLayer = document.getElementById('dialogue-layer');
@@ -2288,21 +3508,38 @@
     const grayIslandTrialChoicesEl = document.getElementById('gray-island-trial-choices');
     const dialogueChoiceBossBtn = document.getElementById('dialogue-choice-boss');
     const dialogueChoiceEnemiesBtn = document.getElementById('dialogue-choice-enemies');
-    const GUIDE_DIALOGUE_HTML = 'Listen carefully — <strong>three bandits</strong> are causing trouble on this island. You cannot fight them <strong>bare-handed</strong>: you need a <strong>fruit power</strong>.<br><br>Go to the <strong>market</strong> (over that way) and buy the <strong>Rubber</strong> or <strong>Flame</strong> fruit from the dealer.<br><br>I am giving you <strong>two missions</strong>: <strong>buy that fruit</strong>, then <strong>defeat all three bandits</strong>. Check your list at the top-right. Good luck!';
+    const GUIDE_DIALOGUE_HTML = 'Listen carefully — <strong>three bandits</strong> are causing trouble on this island. Use <strong>combat fists</strong> (<kbd>2</kbd> on the hotbar) to fight, or earn money and visit the <strong>market</strong> for a <strong>Rubber</strong>, <strong>Flame</strong>, or <strong>Court</strong> fruit — then open <strong>inventory</strong>, select it, and press <strong>Eat</strong>.<br><br>Your mission: <strong>defeat all three bandits</strong>. Check your list at the top-right. Good luck!';
 
-    const GUIDE_POST_MISSIONS_HTML = 'You did it — fruit in hand and all three <strong>bandits</strong> dealt with. Impressive work!<br><br>Your next step is the <strong>boat seller</strong>. Head to the <strong>dock on the west shore</strong> — he wears a <strong>navy shirt</strong>. He will set you up with passage off this island. Good sailing!';
+    const GUIDE_POST_MISSIONS_HTML = 'You did it — all three <strong>bandits</strong> dealt with. Impressive work!<br><br>Your next step is the <strong>boat seller</strong>. Head to the <strong>dock on the west shore</strong> — he wears a <strong>navy shirt</strong>. He will set you up with passage off this island. Good sailing!';
 
     const BOAT_SELLER_DIALOGUE_HTML = 'Ahoy! You must be the one the guide sent. I handle <strong>boats and passage</strong> here at the dock.';
     const GRAY_ISLAND_BOAT_SELLER_INTRO = 'Out here I only handle one thing: <strong>boats</strong>.';
     const BOAT_PRICE = 0;
 
+    let fruitInventoryRubber = 0;
+    let fruitInventoryFlame = 0;
+    let fruitInventoryCourt = 0;
+    let inventorySelectedKind = null;
     let hasRubberFruit = false;
     let hasFlameFruit = false;
+    let hasCourtFruit = false;
     let hasBoat = false;
     let playerInBoat = false;
 
     const normalPunchDamage = 10;
     const heavyPunchDamage = 20;
+    const COURT_PUNCH_BASE_DAMAGE = 10;
+    /** Rubber <kbd>C</kbd>: many quick hits over 5s, then 15s cooldown. */
+    const RUBBER_FLURRY_DURATION = 5;
+    const RUBBER_FLURRY_COOLDOWN = 15;
+    const RUBBER_FLURRY_PUNCH_INTERVAL = 0.14;
+    const RUBBER_FLURRY_ARM_WINDUP = 0.09;
+    const RUBBER_FLURRY_HIT_DAMAGE = 4;
+    const RUBBER_FLURRY_MIN_MASTERY = 10;
+    let rubberFlurryRemainingT = 0;
+    let rubberFlurryCooldownT = 0;
+    let rubberFlurryNextPunchT = 0;
+    let rubberFlurryPunchAnimT = 0;
     const normalPunchRange = 2.55;
     const heavyPunchRange = 4.15;
     const flameNormalPunchDamage = 10;
@@ -2311,6 +3548,25 @@
     const flameHeavyPunchRange = heavyPunchRange;
     const flameBurnDps = 2;
     const flameBurnDuration = 5;
+    const flameFireballSpeed = 24;
+    const flameFireballMaxTravel = 44;
+    const flameFireballHitRadius = 0.3;
+    const flameFireballs = [];
+    let flameFireballMeshTemplate = null;
+
+    const FLAME_FLIGHT_MIN_MASTERY = 5;
+    const FLAME_TORNADO_DURATION = 5;
+    const FLAME_TORNADO_RADIUS = 7.2;
+    const FLAME_TORNADO_PLACE_AHEAD = 5.4;
+    const FLAME_TORNADO_MAX_LIFT = 3.6;
+    const FLAME_TORNADO_LIFT_RATE = 6;
+    const FLAME_TORNADO_FALL_RATE = 8;
+    const FLAME_TORNADO_DPS = 5;
+    const FLAME_TORNADO_CD = 15;
+    const FLAME_TORNADO_BURN_REFRESH = 1.15;
+    const FLAME_TORNADO_MIN_MASTERY = 10;
+    let flameTornadoActive = null;
+    let flameTornadoCooldown = 0;
     const punchReachNormal = 1.35;
     const punchReachHeavy = 1.95;
     const heavyPunchCooldownMax = 3.5;
@@ -2320,61 +3576,632 @@
     let activePunchReach = punchReachNormal;
     let heavyPunchCooldown = 0;
 
+    function getFlameFireballMeshTemplate() {
+      if (!flameFireballMeshTemplate) {
+        const g = new THREE.Group();
+        const coreR = 0.26;
+        const core = new THREE.Mesh(
+          new THREE.SphereGeometry(coreR, 18, 14),
+          new THREE.MeshStandardMaterial({
+            color: 0xff6b1a,
+            emissive: 0xff4400,
+            emissiveIntensity: 1.15,
+            roughness: 0.32,
+            metalness: 0.12,
+          })
+        );
+        core.castShadow = true;
+        g.add(core);
+        const halo = new THREE.Mesh(
+          new THREE.SphereGeometry(coreR * 1.3, 14, 12),
+          new THREE.MeshBasicMaterial({
+            color: 0xffaa66,
+            transparent: true,
+            opacity: 0.4,
+            depthWrite: false,
+          })
+        );
+        g.add(halo);
+        flameFireballMeshTemplate = g;
+      }
+      return flameFireballMeshTemplate;
+    }
+
+    const FIREBALL_FIRE_N = 110;
+    function createFireballFireParticleSystem() {
+      const n = FIREBALL_FIRE_N;
+      const vel = [];
+      const life = new Float32Array(n);
+      const type = new Uint8Array(n);
+      for (let i = 0; i < n; i++) {
+        vel.push(new THREE.Vector3());
+        life[i] = 0;
+        type[i] = 0;
+      }
+      const geo = new THREE.BufferGeometry();
+      const posArr = new Float32Array(n * 3);
+      const colArr = new Float32Array(n * 3);
+      geo.setAttribute('position', new THREE.BufferAttribute(posArr, 3));
+      geo.setAttribute('color', new THREE.BufferAttribute(colArr, 3));
+      const points = new THREE.Points(geo, fistFireMat);
+      points.frustumCulled = false;
+      points.renderOrder = 11;
+      return { geo, n, vel, life, type, points };
+    }
+
+    function updateFireballFireParticles(fb, dt) {
+      const fx = fb.fireParticles;
+      if (!fx) return;
+      const posA = fx.geo.attributes.position.array;
+      const colA = fx.geo.attributes.color.array;
+      const spawnHot = 0.1;
+      const spawnEmber = 0.16;
+      for (let i = 0; i < fx.n; i++) {
+        fx.life[i] -= dt;
+        const ix = i * 3;
+        if (fx.life[i] <= 0) {
+          const ember = Math.random() < 0.58;
+          fx.type[i] = ember ? 1 : 0;
+          const r = ember ? spawnEmber : spawnHot;
+          posA[ix] = (Math.random() - 0.5) * r * 1.15;
+          posA[ix + 1] = (Math.random() - 0.5) * r * 0.75;
+          posA[ix + 2] = (Math.random() - 0.5) * r * 0.75;
+          if (ember) {
+            fx.life[i] = 0.38 + Math.random() * 0.55;
+            fx.vel[i].set(
+              (Math.random() - 0.5) * 0.58,
+              0.36 + Math.random() * 0.52,
+              (Math.random() - 0.5) * 0.58
+            );
+            colA[ix] = 0.95 + Math.random() * 0.05;
+            colA[ix + 1] = 0.28 + Math.random() * 0.22;
+            colA[ix + 2] = 0.02 + Math.random() * 0.08;
+          } else {
+            fx.life[i] = 0.07 + Math.random() * 0.14;
+            fx.vel[i].set(
+              (Math.random() - 0.5) * 0.58,
+              0.82 + Math.random() * 1.02,
+              (Math.random() - 0.5) * 0.58
+            );
+            colA[ix] = 1;
+            colA[ix + 1] = 0.88 + Math.random() * 0.12;
+            colA[ix + 2] = 0.12 + Math.random() * 0.28;
+          }
+        } else {
+          posA[ix] += fx.vel[i].x * dt;
+          posA[ix + 1] += fx.vel[i].y * dt;
+          posA[ix + 2] += fx.vel[i].z * dt;
+          const ember = fx.type[i] === 1;
+          if (ember) fx.vel[i].multiplyScalar(1 - dt * 0.55);
+          else fx.vel[i].multiplyScalar(1 - dt * 1.5);
+          fx.vel[i].y += dt * (ember ? 0.22 : 0.55);
+          fx.vel[i].x += (Math.random() - 0.5) * dt * (ember ? 0.35 : 0.12);
+          fx.vel[i].z += (Math.random() - 0.5) * dt * (ember ? 0.28 : 0.1);
+          const maxL = ember ? 0.93 : 0.21;
+          const tLife = Math.min(1, fx.life[i] / maxL);
+          if (ember) {
+            colA[ix] = Math.max(0.25, 0.45 + 0.55 * tLife);
+            colA[ix + 1] = Math.max(0.02, 0.08 + 0.22 * tLife);
+            colA[ix + 2] = Math.max(0, 0.04 * tLife);
+          } else {
+            colA[ix] = 1;
+            colA[ix + 1] = Math.max(0.15, 0.35 + 0.58 * tLife);
+            colA[ix + 2] = Math.max(0, 0.35 * (1 - tLife));
+          }
+        }
+      }
+      fx.geo.attributes.position.needsUpdate = true;
+      fx.geo.attributes.color.needsUpdate = true;
+    }
+
+    function disposeFireballFireParticles(fb) {
+      const fx = fb.fireParticles;
+      if (!fx) return;
+      if (fx.points.parent) fx.points.parent.remove(fx.points);
+      fx.geo.dispose();
+      fb.fireParticles = null;
+    }
+
+    function spawnFlameFireball() {
+      const mesh = getFlameFireballMeshTemplate().clone(true);
+      const ry = player.rotation.y;
+      const fwx = Math.sin(ry);
+      const fwz = Math.cos(ry);
+      const spawnAhead = 0.92;
+      const py = player.position.y + 1.28;
+      mesh.position.set(
+        player.position.x + fwx * spawnAhead,
+        py,
+        player.position.z + fwz * spawnAhead
+      );
+      scene.add(mesh);
+      const fireParticles = createFireballFireParticleSystem();
+      mesh.add(fireParticles.points);
+      flameFireballs.push({
+        mesh,
+        fireParticles,
+        vx: fwx * flameFireballSpeed,
+        vz: fwz * flameFireballSpeed,
+        traveled: 0,
+        y: py,
+      });
+    }
+
+    function clearFlameFireballs() {
+      for (const fb of flameFireballs) {
+        disposeFireballFireParticles(fb);
+        scene.remove(fb.mesh);
+      }
+      flameFireballs.length = 0;
+    }
+
+    function updateFlameFireballs(dt) {
+      const hitR = flameFireballHitRadius;
+      for (let i = flameFireballs.length - 1; i >= 0; i--) {
+        const fb = flameFireballs[i];
+        updateFireballFireParticles(fb, dt);
+        fb.mesh.position.x += fb.vx * dt;
+        fb.mesh.position.z += fb.vz * dt;
+        fb.mesh.position.y = fb.y;
+        fb.mesh.rotation.y += dt * 7;
+        fb.mesh.rotation.x += dt * 5;
+        fb.traveled += Math.hypot(fb.vx * dt, fb.vz * dt);
+        let remove = fb.traveled >= flameFireballMaxTravel;
+        if (!remove) {
+          const bx = fb.mesh.position.x;
+          const bz = fb.mesh.position.z;
+          for (const e of enemies) {
+            if (!e.alive) continue;
+            const dx = e.mesh.position.x - bx;
+            const dz = e.mesh.position.z - bz;
+            const dist = Math.hypot(dx, dz);
+            const er = (e.collisionR != null ? e.collisionR : enemyRadius) + hitR;
+            if (dist < er && bossChasePlayerShotHitsLegs(e, bx, bz, hitR)) {
+              const dmg = fruitScaledDamage(flameHeavyPunchDamage * getFruitDamageMultiplier());
+              e.hp -= dmg;
+              registerPlayerDamageDealt(dmg);
+              startEnemyDamageFlash(e);
+              applyEnemyBurn(e);
+              updateEnemyHpBar(e);
+              if (e.hp <= 0) finalizeEnemyKillFromPlayer(e);
+              remove = true;
+              break;
+            }
+          }
+        }
+        if (remove) {
+          disposeFireballFireParticles(fb);
+          scene.remove(fb.mesh);
+          flameFireballs.splice(i, 1);
+        }
+      }
+    }
+
+    function makeFlameTornadoMesh() {
+      const g = new THREE.Group();
+      const matOuter = new THREE.MeshBasicMaterial({
+        color: 0xff3300,
+        transparent: true,
+        opacity: 0.2,
+        side: THREE.DoubleSide,
+        depthWrite: false,
+      });
+      const matMid = new THREE.MeshBasicMaterial({
+        color: 0xff6600,
+        transparent: true,
+        opacity: 0.16,
+        side: THREE.DoubleSide,
+        depthWrite: false,
+      });
+      const matCore = new THREE.MeshBasicMaterial({
+        color: 0xffcc44,
+        transparent: true,
+        opacity: 0.12,
+        side: THREE.DoubleSide,
+        depthWrite: false,
+      });
+      const funnel = new THREE.Mesh(
+        new THREE.CylinderGeometry(2.8, FLAME_TORNADO_RADIUS * 1.05, 17, 36, 1, true),
+        matOuter
+      );
+      funnel.position.y = 8.6;
+      g.add(funnel);
+      const funnel2 = new THREE.Mesh(
+        new THREE.CylinderGeometry(1.6, FLAME_TORNADO_RADIUS * 0.72, 15, 28, 1, true),
+        matMid
+      );
+      funnel2.position.y = 8.2;
+      g.add(funnel2);
+      const core = new THREE.Mesh(new THREE.CylinderGeometry(0.9, 6.2, 13, 20, 1, true), matCore);
+      core.position.y = 7.5;
+      g.add(core);
+      const baseGlow = new THREE.Mesh(
+        new THREE.RingGeometry(FLAME_TORNADO_RADIUS * 0.35, FLAME_TORNADO_RADIUS * 1.08, 48),
+        new THREE.MeshBasicMaterial({
+          color: 0xff2200,
+          transparent: true,
+          opacity: 0.35,
+          side: THREE.DoubleSide,
+          depthWrite: false,
+        })
+      );
+      baseGlow.rotation.x = -Math.PI / 2;
+      baseGlow.position.y = 0.04;
+      g.add(baseGlow);
+      return g;
+    }
+
+    function clearFlameTornado() {
+      if (flameTornadoActive) {
+        scene.remove(flameTornadoActive.mesh);
+        flameTornadoActive = null;
+      }
+    }
+
+    function trySpawnFlameTornado() {
+      if (playerDead) return false;
+      if (playerInBoat) return false;
+      if (shopOpen || codesPanelOpen || inventoryPanelOpen || dialogueOpen) return false;
+      if (getActiveFruitForPowers() !== 'flame') return false;
+      if (flameMasteryLevel < FLAME_TORNADO_MIN_MASTERY) return false;
+      if (flameTornadoCooldown > 0) return false;
+      clearFlameTornado();
+      const ry = player.rotation.y;
+      const fwx = Math.sin(ry);
+      const fwz = Math.cos(ry);
+      const tx = player.position.x + fwx * FLAME_TORNADO_PLACE_AHEAD;
+      const tz = player.position.z + fwz * FLAME_TORNADO_PLACE_AHEAD;
+      const mesh = makeFlameTornadoMesh();
+      mesh.position.set(tx, groundY, tz);
+      scene.add(mesh);
+      flameTornadoActive = {
+        mesh,
+        x: tx,
+        z: tz,
+        t: FLAME_TORNADO_DURATION,
+        spin: 0,
+      };
+      flameTornadoCooldown = FLAME_TORNADO_CD;
+      return true;
+    }
+
+    function updateFlameTornado(dt) {
+      if (hasFlameFruit && flameMasteryLevel >= FLAME_TORNADO_MIN_MASTERY && flameTornadoCooldown > 0) {
+        flameTornadoCooldown = Math.max(0, flameTornadoCooldown - dt);
+      }
+
+      if (flameTornadoActive) {
+        const ft = flameTornadoActive;
+        ft.t -= dt;
+        ft.spin += dt * 3.2;
+        ft.mesh.rotation.y = ft.spin;
+        let i = 0;
+        for (const ch of ft.mesh.children) {
+          if (ch.isMesh && ch.geometry && ch.geometry.type === 'CylinderGeometry') {
+            ch.rotation.y = Math.sin(ft.spin * 1.4 + i * 0.7) * 0.12;
+            i++;
+          }
+        }
+        if (ft.t <= 0) {
+          scene.remove(ft.mesh);
+          flameTornadoActive = null;
+        }
+      }
+
+      const active = flameTornadoActive && flameTornadoActive.t > 0;
+      const cx = active ? flameTornadoActive.x : 0;
+      const cz = active ? flameTornadoActive.z : 0;
+      const R = FLAME_TORNADO_RADIUS;
+      const R2 = R * R;
+
+      for (const e of enemies) {
+        if (!e.alive) continue;
+        if (e.tornadoLiftY == null) e.tornadoLiftY = 0;
+        if (e.tornadoBurnAcc == null) e.tornadoBurnAcc = 0;
+
+        let fx = e.mesh.position.x;
+        let fz = e.mesh.position.z;
+        if (e.grayQuestRole === 'boss' && e.bossLegsRoot) {
+          e.bossLegsRoot.getWorldPosition(_bossLegsWorld);
+          fx = _bossLegsWorld.x;
+          fz = _bossLegsWorld.z;
+        }
+
+        const dx = fx - cx;
+        const dz = fz - cz;
+        const inZone = active && dx * dx + dz * dz <= R2;
+
+        if (inZone) {
+          const target = FLAME_TORNADO_MAX_LIFT;
+          if (e.tornadoLiftY < target) {
+            e.tornadoLiftY = Math.min(target, e.tornadoLiftY + FLAME_TORNADO_LIFT_RATE * dt);
+          }
+          const dmg = fruitScaledDamage(FLAME_TORNADO_DPS * dt * getFruitDamageMultiplier());
+          e.hp -= dmg;
+          registerPlayerDamageDealt(dmg);
+          let acc = (e.burnDmgFlashAccum || 0) + dmg;
+          while (acc >= 1) {
+            acc -= 1;
+            startEnemyDamageFlash(e);
+          }
+          e.burnDmgFlashAccum = acc;
+          updateEnemyHpBar(e);
+          if (e.hp <= 0) {
+            finalizeEnemyKillFromPlayer(e);
+            continue;
+          }
+          e.tornadoBurnAcc += dt;
+          if (e.tornadoBurnAcc >= FLAME_TORNADO_BURN_REFRESH) {
+            e.tornadoBurnAcc = 0;
+            applyEnemyBurn(e);
+          }
+        } else if (e.tornadoLiftY > 0) {
+          e.tornadoLiftY = Math.max(0, e.tornadoLiftY - FLAME_TORNADO_FALL_RATE * dt);
+        }
+
+        e.mesh.position.y = e.spawn.y + e.tornadoLiftY;
+      }
+    }
+
+    function enemyInActiveFlameTornado(e) {
+      if (!flameTornadoActive || flameTornadoActive.t <= 0) return false;
+      const cx = flameTornadoActive.x;
+      const cz = flameTornadoActive.z;
+      const R = FLAME_TORNADO_RADIUS;
+      const R2 = R * R;
+      let fx = e.mesh.position.x;
+      let fz = e.mesh.position.z;
+      if (e.grayQuestRole === 'boss' && e.bossLegsRoot) {
+        e.bossLegsRoot.getWorldPosition(_bossLegsWorld);
+        fx = _bossLegsWorld.x;
+        fz = _bossLegsWorld.z;
+      }
+      const dx = fx - cx;
+      const dz = fz - cz;
+      return dx * dx + dz * dz <= R2;
+    }
+
     function tryPlayerFruitHits() {
-      const fruit = getEquippedFruit();
-      if (!fruit) return;
+      const fruit = getActiveFruitForPowers();
+      const combatFists = hotbarCombatSlotActive;
+      if (!fruit && !combatFists) return;
+      if (
+        fruit &&
+        pendingPunchDamage === RUBBER_FLURRY_HIT_DAMAGE &&
+        (fruit !== 'rubber' || rubberMasteryLevel < RUBBER_FLURRY_MIN_MASTERY)
+      ) {
+        return;
+      }
       const ry = player.rotation.y;
       const fwx = Math.sin(ry);
       const fwz = Math.cos(ry);
       const px = player.position.x;
       const pz = player.position.z;
       for (const e of enemies) {
-        if (!e.alive || e.grayQuestFrozen) continue;
-        const ex = e.mesh.position.x;
-        const ez = e.mesh.position.z;
-        const dx = ex - px;
-        const dz = ez - pz;
+        if (!e.alive) continue;
+        const chaseLegsOnly =
+          e.grayQuestRole === 'boss' && e.bossChaseRemaining > 0 && e.bossLegsRoot;
+        let tx = e.mesh.position.x;
+        let tz = e.mesh.position.z;
+        if (chaseLegsOnly) {
+          e.bossLegsRoot.getWorldPosition(_bossLegsWorld);
+          tx = _bossLegsWorld.x;
+          tz = _bossLegsWorld.z;
+        }
+        const dx = tx - px;
+        const dz = tz - pz;
         const dist = Math.sqrt(dx * dx + dz * dz);
-        if (dist > pendingPunchMaxDist || dist < 0.2) continue;
+        const legStrikeMax = BOSS_CHASE_LEG_STRIKE_MAX * e.mesh.scale.x;
+        const maxReach = chaseLegsOnly ? Math.min(pendingPunchMaxDist, legStrikeMax) : pendingPunchMaxDist;
+        if (dist > maxReach || dist < 0.2) continue;
         const ndx = dx / dist;
         const ndz = dz / dist;
         if (fwx * ndx + fwz * ndz < 0.2) continue;
-        const fruitDmg = fruitScaledDamage(pendingPunchDamage * getFruitDamageMultiplier());
+        const fruitDmg =
+          combatFists || !fruit
+            ? fruitScaledDamage(pendingPunchDamage)
+            : fruitScaledDamage(pendingPunchDamage * getFruitDamageMultiplier());
         e.hp -= fruitDmg;
+        registerPlayerDamageDealt(fruitDmg);
+        startEnemyDamageFlash(e);
         updateEnemyHpBar(e);
         if (fruit === 'flame') applyEnemyBurn(e);
         if (e.hp <= 0) finalizeEnemyKillFromPlayer(e);
       }
     }
 
-    let missionsHudUnlocked = false;
-    let boatSellerMet = false;
-    let activeDialogueKind = null;
-    let guideTutorialConversationsFinished = 0;
-
     function hasAnyFruit() {
-      return hasRubberFruit || hasFlameFruit;
+      return hasRubberFruit || hasFlameFruit || hasCourtFruit;
     }
 
-    function normalizeHotbarFruitSelection() {
-      if (hotbarFruitSelection === 1 && !hasRubberFruit && hasFlameFruit) hotbarFruitSelection = 2;
-      if (hotbarFruitSelection === 2 && !hasFlameFruit && hasRubberFruit) hotbarFruitSelection = 1;
+    function ownedFruitKindsOrdered() {
+      const o = [];
+      if (hasRubberFruit) o.push('rubber');
+      if (hasFlameFruit) o.push('flame');
+      if (hasCourtFruit) o.push('court');
+      return o;
+    }
+
+    function normalizeEquippedFruit() {
+      const owned = ownedFruitKindsOrdered();
+      if (!owned.length) return;
+      if (!owned.includes(equippedFruitKind)) equippedFruitKind = owned[0];
     }
 
     function getEquippedFruit() {
-      normalizeHotbarFruitSelection();
-      if (hotbarFruitSelection === 1 && hasRubberFruit) return 'rubber';
-      if (hotbarFruitSelection === 2 && hasFlameFruit) return 'flame';
+      normalizeEquippedFruit();
+      if (equippedFruitKind === 'rubber' && hasRubberFruit) return 'rubber';
+      if (equippedFruitKind === 'flame' && hasFlameFruit) return 'flame';
+      if (equippedFruitKind === 'court' && hasCourtFruit) return 'court';
       if (hasRubberFruit) return 'rubber';
       if (hasFlameFruit) return 'flame';
+      if (hasCourtFruit) return 'court';
       return null;
     }
 
+    /** Flame flight is Flame-only; end it immediately if player equips Rubber or loses mastery gate. */
+    function stopFlameFlightIfWrongFruit() {
+      if (!flameFlightActive) return;
+      const f = getActiveFruitForPowers();
+      if (f === 'flame' && flameMasteryLevel >= FLAME_FLIGHT_MIN_MASTERY) return;
+      syncOrbitCameraFromFlightSteer();
+      flameFlightActive = false;
+      player.quaternion.identity();
+      player.rotation.set(0, flameFlightStoredYaw, 0);
+      vy = 0;
+    }
+
+    /** Tornado Flame (<kbd>X</kbd>) is Flame-only at mastery 10+; clear mesh and cooldown otherwise. */
+    function stopFlameTornadoIfWrongFruit() {
+      const f = getActiveFruitForPowers();
+      if (f === 'flame' && flameMasteryLevel >= FLAME_TORNADO_MIN_MASTERY) return;
+      clearFlameTornado();
+      flameTornadoCooldown = 0;
+    }
+
+    /** Rubber flurry (<kbd>C</kbd>) is Rubber-only and needs mastery; clear if wrong fruit or mastery too low. */
+    function stopRubberFlurryIfWrongFruit() {
+      const f = getActiveFruitForPowers();
+      if (f === 'rubber' && rubberMasteryLevel >= RUBBER_FLURRY_MIN_MASTERY) return;
+      const hadVisual = rubberFlurryRemainingT > 0 || rubberFlurryPunchAnimT > 0;
+      rubberFlurryRemainingT = 0;
+      rubberFlurryNextPunchT = 0;
+      rubberFlurryPunchAnimT = 0;
+      rubberFlurryCooldownT = 0;
+      if (pendingPunchDamage === RUBBER_FLURRY_HIT_DAMAGE) {
+        const slotF = getActiveFruitForPowers();
+        pendingPunchDamage =
+          slotF === 'flame'
+            ? flameNormalPunchDamage
+            : slotF === 'court'
+              ? COURT_PUNCH_BASE_DAMAGE
+              : normalPunchDamage;
+      }
+      if (hadVisual) resetPunchPose();
+    }
+
+    function resetCourtPunchState() {
+      courtPunchPhase = 'idle';
+      courtFistMesh.visible = false;
+      courtUpperStub.visible = false;
+      playerArmR.visible = true;
+    }
+
+    /** Court punch visuals are Court-only; clear when equipping another fruit. */
+    function stopCourtPunchIfWrongFruit() {
+      if (getActiveFruitForPowers() === 'court') return;
+      if (courtPunchPhase !== 'idle') {
+        resetCourtPunchState();
+        resetPunchPose();
+      }
+    }
+
+    /** Same XP amount and same xpRequiredToReachNextLevel curve as the main level bar; applies to equipped fruit only. */
+    function addFruitMasteryXpFromPlayerXp(amount) {
+      const n = Math.max(0, Math.floor(amount));
+      if (n <= 0) return;
+      const fruit = getEquippedFruit();
+      if (!fruit) return;
+      if (fruit === 'flame') {
+        flameMasteryXp += n;
+        let cap = xpRequiredToReachNextLevel(flameMasteryLevel);
+        while (flameMasteryXp >= cap) {
+          flameMasteryXp -= cap;
+          flameMasteryLevel += 1;
+          cap = xpRequiredToReachNextLevel(flameMasteryLevel);
+        }
+      } else if (fruit === 'court') {
+        courtMasteryXp += n;
+        let cap = xpRequiredToReachNextLevel(courtMasteryLevel);
+        while (courtMasteryXp >= cap) {
+          courtMasteryXp -= cap;
+          courtMasteryLevel += 1;
+          cap = xpRequiredToReachNextLevel(courtMasteryLevel);
+        }
+      } else {
+        rubberMasteryXp += n;
+        let cap = xpRequiredToReachNextLevel(rubberMasteryLevel);
+        while (rubberMasteryXp >= cap) {
+          rubberMasteryXp -= cap;
+          rubberMasteryLevel += 1;
+          cap = xpRequiredToReachNextLevel(rubberMasteryLevel);
+        }
+      }
+      updateFruitMasteryHud();
+    }
+
+    function updateFruitMasteryHud() {
+      const block = document.getElementById('fruit-mastery-block');
+      const labelEl = document.getElementById('fruit-mastery-label');
+      const xpEl = document.getElementById('fruit-mastery-xp');
+      const fillEl = document.getElementById('fruit-mastery-fill');
+      if (!block || !labelEl || !xpEl || !fillEl) return;
+      const fruit = getActiveFruitForPowers();
+      if (!fruit) {
+        block.hidden = true;
+        return;
+      }
+      block.hidden = false;
+      const lv =
+        fruit === 'flame' ? flameMasteryLevel : fruit === 'court' ? courtMasteryLevel : rubberMasteryLevel;
+      const xp = fruit === 'flame' ? flameMasteryXp : fruit === 'court' ? courtMasteryXp : rubberMasteryXp;
+      const need = xpRequiredToReachNextLevel(lv);
+      labelEl.textContent = `Mastery ${lv}`;
+      xpEl.textContent = `${Math.floor(xp)}/${need}`;
+      fillEl.style.width = `${Math.min(100, (xp / need) * 100)}%`;
+      if (fruit === 'flame') {
+        refreshFlameFlightHudLine();
+        refreshFlameTornadoHudLine();
+      } else if (fruit === 'rubber') {
+        refreshRubberFlurryHudLine();
+      }
+    }
+
+    function refreshRubberFlurryHudLine() {
+      const li = fruitHudRubberFlurryLi;
+      if (!li || getActiveFruitForPowers() !== 'rubber') return;
+      li.hidden = false;
+      if (rubberMasteryLevel >= RUBBER_FLURRY_MIN_MASTERY) {
+        li.innerHTML =
+          '<kbd>C</kbd> Rubber flurry — rapid punches <strong>5</strong>s · cooldown <strong>15</strong>s <span class="fruit-hud__cd" id="rubber-flurry-cd" hidden></span>';
+      } else {
+        li.innerHTML = `<kbd>C</kbd> Rubber flurry — requires <strong>Mastery ${RUBBER_FLURRY_MIN_MASTERY}</strong> <span class="fruit-hud__cd" id="rubber-flurry-cd" hidden></span>`;
+      }
+    }
+
+    function refreshFlameFlightHudLine() {
+      const li = fruitHudFlightLi;
+      if (!li || getActiveFruitForPowers() !== 'flame') return;
+      li.hidden = false;
+      if (flameMasteryLevel >= FLAME_FLIGHT_MIN_MASTERY) {
+        li.innerHTML =
+          '<kbd>F</kbd> Flame flight — <strong>toggle</strong>; drag camera to steer (orbit yaw + pitch), Superman pose';
+      } else {
+        li.innerHTML = `<kbd>F</kbd> Flame flight — requires <strong>Mastery ${FLAME_FLIGHT_MIN_MASTERY}</strong>`;
+      }
+    }
+
+    function refreshFlameTornadoHudLine() {
+      const li = fruitHudTornadoLi || document.getElementById('fruit-hud-tornado-li');
+      if (!li || getActiveFruitForPowers() !== 'flame') return;
+      li.hidden = false;
+      if (flameMasteryLevel >= FLAME_TORNADO_MIN_MASTERY) {
+        li.innerHTML =
+          '<kbd>X</kbd> Tornado Flame — <strong>5</strong>/s × <strong>5</strong>s <span class="fruit-hud__cd" id="flame-tornado-cd" hidden></span>';
+      } else {
+        li.innerHTML = `<kbd>X</kbd> Tornado Flame — requires <strong>Mastery ${FLAME_TORNADO_MIN_MASTERY}</strong> <span class="fruit-hud__cd" id="flame-tornado-cd" hidden></span>`;
+      }
+    }
+
     function refreshHotbarHalos() {
-      if (!hotbarSlot1 || !hotbarSlot2) return;
-      normalizeHotbarFruitSelection();
-      hotbarSlot1.classList.toggle('hotbar-slot--halo', hotbarFruitSelection === 1);
-      hotbarSlot2.classList.toggle('hotbar-slot--halo', hotbarFruitSelection === 2);
+      if (!hotbarSlot1) return;
+      normalizeEquippedFruit();
+      if (hotbarSlot2) {
+        hotbarSlot1.classList.toggle('hotbar-slot--halo', !hotbarCombatSlotActive);
+        hotbarSlot2.classList.toggle('hotbar-slot--halo', hotbarCombatSlotActive);
+      } else {
+        hotbarSlot1.classList.toggle('hotbar-slot--halo', hasAnyFruit() && !hotbarCombatSlotActive);
+      }
     }
 
     function applyEnemyBurn(e) {
@@ -2385,56 +4212,64 @@
 
     function finalizeEnemyKillFromPlayer(e) {
       if (!e.alive) return;
+      restoreEnemyDamageFlash(e);
       e.burnTimeRemaining = 0;
       e.burnDps = 0;
+      e.burnDmgFlashAccum = 0;
       if (e.countsForMission !== false) {
         enemyKillCount += 1;
-        if (!greenMissionNeedsNpcTurnIn && greenMissionRunKills < MISSION_KILLS_TARGET) {
+        if (!greenBanditMissionCompleted && greenMissionRunKills < MISSION_KILLS_TARGET) {
           greenMissionRunKills += 1;
-          if (greenMissionRunKills >= MISSION_KILLS_TARGET) greenMissionNeedsNpcTurnIn = true;
+          if (greenMissionRunKills >= MISSION_KILLS_TARGET) {
+            addPlayerXp(GREEN_ISLAND_DEFEAT_THREE_ENEMIES_XP);
+            setMoney(playerMoney + MISSION_REWARD_BANDITS_MONEY);
+            greenBanditMissionCompleted = true;
+            greenMissionNeedsNpcTurnIn = false;
+          }
         }
       }
+      let grayTrialCompleteChoice = null;
       if (e.grayQuestRole === 'boss' && grayQuestChoice === 'boss') {
         grayBossKills = 1;
-        grayMissionNeedsNpcTurnIn = true;
+        grayTrialCompleteChoice = 'boss';
       }
-      if (e.grayQuestRole === 'swarm' && grayQuestChoice === 'enemies' && !grayMissionNeedsNpcTurnIn) {
+      if (e.grayQuestRole === 'swarm' && grayQuestChoice === 'enemies') {
         if (graySwarmKills < GRAY_SWARM_TARGET) {
           graySwarmKills += 1;
-          if (graySwarmKills >= GRAY_SWARM_TARGET) grayMissionNeedsNpcTurnIn = true;
+          if (graySwarmKills >= GRAY_SWARM_TARGET) grayTrialCompleteChoice = 'enemies';
         }
       }
       e.alive = false;
+      e.tornadoLiftY = 0;
+      e.tornadoBurnAcc = 0;
       e.mesh.visible = false;
       e.respawnT = e.noRespawn ? 999 : 5;
       e.punchT = 0;
       e.attackCD = 0;
       resetEnemyPunchPose(e);
-      updateMissionsHUD();
+      if (e.grayQuestRole === 'boss') resetBossPose(e);
+      if (grayTrialCompleteChoice) grantGrayTrialCompleteInstantReward(grayTrialCompleteChoice);
+      else updateMissionsHUD();
     }
 
     function coreMissionsComplete() {
-      return hasAnyFruit() && enemyKillCount >= MISSION_KILLS_TARGET;
+      return greenBanditMissionCompleted;
+    }
+
+    function greenIslandMissionsAllComplete() {
+      return greenBanditMissionCompleted && boatSellerMet;
     }
 
     function updateMissionsHUD() {
-      if (!missionFruitEl || !missionKillsEl) return;
-      if (hasAnyFruit()) {
-        missionFruitEl.textContent = '✓ Buy a fruit at the market';
-        missionFruitEl.classList.add('mission-done');
-      } else {
-        missionFruitEl.textContent = '○ Buy a fruit at the market';
-        missionFruitEl.classList.remove('mission-done');
-      }
-      if (greenMissionNeedsNpcTurnIn) {
-        missionKillsEl.textContent = '○ See the guide — bandits cleared';
+      if (!missionKillsEl) return;
+      if (greenBanditMissionCompleted) {
+        missionKillsEl.textContent = '✓ Defeat 3 bandits';
         missionKillsEl.classList.add('mission-done');
       } else {
         missionKillsEl.textContent = `○ Defeat 3 bandits (${greenMissionRunKills}/3)`;
         missionKillsEl.classList.remove('mission-done');
       }
       if (missionBoatEl) {
-        missionBoatEl.hidden = false;
         if (boatSellerMet) {
           missionBoatEl.textContent = '✓ Speak with the boat seller';
           missionBoatEl.classList.add('mission-done');
@@ -2445,17 +4280,20 @@
       }
       if (missionGrayEl) {
         if (!grayQuestChoice) {
-          missionGrayEl.hidden = true;
+          if (grayAwaitingNextTrialChoice) {
+            missionGrayEl.hidden = false;
+            missionGrayEl.textContent = `○ Gray island NPC — pirates Lv ${GRAY_QUEST_MIN_LEVEL_PIRATES}+, ${BOSS_DISPLAY_NAME} Lv ${GRAY_QUEST_MIN_LEVEL_BUGGY}+`;
+            missionGrayEl.classList.remove('mission-done');
+          } else {
+            missionGrayEl.hidden = true;
+          }
         } else {
           missionGrayEl.hidden = false;
-          if (grayMissionNeedsNpcTurnIn) {
-            missionGrayEl.textContent = '○ See gray island NPC — trial complete';
-            missionGrayEl.classList.add('mission-done');
-          } else if (grayQuestChoice === 'boss') {
+          if (grayQuestChoice === 'boss') {
             const done = grayBossKills >= 1;
             missionGrayEl.textContent = done
-              ? '✓ Defeat the pirate captain (1/1)'
-              : `○ Defeat the pirate captain (${grayBossKills}/1)`;
+              ? `✓ Defeat ${BOSS_DISPLAY_NAME} (1/1)`
+              : `○ Defeat ${BOSS_DISPLAY_NAME} (${grayBossKills}/1)`;
             missionGrayEl.classList.toggle('mission-done', done);
           } else {
             missionGrayEl.textContent = `○ Defeat six pirates (${graySwarmKills}/${GRAY_SWARM_TARGET})`;
@@ -2463,24 +4301,76 @@
           }
         }
       }
+
+      const greenDone = greenIslandMissionsAllComplete();
+      if (missionKillsEl) missionKillsEl.hidden = greenDone;
+      if (missionBoatEl) missionBoatEl.hidden = greenDone;
+    }
+
+    function grantGrayTrialCompleteInstantReward(completedChoice) {
+      const grayXpReward =
+        completedChoice === 'boss' ? GRAY_ISLAND_BUGGY_MISSION_XP : GRAY_ISLAND_PIRATES_MISSION_XP;
+      addPlayerXp(grayXpReward);
+      if (completedChoice === 'boss') {
+        setMoney(playerMoney + MISSION_REWARD_GRAY_BOSS_BUGGY_MONEY);
+      } else {
+        setMoney(playerMoney + MISSION_REWARD_GRAY_PIRATES_MONEY);
+      }
+      grayMissionNeedsNpcTurnIn = false;
+      if (completedChoice === 'boss') {
+        grayBossKills = 0;
+        for (const en of enemies) {
+          if (en.grayQuestRole === 'boss') revivePirateCaptain(en);
+        }
+      } else {
+        graySwarmKills = 0;
+        reviveGraySwarmPirates();
+      }
+      grayQuestChoice = null;
+      grayAwaitingNextTrialChoice = true;
+      updateMissionsHUD();
+    }
+
+    function updateGrayTrialChoiceButtons() {
+      if (!dialogueChoiceBossBtn || !dialogueChoiceEnemiesBtn) return;
+      const choicesOpen =
+        grayIslandDialogueLayer &&
+        grayIslandDialogueLayer.classList.contains('dialogue-layer--open') &&
+        grayIslandTrialChoicesEl &&
+        !grayIslandTrialChoicesEl.hidden &&
+        !grayQuestChoice;
+      if (!choicesOpen) {
+        dialogueChoiceBossBtn.disabled = false;
+        dialogueChoiceEnemiesBtn.disabled = false;
+        dialogueChoiceBossBtn.removeAttribute('title');
+        dialogueChoiceEnemiesBtn.removeAttribute('title');
+        return;
+      }
+      const okBuggy = playerLevel >= GRAY_QUEST_MIN_LEVEL_BUGGY;
+      const okPirates = playerLevel >= GRAY_QUEST_MIN_LEVEL_PIRATES;
+      dialogueChoiceBossBtn.disabled = !okBuggy;
+      dialogueChoiceEnemiesBtn.disabled = !okPirates;
+      dialogueChoiceBossBtn.title = okBuggy
+        ? ''
+        : `Requires level ${GRAY_QUEST_MIN_LEVEL_BUGGY} (you are ${playerLevel})`;
+      dialogueChoiceEnemiesBtn.title = okPirates
+        ? ''
+        : `Requires level ${GRAY_QUEST_MIN_LEVEL_PIRATES} (you are ${playerLevel})`;
     }
 
     function applyGrayQuestChoice(choice) {
+      if (choice === 'boss' && playerLevel < GRAY_QUEST_MIN_LEVEL_BUGGY) return;
+      if (choice === 'enemies' && playerLevel < GRAY_QUEST_MIN_LEVEL_PIRATES) return;
       grayQuestChoice = choice;
+      grayAwaitingNextTrialChoice = false;
       grayGuideExclaimMark.visible = false;
       for (const e of enemies) {
-        if (e.grayQuestRole === 'boss') {
-          e.grayQuestFrozen = false;
+        if (e.grayQuestRole === 'swarm' && choice === 'boss') {
+          e.alive = false;
+          e.mesh.visible = false;
+          e.noRespawn = true;
         } else if (e.grayQuestRole === 'swarm') {
-          if (choice === 'boss') {
-            e.alive = false;
-            e.mesh.visible = false;
-            e.grayQuestFrozen = false;
-            e.noRespawn = true;
-          } else {
-            e.grayQuestFrozen = false;
-            e.noRespawn = false;
-          }
+          e.noRespawn = false;
         }
       }
       updateMissionsHUD();
@@ -2506,31 +4396,17 @@
       activeDialogueKind = 'gray_quest';
       if (grayIslandDialogueNameEl) grayIslandDialogueNameEl.textContent = 'Gray island NPC';
       if (grayIslandDialogueBody) {
-        if (grayMissionNeedsNpcTurnIn && grayQuestChoice) {
-          addPlayerXp(GRAY_ISLAND_PIRATES_MISSION_XP);
-          grayMissionNeedsNpcTurnIn = false;
-          if (grayQuestChoice === 'boss') {
-            grayBossKills = 0;
-            for (const en of enemies) {
-              if (en.grayQuestRole === 'boss') revivePirateCaptain(en);
-            }
-          } else {
-            graySwarmKills = 0;
-          }
+        if (!grayQuestChoice) {
           grayIslandDialogueBody.innerHTML =
-            'Trial finished — here is <strong>1200 XP</strong>. Your pact is open again: finish the same trial, then come back to me for the reward.';
-          if (grayIslandTrialChoicesEl) grayIslandTrialChoicesEl.hidden = true;
-          if (grayIslandDialogueCloseBtn) grayIslandDialogueCloseBtn.hidden = false;
-        } else if (!grayQuestChoice) {
-          grayIslandDialogueBody.innerHTML =
-            'Trials on the <strong>gray island</strong> — choose <strong>one</strong>:<br><br><strong>Pirate captain</strong> to the <strong>west</strong>.<br><strong>Pirates</strong>: <strong>six</strong> kills counted; <strong>four</strong> pirates on the <strong>east ring</strong> (they <strong>respawn</strong>).';
+            `Trials on the <strong>gray island</strong> — choose <strong>one</strong>:<br><br><strong>${BOSS_DISPLAY_NAME}</strong> (west) — requires <strong>level ${GRAY_QUEST_MIN_LEVEL_BUGGY}</strong>.<br><strong>Pirates</strong> — <strong>six</strong> kills; <strong>four</strong> on the <strong>east ring</strong> (they <strong>respawn</strong>) — requires <strong>level ${GRAY_QUEST_MIN_LEVEL_PIRATES}</strong>.`;
           if (grayIslandTrialChoicesEl) grayIslandTrialChoicesEl.hidden = false;
           if (grayIslandDialogueCloseBtn) grayIslandDialogueCloseBtn.hidden = true;
+          updateGrayTrialChoiceButtons();
         } else if (grayQuestChoice === 'boss') {
           if (grayBossKills >= 1) {
-            grayIslandDialogueBody.innerHTML = 'The <strong>pirate captain</strong> is defeated.';
+            grayIslandDialogueBody.innerHTML = `<strong>${BOSS_DISPLAY_NAME}</strong> is defeated.`;
           } else {
-            grayIslandDialogueBody.innerHTML = 'Your trial: the <strong>pirate captain</strong> to the <strong>west</strong>.';
+            grayIslandDialogueBody.innerHTML = `Your trial: <strong>${BOSS_DISPLAY_NAME}</strong> to the <strong>west</strong>.`;
           }
           if (grayIslandTrialChoicesEl) grayIslandTrialChoicesEl.hidden = true;
           if (grayIslandDialogueCloseBtn) grayIslandDialogueCloseBtn.hidden = false;
@@ -2563,13 +4439,10 @@
       dialogueOpen = true;
       activeDialogueKind = 'guide';
       if (dialogueNameEl) dialogueNameEl.textContent = 'Island guide';
-      if (greenMissionNeedsNpcTurnIn) {
-        addPlayerXp(GREEN_ISLAND_DEFEAT_THREE_ENEMIES_XP);
-        greenMissionNeedsNpcTurnIn = false;
-        greenMissionRunKills = 0;
-        dialogueBody.innerHTML =
-          'You cleared all <strong>three bandits</strong>. Here is <strong>300 XP</strong>.<br><br>Want to run it again? Defeat three more, then come back when you are done.';
-      } else {
+      if (greenBanditMissionCompleted && greenMissionRunKills < MISSION_KILLS_TARGET) {
+        greenMissionRunKills = MISSION_KILLS_TARGET;
+      }
+      if (dialogueBody) {
         dialogueBody.innerHTML = coreMissionsComplete() ? GUIDE_POST_MISSIONS_HTML : GUIDE_DIALOGUE_HTML;
       }
       dialogueLayer.classList.add('dialogue-layer--open');
@@ -2648,30 +4521,26 @@
     dialogueCloseBtn.addEventListener('click', closeGuideDialogue);
     if (grayIslandDialogueBackdrop) grayIslandDialogueBackdrop.addEventListener('click', closeGuideDialogue);
     if (grayIslandDialogueCloseBtn) grayIslandDialogueCloseBtn.addEventListener('click', closeGuideDialogue);
+    function grayTrialChoiceButtonsActive() {
+      if (grayQuestChoice || !grayIslandTrialChoicesEl || grayIslandTrialChoicesEl.hidden) return false;
+      if (!grayIslandDialogueLayer || !grayIslandDialogueLayer.classList.contains('dialogue-layer--open')) return false;
+      return true;
+    }
+
     if (dialogueChoiceBossBtn) {
-      dialogueChoiceBossBtn.addEventListener('click', () => {
-        if (
-          activeDialogueKind !== 'gray_quest' ||
-          grayQuestChoice ||
-          !grayIslandTrialChoicesEl ||
-          grayIslandTrialChoicesEl.hidden
-        ) {
-          return;
-        }
+      dialogueChoiceBossBtn.addEventListener('click', (ev) => {
+        ev.stopPropagation();
+        ev.preventDefault();
+        if (!grayTrialChoiceButtonsActive()) return;
         applyGrayQuestChoice('boss');
         closeGuideDialogue();
       });
     }
     if (dialogueChoiceEnemiesBtn) {
-      dialogueChoiceEnemiesBtn.addEventListener('click', () => {
-        if (
-          activeDialogueKind !== 'gray_quest' ||
-          grayQuestChoice ||
-          !grayIslandTrialChoicesEl ||
-          grayIslandTrialChoicesEl.hidden
-        ) {
-          return;
-        }
+      dialogueChoiceEnemiesBtn.addEventListener('click', (ev) => {
+        ev.stopPropagation();
+        ev.preventDefault();
+        if (!grayTrialChoiceButtonsActive()) return;
         applyGrayQuestChoice('enemies');
         closeGuideDialogue();
       });
@@ -2682,7 +4551,7 @@
 
     function resolvePlayerEnemyCollisions() {
       for (const e of enemies) {
-        if (!e.alive || e.grayQuestFrozen) continue;
+        if (!e.alive) continue;
         const ex = e.mesh.position.x;
         const ez = e.mesh.position.z;
         const dx = player.position.x - ex;
@@ -2744,10 +4613,10 @@
     function resolveEnemyEnemyCollisions() {
       for (let i = 0; i < enemies.length; i++) {
         const a = enemies[i];
-        if (!a.alive || a.grayQuestFrozen) continue;
+        if (!a.alive) continue;
         for (let j = i + 1; j < enemies.length; j++) {
           const b = enemies[j];
-          if (!b.alive || b.grayQuestFrozen) continue;
+          if (!b.alive) continue;
           const dx = b.mesh.position.x - a.mesh.position.x;
           const dz = b.mesh.position.z - a.mesh.position.z;
           const distSq = dx * dx + dz * dz;
@@ -2765,7 +4634,212 @@
       }
     }
 
+    const _bossTorsoWorld = new THREE.Vector3();
+
+    function bossTickPunchAnim(e, dt, inChase) {
+      const sc = e.mesh.scale.x;
+      const bossPunchDmg = inChase
+        ? BOSS_CHASE_PUNCH_DMG
+        : e.punchDamage != null
+          ? e.punchDamage
+          : BOSS_PUNCH_DMG;
+      e.punchT += dt;
+      const t = e.punchT;
+      if (t >= enemyPunchTotal) {
+        e.punchT = 0;
+        resetEnemyPunchPose(e);
+        if (inChase) {
+          e.bossChasePunchCd = BOSS_CHASE_PUNCH_CD;
+        } else {
+          e.bossCdNormal = BOSS_PUNCH_CD;
+        }
+        return;
+      }
+      if (t < ePunchP1) {
+        const u = t / ePunchP1;
+        e.armRRig.rotation.x = (-Math.PI / 2) * u;
+        e.armRRig.position.copy(e.armRRigBasePos);
+      } else if (t < ePunchP1 + ePunchP2) {
+        const u = (t - ePunchP1) / ePunchP2;
+        e.armRRig.rotation.x = -Math.PI / 2;
+        e.armRRig.position.z = e.armRRigBasePos.z + enemyPunchReach * u;
+      } else if (t < ePunchP1 + ePunchP2 + ePunchP3) {
+        e.armRRig.rotation.x = -Math.PI / 2;
+        e.armRRig.position.z = e.armRRigBasePos.z + enemyPunchReach;
+        if (!e.punchDidDamage) {
+          e.punchDidDamage = true;
+          let dist;
+          if (inChase) {
+            e.bossTorsoArmRoot.getWorldPosition(_bossTorsoWorld);
+            dist = Math.hypot(
+              player.position.x - _bossTorsoWorld.x,
+              player.position.z - _bossTorsoWorld.z
+            );
+          } else {
+            dist = Math.hypot(player.position.x - e.mesh.position.x, player.position.z - e.mesh.position.z);
+          }
+          const hr = inChase ? BOSS_CHASE_PUNCH_HIT * sc : e.hitRange != null ? e.hitRange : BOSS_PUNCH_HIT;
+          if (dist <= hr) damagePlayer(bossPunchDmg);
+        }
+      } else if (t < ePunchP1 + ePunchP2 + ePunchP3 + ePunchP4) {
+        const u = (t - ePunchP1 - ePunchP2 - ePunchP3) / ePunchP4;
+        e.armRRig.rotation.x = -Math.PI / 2;
+        e.armRRig.position.z = e.armRRigBasePos.z + enemyPunchReach * (1 - u);
+      } else {
+        const u = (t - ePunchP1 - ePunchP2 - ePunchP3 - ePunchP4) / ePunchP5;
+        e.armRRig.rotation.x = (-Math.PI / 2) * (1 - u);
+        e.armRRig.position.copy(e.armRRigBasePos);
+      }
+    }
+
+    function bossChaseFollow(e, dt) {
+      const relX = player.position.x - e.mesh.position.x;
+      const relZ = player.position.z - e.mesh.position.z;
+      const yaw = e.mesh.rotation.y;
+      const lx = Math.cos(yaw) * relX + Math.sin(yaw) * relZ;
+      const lz = -Math.sin(yaw) * relX + Math.cos(yaw) * relZ;
+      const len = Math.hypot(lx, lz);
+      const step = BOSS_CHASE_FOLLOW_SPEED * dt;
+      if (len > 0.08) {
+        const ux = lx / len;
+        const uz = lz / len;
+        const m = Math.min(len * 0.38, step);
+        e.bossTorsoArmRoot.position.x += ux * m;
+        e.bossTorsoArmRoot.position.z += uz * m;
+      }
+      e.bossHeadRoot.position.x = e.bossTorsoArmRoot.position.x;
+      e.bossHeadRoot.position.z = e.bossTorsoArmRoot.position.z;
+      e.bossHeadRoot.position.y = e.bossBodyY + e.bossHeadYOffset + 0.2;
+      e.mesh.rotation.y = Math.atan2(relX, relZ);
+      return len;
+    }
+
+    function updateBossEnemy(e, dt) {
+      const sc = e.mesh.scale.x;
+      if (e.bossCdNormal > 0) e.bossCdNormal -= dt;
+      if (e.bossCdSpin > 0) e.bossCdSpin -= dt;
+      if (e.bossCdChase > 0) e.bossCdChase -= dt;
+      if (e.bossChasePunchCd > 0) e.bossChasePunchCd -= dt;
+
+      const er = e.collisionR != null ? e.collisionR : enemyRadius;
+
+      if (e.bossSpinRemaining > 0) {
+        e.bossSpinRemaining -= dt;
+        e.bossSpinPhase = (e.bossSpinPhase || 0) + dt;
+        const ph = e.bossSpinPhase;
+        e.bossHeadRoot.position.y = e.bossBodyY + e.bossHeadYOffset + 0.55 + Math.sin(ph * 4.2) * 0.08;
+        e.bossHeadRoot.rotation.z = Math.sin(ph * 2.2) * 0.1;
+        e.bossTorsoArmRoot.rotation.x += dt * 11;
+        e.bossTorsoArmRoot.rotation.z += dt * 9;
+        e.bossLegsRoot.rotation.y += dt * 14;
+
+        const d = Math.hypot(player.position.x - e.mesh.position.x, player.position.z - e.mesh.position.z);
+        const r = BOSS_SPIN_RADIUS * sc;
+        if (!playerInBoat && !playerDead && d < r) {
+          damagePlayer(BOSS_SPIN_DPS * dt);
+          playerBossSlowMult = Math.min(playerBossSlowMult, 0.42);
+        }
+
+        if (e.bossSpinRemaining <= 0) {
+          e.bossSpinRemaining = 0;
+          e.bossCdSpin = BOSS_SPIN_CD;
+          resetBossPose(e);
+        }
+        resolveStallCollisionXZFor(e.mesh.position, er);
+        clampEntityToNearestIsland(e.mesh.position);
+        return;
+      }
+
+      if (e.punchT > 0) {
+        const inChase = e.bossChaseRemaining > 0;
+        if (inChase) {
+          e.bossChaseRemaining -= dt;
+          bossChaseFollow(e, dt);
+          if (e.bossChaseRemaining <= 0) {
+            e.bossChaseRemaining = 0;
+            e.bossCdChase = BOSS_CHASE_CD;
+            resetBossPose(e);
+            e.punchT = 0;
+            resetEnemyPunchPose(e);
+            resolveStallCollisionXZFor(e.mesh.position, er);
+            clampEntityToNearestIsland(e.mesh.position);
+            return;
+          }
+        }
+        bossTickPunchAnim(e, dt, inChase);
+        resolveStallCollisionXZFor(e.mesh.position, er);
+        clampEntityToNearestIsland(e.mesh.position);
+        return;
+      }
+
+      if (e.bossChaseRemaining > 0) {
+        e.bossChaseRemaining -= dt;
+        const len = bossChaseFollow(e, dt);
+        if (e.bossChaseRemaining <= 0) {
+          e.bossChaseRemaining = 0;
+          e.bossCdChase = BOSS_CHASE_CD;
+          resetBossPose(e);
+        } else if (e.bossChasePunchCd <= 0 && len < BOSS_CHASE_PUNCH_HIT * sc * 1.4) {
+          e.punchT = 1e-6;
+          e.punchDidDamage = false;
+        }
+        resolveStallCollisionXZFor(e.mesh.position, er);
+        clampEntityToNearestIsland(e.mesh.position);
+        return;
+      }
+
+      const ex = e.mesh.position.x;
+      const ez = e.mesh.position.z;
+      const dx = player.position.x - ex;
+      const dz = player.position.z - ez;
+      const dist = Math.hypot(dx, dz);
+      const canSee = dist <= enemyVisionRange * 1.35;
+
+      const ar = e.attackRange != null ? e.attackRange : BOSS_PUNCH_RANGE;
+      /** Attack 1 — normal punch: take priority in melee so spin (attack 2) does not block it. */
+      if (canSee && dist <= ar && e.bossCdNormal <= 0 && dist > 0.25) {
+        e.punchT = 1e-6;
+        e.punchDidDamage = false;
+        e.mesh.rotation.y = Math.atan2(dx, dz);
+        resolveStallCollisionXZFor(e.mesh.position, er);
+        clampEntityToNearestIsland(e.mesh.position);
+        return;
+      }
+
+      if (canSee && e.bossCdSpin <= 0 && dist < BOSS_SPIN_RADIUS * sc * 2.05) {
+        e.bossSpinRemaining = BOSS_SPIN_DURATION;
+        e.bossSpinPhase = 0;
+        resetEnemyPunchPose(e);
+        e.punchT = 0;
+        resolveStallCollisionXZFor(e.mesh.position, er);
+        clampEntityToNearestIsland(e.mesh.position);
+        return;
+      }
+      if (canSee && e.bossCdChase <= 0 && dist < 17 && dist > 2.6) {
+        e.bossChaseRemaining = BOSS_CHASE_DURATION;
+        e.bossTorsoArmRoot.position.set(0, e.bossBodyY + 0.1, 0.12);
+        e.bossHeadRoot.position.set(0, e.bossBodyY + e.bossHeadYOffset + 0.2, 0.12);
+        resetEnemyPunchPose(e);
+        e.punchT = 0;
+        e.mesh.rotation.y = Math.atan2(dx, dz);
+        resolveStallCollisionXZFor(e.mesh.position, er);
+        clampEntityToNearestIsland(e.mesh.position);
+        return;
+      }
+
+      if (canSee && dist > 0.15) {
+        const sp = (enemyMoveSpeed * BOSS_MOVE_SPEED_MULT * dt) / dist;
+        e.mesh.position.x += dx * sp;
+        e.mesh.position.z += dz * sp;
+        e.mesh.rotation.y = Math.atan2(dx, dz);
+      }
+
+      resolveStallCollisionXZFor(e.mesh.position, er);
+      clampEntityToNearestIsland(e.mesh.position);
+    }
+
     function updateEnemies(dt) {
+      playerBossSlowMult = 1;
       for (const e of enemies) {
         if (!e.alive) {
           if (e.noRespawn) continue;
@@ -2774,11 +4848,21 @@
           continue;
         }
 
+        tickEnemyDamageFlash(e, dt);
+
         if (e.burnTimeRemaining > 0) {
           e.burnTimeRemaining -= dt;
           const dps = e.burnDps || 0;
-          if (dps > 0 && !e.grayQuestFrozen) {
-            e.hp -= dps * dt;
+          if (dps > 0) {
+            const burnDmg = dps * dt;
+            e.hp -= burnDmg;
+            registerPlayerDamageDealt(burnDmg);
+            let acc = (e.burnDmgFlashAccum || 0) + burnDmg;
+            while (acc >= 1) {
+              acc -= 1;
+              startEnemyDamageFlash(e);
+            }
+            e.burnDmgFlashAccum = acc;
             updateEnemyHpBar(e);
             if (e.hp <= 0) {
               finalizeEnemyKillFromPlayer(e);
@@ -2788,11 +4872,30 @@
           if (e.burnTimeRemaining <= 0) {
             e.burnTimeRemaining = 0;
             e.burnDps = 0;
+            e.burnDmgFlashAccum = 0;
             updateEnemyHpBar(e);
           }
         }
 
-        if (e.grayQuestFrozen) continue;
+        if (enemyInActiveFlameTornado(e)) {
+          if (e.grayQuestRole === 'boss') {
+            e.bossSpinRemaining = 0;
+            e.bossChaseRemaining = 0;
+            e.punchT = 0;
+            e.bossChasePunchCd = 0;
+            resetBossPose(e);
+            resetEnemyPunchPose(e);
+          } else if (e.punchT > 0) {
+            e.punchT = 0;
+            resetEnemyPunchPose(e);
+          }
+          continue;
+        }
+
+        if (e.grayQuestRole === 'boss') {
+          updateBossEnemy(e, dt);
+          continue;
+        }
 
         if (e.attackCD > 0) e.attackCD -= dt;
 
@@ -2873,43 +4976,246 @@
     }
 
     function syncAttackListVisible() {
-      normalizeHotbarFruitSelection();
+      normalizeEquippedFruit();
+      stopFlameFlightIfWrongFruit();
+      stopFlameTornadoIfWrongFruit();
+      stopRubberFlurryIfWrongFruit();
+      stopCourtPunchIfWrongFruit();
+      if (hotbarCombatSlotActive) {
+        fruitHud.classList.add('fruit-hud--visible');
+        fruitHud.setAttribute('aria-hidden', 'false');
+        if (fruitHudHead && fruitHudList) {
+          const lis = fruitHudList.querySelectorAll('li');
+          fruitHudHead.textContent = 'Combat — fists';
+          if (fruitHudRubberOnlyList) fruitHudRubberOnlyList.hidden = true;
+          if (fruitHudFlameOnlyList) fruitHudFlameOnlyList.hidden = true;
+          if (fruitHudCourtOnlyList) fruitHudCourtOnlyList.hidden = true;
+          if (lis[0])
+            lis[0].innerHTML =
+              '<span class="fruit-hud__m">Click</span> Punch — <strong>10</strong> damage, normal range (no fruit power)';
+          if (lis[1]) {
+            lis[1].hidden = true;
+            lis[1].innerHTML = '';
+          }
+        }
+        refreshHotbarHalos();
+        updateFruitMasteryHud();
+        return;
+      }
       const fruit = getEquippedFruit();
       const show = fruit !== null;
       fruitHud.classList.toggle('fruit-hud--visible', show);
       fruitHud.setAttribute('aria-hidden', show ? 'false' : 'true');
       if (fruitHudHead && fruitHudList) {
         const lis = fruitHudList.querySelectorAll('li');
+        if (fruitHudRubberOnlyList) fruitHudRubberOnlyList.hidden = fruit !== 'rubber';
+        if (fruitHudFlameOnlyList) fruitHudFlameOnlyList.hidden = fruit !== 'flame';
+        if (fruitHudCourtOnlyList) fruitHudCourtOnlyList.hidden = true;
         if (fruit === 'rubber') {
           fruitHudHead.textContent = 'Rubber — attacks';
           if (lis[0]) lis[0].innerHTML = '<span class="fruit-hud__m">Click</span> Stretch punch';
-          if (lis[1])
+          if (lis[1]) {
+            lis[1].hidden = false;
             lis[1].innerHTML =
               '<kbd>Z</kbd> Heavy stretch — longer range <span class="fruit-hud__cd" id="heavy-punch-cd" hidden></span>';
+          }
+          refreshRubberFlurryHudLine();
         } else if (fruit === 'flame') {
           fruitHudHead.textContent = 'Flame — attacks';
+          refreshFlameFlightHudLine();
+          refreshFlameTornadoHudLine();
           if (lis[0])
             lis[0].innerHTML =
               '<span class="fruit-hud__m">Click</span> Fire punch — <strong>10</strong> dmg, burn <strong>2</strong>/s × <strong>5</strong>s';
-          if (lis[1])
+          if (lis[1]) {
+            lis[1].hidden = false;
             lis[1].innerHTML =
-              '<kbd>Z</kbd> Searing strike — <strong>20</strong> dmg, same burn <span class="fruit-hud__cd" id="heavy-punch-cd" hidden></span>';
+              '<kbd>Z</kbd> Fireball — <strong>20</strong> dmg + burn <strong>2</strong>/s × <strong>5</strong>s <span class="fruit-hud__cd" id="heavy-punch-cd" hidden></span>';
+          }
+        } else if (fruit === 'court') {
+          fruitHudHead.textContent = 'Court — attacks';
+          if (lis[0])
+            lis[0].innerHTML =
+              '<span class="fruit-hud__m">Click</span> Court punch — <strong>10</strong> dmg, fist flies forward until it hits; <strong>click again</strong> to recall';
+          if (lis[1]) {
+            lis[1].hidden = true;
+            lis[1].innerHTML = '';
+          }
         }
       }
       refreshHotbarHalos();
+      updateFruitMasteryHud();
     }
 
     window.addEventListener('keydown', (e) => {
       const is1 = e.code === 'Digit1' || e.code === 'Numpad1';
-      const is2 = e.code === 'Digit2' || e.code === 'Numpad2';
-      if (!is1 && !is2) return;
+      if (!is1) return;
       e.preventDefault();
       if (e.repeat) return;
-      if (is1 && hasRubberFruit) hotbarFruitSelection = 1;
-      else if (is2 && hasFlameFruit) hotbarFruitSelection = 2;
+      hotbarCombatSlotActive = false;
+      if (hasAnyFruit()) {
+        const owned = ownedFruitKindsOrdered();
+        if (owned.length >= 2) {
+          const i = Math.max(0, owned.indexOf(equippedFruitKind));
+          equippedFruitKind = owned[(i + 1) % owned.length];
+        }
+      }
+      stopFlameFlightIfWrongFruit();
+      stopFlameTornadoIfWrongFruit();
+      stopRubberFlurryIfWrongFruit();
+      stopCourtPunchIfWrongFruit();
       refreshHotbarHalos();
       syncAttackListVisible();
     });
+
+    window.addEventListener('keydown', (e) => {
+      const is2 = e.code === 'Digit2' || e.code === 'Numpad2';
+      if (!is2) return;
+      e.preventDefault();
+      if (e.repeat) return;
+      hotbarCombatSlotActive = true;
+      stopFlameFlightIfWrongFruit();
+      stopFlameTornadoIfWrongFruit();
+      stopRubberFlurryIfWrongFruit();
+      stopCourtPunchIfWrongFruit();
+      refreshHotbarHalos();
+      syncAttackListVisible();
+    });
+    const COURT_FIST_SPEED = 54;
+    const COURT_FIST_HIT_R = 0.5;
+    const COURT_FIST_RETRACT_SPEED = 78;
+    let courtPunchPhase = 'idle';
+    const courtFistPos = new THREE.Vector3();
+    let courtPunchHandY = 0;
+    const courtPunchDir = new THREE.Vector3();
+    const _courtHandLocal = new THREE.Vector3();
+    const _courtRetractTarget = new THREE.Vector3();
+    const _courtRetractDir = new THREE.Vector3();
+
+    function getCourtHandWorld(out) {
+      playerArmRRig.updateMatrixWorld(true);
+      if (courtUpperStub.visible) {
+        _courtHandLocal.set(0, -0.5, 0);
+        courtUpperStub.localToWorld(out.copy(_courtHandLocal));
+      } else {
+        _courtHandLocal.set(0, -0.88, 0);
+        playerArmR.localToWorld(out.copy(_courtHandLocal));
+      }
+      return out;
+    }
+
+    function courtTryApplyHit() {
+      if (getActiveFruitForPowers() !== 'court') return false;
+      const ry = player.rotation.y;
+      const fwx = Math.sin(ry);
+      const fwz = Math.cos(ry);
+      const px = player.position.x;
+      const pz = player.position.z;
+      const fx = courtFistPos.x;
+      const fz = courtFistPos.z;
+      const hitR = COURT_FIST_HIT_R;
+      for (const e of enemies) {
+        if (!e.alive) continue;
+        const chaseLegsOnly =
+          e.grayQuestRole === 'boss' && e.bossChaseRemaining > 0 && e.bossLegsRoot;
+        let tx = e.mesh.position.x;
+        let tz = e.mesh.position.z;
+        if (chaseLegsOnly) {
+          e.bossLegsRoot.getWorldPosition(_bossLegsWorld);
+          tx = _bossLegsWorld.x;
+          tz = _bossLegsWorld.z;
+        }
+        const pdx = tx - px;
+        const pdz = tz - pz;
+        if (fwx * pdx + fwz * pdz < 0.18) continue;
+        const dxf = tx - fx;
+        const dzf = tz - fz;
+        const er = e.collisionR != null ? e.collisionR : enemyRadius;
+        const lim = er + hitR;
+        if (dxf * dxf + dzf * dzf > lim * lim) continue;
+        const fruitDmg = fruitScaledDamage(COURT_PUNCH_BASE_DAMAGE * getFruitDamageMultiplier());
+        e.hp -= fruitDmg;
+        registerPlayerDamageDealt(fruitDmg);
+        startEnemyDamageFlash(e);
+        updateEnemyHpBar(e);
+        if (e.hp <= 0) finalizeEnemyKillFromPlayer(e);
+        return true;
+      }
+      return false;
+    }
+
+    function startCourtPunchExtend() {
+      const ry = player.rotation.y;
+      courtPunchDir.set(Math.sin(ry), 0, Math.cos(ry)).normalize();
+      playerArmRRig.rotation.x = -punchArmAngle;
+      playerArmRRig.position.copy(playerArmRRigBasePos);
+      playerArmR.visible = false;
+      courtUpperStub.visible = true;
+      getCourtHandWorld(courtFistPos);
+      courtPunchHandY = courtFistPos.y;
+      courtFistMesh.position.copy(courtFistPos);
+      courtFistMesh.visible = true;
+      fistFirePoints.visible = false;
+      courtPunchPhase = 'extending';
+    }
+
+    function tryCourtPunchClick() {
+      if (courtPunchPhase === 'idle') {
+        startCourtPunchExtend();
+        return true;
+      }
+      if (courtPunchPhase === 'extending' || courtPunchPhase === 'stuck') {
+        courtPunchPhase = 'retracting';
+        return true;
+      }
+      return false;
+    }
+
+    function updateCourtPunch(dt) {
+      if (courtPunchPhase === 'idle') return;
+      if (getActiveFruitForPowers() !== 'court') {
+        resetCourtPunchState();
+        resetPunchPose();
+        return;
+      }
+      playerArmRRig.rotation.x = -punchArmAngle;
+      playerArmRRig.position.copy(playerArmRRigBasePos);
+      courtUpperStub.visible = true;
+      playerArmR.visible = false;
+
+      if (courtPunchPhase === 'extending') {
+        getCourtHandWorld(_courtRetractTarget);
+        courtPunchHandY = _courtRetractTarget.y;
+        courtFistPos.x += courtPunchDir.x * COURT_FIST_SPEED * dt;
+        courtFistPos.z += courtPunchDir.z * COURT_FIST_SPEED * dt;
+        courtFistPos.y = courtPunchHandY;
+        courtFistMesh.position.copy(courtFistPos);
+        if (courtTryApplyHit()) courtPunchPhase = 'stuck';
+        return;
+      }
+      if (courtPunchPhase === 'stuck') {
+        getCourtHandWorld(_courtRetractTarget);
+        courtPunchHandY = _courtRetractTarget.y;
+        courtFistPos.y = courtPunchHandY;
+        courtFistMesh.position.copy(courtFistPos);
+        return;
+      }
+      if (courtPunchPhase === 'retracting') {
+        getCourtHandWorld(_courtRetractTarget);
+        _courtRetractDir.copy(_courtRetractTarget).sub(courtFistPos);
+        const d = _courtRetractDir.length();
+        const spd = COURT_FIST_RETRACT_SPEED * dt;
+        if (d <= 0.14 || spd >= d) {
+          resetCourtPunchState();
+          resetPunchPose();
+          return;
+        }
+        _courtRetractDir.multiplyScalar(1 / d);
+        courtFistPos.addScaledVector(_courtRetractDir, spd);
+        courtFistMesh.position.copy(courtFistPos);
+      }
+    }
+
     let punchAnimT = 0;
     const punchP1 = 0.12;
     const punchP2 = 0.11;
@@ -2928,19 +5234,66 @@
     const boatWakeLifeMax = 0.75;
     let boatWakeEmitAcc = 0;
 
+    function tryStartRubberFlurry() {
+      if (playerDead) return false;
+      if (playerInBoat) return false;
+      if (shopOpen || codesPanelOpen || inventoryPanelOpen || dialogueOpen) return false;
+      stopFlameFlightIfWrongFruit();
+      stopFlameTornadoIfWrongFruit();
+      stopRubberFlurryIfWrongFruit();
+      if (getActiveFruitForPowers() !== 'rubber') return false;
+      if (rubberMasteryLevel < RUBBER_FLURRY_MIN_MASTERY) return false;
+      if (rubberFlurryRemainingT > 0 || rubberFlurryCooldownT > 0) return false;
+      if (punchAnimT > 0 || punchCooldown > 0) return false;
+      rubberFlurryRemainingT = RUBBER_FLURRY_DURATION;
+      rubberFlurryNextPunchT = 0;
+      rubberFlurryPunchAnimT = 0;
+      punchAnimT = 0;
+      punchHitThisSwing = false;
+      resetPunchPose();
+      return true;
+    }
+
     function tryStartPunch(isHeavy) {
       if (playerDead) return false;
       if (playerInBoat) return false;
-      if (shopOpen || dialogueOpen || !getEquippedFruit()) return false;
+      if (shopOpen || codesPanelOpen || inventoryPanelOpen || dialogueOpen) return false;
+      const powersFruit = getActiveFruitForPowers();
+      if (!hotbarCombatSlotActive && !powersFruit) return false;
+      stopFlameFlightIfWrongFruit();
+      stopFlameTornadoIfWrongFruit();
+      if (powersFruit === 'court') {
+        if (isHeavy) return false;
+        return tryCourtPunchClick();
+      }
+      if (hotbarCombatSlotActive) {
+        if (isHeavy) return false;
+        if (rubberFlurryRemainingT > 0) return false;
+        if (punchAnimT > 0 || punchCooldown > 0) return false;
+        pendingPunchDamage = normalPunchDamage;
+        pendingPunchMaxDist = normalPunchRange;
+        activePunchReach = punchReachNormal;
+        punchHitThisSwing = false;
+        punchAnimT = 1e-6;
+        return true;
+      }
+      if (rubberFlurryRemainingT > 0) return false;
       if (punchAnimT > 0 || punchCooldown > 0) return false;
       if (isHeavy && heavyPunchCooldown > 0) return false;
-      const f = getEquippedFruit();
+      const f = powersFruit;
+      if (isHeavy && f === 'flame') {
+        spawnFlameFireball();
+        heavyPunchCooldown = heavyPunchCooldownMax;
+        return true;
+      }
       if (f === 'rubber') {
         pendingPunchDamage = isHeavy ? heavyPunchDamage : normalPunchDamage;
         pendingPunchMaxDist = isHeavy ? heavyPunchRange : normalPunchRange;
       } else if (f === 'flame') {
         pendingPunchDamage = isHeavy ? flameHeavyPunchDamage : flameNormalPunchDamage;
         pendingPunchMaxDist = isHeavy ? flameHeavyPunchRange : flameNormalPunchRange;
+      } else {
+        return false;
       }
       activePunchReach = isHeavy ? punchReachHeavy : punchReachNormal;
       punchHitThisSwing = false;
@@ -2958,18 +5311,31 @@
       playerArmRRig.rotation.set(0, 0, 0);
       playerArmRRig.position.copy(playerArmRRigBasePos);
       playerArmR.position.set(0, -0.44, 0);
+      playerArmL.rotation.set(0, 0, 0);
+      playerArmL.position.copy(playerArmLBasePos);
     }
 
     function mountBoat() {
       if (!hasBoat || !playerBoat.visible) return;
       playerInBoat = true;
+      flameFlightActive = false;
+      syncOrbitCameraFromFlightSteer();
+      player.quaternion.identity();
+      player.rotation.x = 0;
+      clearFlameFireballs();
+      clearFlameTornado();
+      flameTornadoCooldown = 0;
       const bx = Math.sin(playerBoat.rotation.y);
       const bz = Math.cos(playerBoat.rotation.y);
       player.position.set(playerBoat.position.x - bx * 0.25, playerBoat.position.y + 0.25, playerBoat.position.z - bz * 0.25);
       player.rotation.y = playerBoat.rotation.y;
       vy = 0;
+      resetCourtPunchState();
       resetPunchPose();
       punchAnimT = 0;
+      rubberFlurryRemainingT = 0;
+      rubberFlurryNextPunchT = 0;
+      rubberFlurryPunchAnimT = 0;
     }
 
     function dismountBoat() {
@@ -2998,17 +5364,23 @@
     function updateShopUI() {
       const canAffordRubber = playerMoney >= rubberFruitPrice;
       const canAffordFlame = playerMoney >= flameFruitPrice;
+      const canAffordCourt = playerMoney >= courtFruitPrice;
       if (buyRubberBtn) {
-        buyRubberBtn.disabled = hasRubberFruit || !canAffordRubber;
-        buyRubberBtn.textContent = hasRubberFruit ? 'Owned' : canAffordRubber ? 'Buy' : `Need $${rubberFruitPrice}`;
+        buyRubberBtn.disabled = !canAffordRubber;
+        buyRubberBtn.textContent = canAffordRubber ? 'Buy' : `Need $${rubberFruitPrice}`;
       }
       if (buyFlameBtn) {
-        buyFlameBtn.disabled = hasFlameFruit || !canAffordFlame;
-        buyFlameBtn.textContent = hasFlameFruit ? 'Owned' : canAffordFlame ? 'Buy' : `Need $${flameFruitPrice}`;
+        buyFlameBtn.disabled = !canAffordFlame;
+        buyFlameBtn.textContent = canAffordFlame ? 'Buy' : `Need $${flameFruitPrice}`;
+      }
+      if (buyCourtBtn) {
+        buyCourtBtn.disabled = !canAffordCourt;
+        buyCourtBtn.textContent = canAffordCourt ? 'Buy' : `Need $${courtFruitPrice}`;
       }
       if (shopRowRubber) shopRowRubber.classList.toggle('shop-row--owned', hasRubberFruit);
       if (shopRowFlame) shopRowFlame.classList.toggle('shop-row--owned', hasFlameFruit);
-      normalizeHotbarFruitSelection();
+      if (shopRowCourt) shopRowCourt.classList.toggle('shop-row--owned', hasCourtFruit);
+      normalizeEquippedFruit();
       refreshHotbarHalos();
       syncAttackListVisible();
       updateMissionsHUD();
@@ -3017,29 +5389,44 @@
     if (buyRubberBtn) {
       buyRubberBtn.addEventListener('click', (e) => {
         e.stopPropagation();
-        if (hasRubberFruit) return;
         if (playerMoney < rubberFruitPrice) return;
         setMoney(playerMoney - rubberFruitPrice);
-        hasRubberFruit = true;
-        hotbarFruitSelection = 1;
+        fruitInventoryRubber += 1;
         updateShopUI();
+        updateMissionsHUD();
+        if (inventoryPanelOpen) renderInventoryList();
       });
     }
 
     if (buyFlameBtn) {
       buyFlameBtn.addEventListener('click', (e) => {
         e.stopPropagation();
-        if (hasFlameFruit) return;
         if (playerMoney < flameFruitPrice) return;
         setMoney(playerMoney - flameFruitPrice);
-        hasFlameFruit = true;
-        hotbarFruitSelection = 2;
+        fruitInventoryFlame += 1;
         updateShopUI();
+        updateMissionsHUD();
+        if (inventoryPanelOpen) renderInventoryList();
+      });
+    }
+
+    if (buyCourtBtn) {
+      buyCourtBtn.addEventListener('click', (e) => {
+        e.stopPropagation();
+        if (playerMoney < courtFruitPrice) return;
+        setMoney(playerMoney - courtFruitPrice);
+        fruitInventoryCourt += 1;
+        updateShopUI();
+        updateMissionsHUD();
+        if (inventoryPanelOpen) renderInventoryList();
       });
     }
 
     function openShop() {
       if (shopOpen) return;
+      if (inventoryPanelOpen) closeInventoryPanel();
+      if (codesPanelOpen) closeCodesPanel();
+      keys.clear();
       shopOpen = true;
       shopLayer.classList.add('shop-layer--open');
       shopLayer.setAttribute('aria-hidden', 'false');
@@ -3053,11 +5440,256 @@
     }
 
     shopBackdrop.addEventListener('click', closeShop);
-    shopCloseBtn.addEventListener('click', closeShop);
+
+    function setCodesStatus(message, kind = '') {
+      if (!codesStatusEl) return;
+      codesStatusEl.textContent = message;
+      codesStatusEl.classList.remove('codes-panel__status--error', 'codes-panel__status--ok');
+      if (kind === 'error') codesStatusEl.classList.add('codes-panel__status--error');
+      else if (kind === 'ok') codesStatusEl.classList.add('codes-panel__status--ok');
+    }
+
+    function openCodesPanel() {
+      if (codesPanelOpen || !codesLayer) return;
+      if (shopOpen) closeShop();
+      if (inventoryPanelOpen) closeInventoryPanel();
+      if (dialogueOpen) closeGuideDialogue();
+      keys.clear();
+      codesPanelOpen = true;
+      codesLayer.classList.add('codes-layer--open');
+      codesLayer.setAttribute('aria-hidden', 'false');
+      setCodesStatus('');
+      if (codesInput) {
+        codesInput.value = '';
+        requestAnimationFrame(() => codesInput.focus());
+      }
+    }
+
+    function closeCodesPanel() {
+      if (!codesPanelOpen || !codesLayer) return;
+      codesPanelOpen = false;
+      codesLayer.classList.remove('codes-layer--open');
+      codesLayer.setAttribute('aria-hidden', 'true');
+      if (codesInput) codesInput.blur();
+    }
+
+    function closeInventoryPanel() {
+      if (!inventoryPanelOpen || !inventoryLayer) return;
+      inventoryPanelOpen = false;
+      inventoryLayer.classList.remove('inventory-layer--open');
+      inventoryLayer.setAttribute('aria-hidden', 'true');
+      inventorySelectedKind = null;
+    }
+
+    function canEatInventoryKind(kind) {
+      if (kind === 'rubber') return fruitInventoryRubber > 0 && !hasRubberFruit;
+      if (kind === 'flame') return fruitInventoryFlame > 0 && !hasFlameFruit;
+      if (kind === 'court') return fruitInventoryCourt > 0 && !hasCourtFruit;
+      return false;
+    }
+
+    function updateInventoryEatButton() {
+      if (!inventoryEatBtn) return;
+      const can = inventorySelectedKind && canEatInventoryKind(inventorySelectedKind);
+      inventoryEatBtn.disabled = !can;
+      if (!inventoryStatusEl) return;
+      if (!inventorySelectedKind) {
+        inventoryStatusEl.textContent =
+          fruitInventoryRubber + fruitInventoryFlame + fruitInventoryCourt > 0 ? 'Select a fruit.' : '';
+        return;
+      }
+      const cnt =
+        inventorySelectedKind === 'rubber'
+          ? fruitInventoryRubber
+          : inventorySelectedKind === 'flame'
+            ? fruitInventoryFlame
+            : fruitInventoryCourt;
+      if (cnt <= 0) inventoryStatusEl.textContent = '';
+      else if (inventorySelectedKind === 'rubber' && hasRubberFruit) {
+        inventoryStatusEl.textContent = 'You already have Rubber powers. Extra fruits stay in your bag.';
+      } else if (inventorySelectedKind === 'flame' && hasFlameFruit) {
+        inventoryStatusEl.textContent = 'You already have Flame powers. Extra fruits stay in your bag.';
+      } else if (inventorySelectedKind === 'court' && hasCourtFruit) {
+        inventoryStatusEl.textContent = 'You already have Court powers. Extra fruits stay in your bag.';
+      } else if (can) inventoryStatusEl.textContent = 'Press Eat to consume and unlock attacks.';
+      else inventoryStatusEl.textContent = '';
+    }
+
+    function renderInventoryList() {
+      if (!inventoryListEl) return;
+      if (inventorySelectedKind === 'rubber' && fruitInventoryRubber <= 0) inventorySelectedKind = null;
+      if (inventorySelectedKind === 'flame' && fruitInventoryFlame <= 0) inventorySelectedKind = null;
+      if (inventorySelectedKind === 'court' && fruitInventoryCourt <= 0) inventorySelectedKind = null;
+      inventoryListEl.innerHTML = '';
+      const mkRow = (kind, label, count) => {
+        if (count <= 0) return;
+        const li = document.createElement('li');
+        li.className = 'inventory-row';
+        if (kind === inventorySelectedKind) li.classList.add('inventory-row--selected');
+        li.setAttribute('role', 'button');
+        li.tabIndex = 0;
+        li.innerHTML = `<span class="inventory-row__name">${label}</span><span class="inventory-row__count">×${count}</span>`;
+        const pick = () => {
+          inventorySelectedKind = kind;
+          renderInventoryList();
+        };
+        li.addEventListener('click', pick);
+        li.addEventListener('keydown', (ev) => {
+          if (ev.code === 'Enter' || ev.code === 'Space') {
+            ev.preventDefault();
+            pick();
+          }
+        });
+        inventoryListEl.appendChild(li);
+      };
+      mkRow('rubber', 'Rubber fruit', fruitInventoryRubber);
+      mkRow('flame', 'Flame fruit', fruitInventoryFlame);
+      mkRow('court', 'Court fruit', fruitInventoryCourt);
+      if (!inventoryListEl.children.length) {
+        const li = document.createElement('li');
+        li.className = 'inventory-row inventory-row--empty';
+        li.textContent = 'Your bag is empty. Buy fruits at the market.';
+        inventoryListEl.appendChild(li);
+      }
+      updateInventoryEatButton();
+    }
+
+    function openInventoryPanel() {
+      if (inventoryPanelOpen || !inventoryLayer) return;
+      if (shopOpen) closeShop();
+      if (codesPanelOpen) closeCodesPanel();
+      if (dialogueOpen) closeGuideDialogue();
+      keys.clear();
+      inventoryPanelOpen = true;
+      inventoryLayer.classList.add('inventory-layer--open');
+      inventoryLayer.setAttribute('aria-hidden', 'false');
+      inventorySelectedKind = null;
+      renderInventoryList();
+    }
+
+    function eatSelectedInventoryFruit() {
+      if (!inventorySelectedKind || !canEatInventoryKind(inventorySelectedKind)) return;
+      if (inventorySelectedKind === 'rubber') {
+        fruitInventoryRubber -= 1;
+        hasRubberFruit = true;
+        equippedFruitKind = 'rubber';
+      } else if (inventorySelectedKind === 'flame') {
+        fruitInventoryFlame -= 1;
+        hasFlameFruit = true;
+        equippedFruitKind = 'flame';
+      } else {
+        fruitInventoryCourt -= 1;
+        hasCourtFruit = true;
+        equippedFruitKind = 'court';
+      }
+      hotbarCombatSlotActive = false;
+      inventorySelectedKind = null;
+      normalizeEquippedFruit();
+      stopFlameFlightIfWrongFruit();
+      stopFlameTornadoIfWrongFruit();
+      stopRubberFlurryIfWrongFruit();
+      updateShopUI();
+      updateMissionsHUD();
+      syncAttackListVisible();
+      renderInventoryList();
+    }
+
+    if (inventoryBackdrop) inventoryBackdrop.addEventListener('click', closeInventoryPanel);
+    if (inventoryCloseBtn) inventoryCloseBtn.addEventListener('click', closeInventoryPanel);
+    if (inventoryEatBtn) inventoryEatBtn.addEventListener('click', eatSelectedInventoryFruit);
+
+    const CODE_BUGGY_XP = 300;
+
+    function trySubmitCode() {
+      const raw = codesInput ? codesInput.value.trim() : '';
+      if (!raw) {
+        setCodesStatus('Please enter a code.', 'error');
+        return;
+      }
+      const norm = raw.toLowerCase();
+      if (norm === 'buggy') {
+        addPlayerXp(CODE_BUGGY_XP);
+        clearFlameFireballs();
+        clearFlameTornado();
+        flameTornadoCooldown = 0;
+        playerInBoat = false;
+        if (hasBoat && playerBoat) {
+          playerBoat.position.copy(grayIslandBoatDockSpawn);
+          playerBoat.rotation.y = Math.PI;
+        }
+        const tx = island2.position.x + 2.2;
+        const tz = island2.position.z + 5.5;
+        player.position.set(tx, groundY, tz);
+        player.rotation.y = Math.atan2(
+          grayIslandCenterMissionNpc.position.x - tx,
+          grayIslandCenterMissionNpc.position.z - tz
+        );
+        vy = 0;
+        clampPlayerToLandBounds();
+        resolveStallCollisionXZ();
+        syncCamTarget();
+        updateShopUI();
+        setCodesStatus('Code redeemed: Gray island, +300 XP.', 'ok');
+        closeCodesPanel();
+        return;
+      }
+      if (norm === 'fruits_v2') {
+        fruitInventoryRubber += 1;
+        fruitInventoryFlame += 1;
+        fruitInventoryCourt += 1;
+        rubberMasteryLevel = 10;
+        rubberMasteryXp = 0;
+        flameMasteryLevel = 10;
+        flameMasteryXp = 0;
+        courtMasteryLevel = 10;
+        courtMasteryXp = 0;
+        updateShopUI();
+        updateMissionsHUD();
+        syncAttackListVisible();
+        renderInventoryList();
+        setCodesStatus(
+          'Code redeemed: +1 Rubber, +1 Flame, +1 Court in your bag; all three masteries set to 10.',
+          'ok'
+        );
+        closeCodesPanel();
+        return;
+      }
+      if (norm === 'court') {
+        fruitInventoryCourt += 1;
+        updateShopUI();
+        updateMissionsHUD();
+        syncAttackListVisible();
+        if (inventoryPanelOpen) renderInventoryList();
+        setCodesStatus('Code redeemed: +1 Court fruit in your bag. Open inventory and Eat to use it.', 'ok');
+        closeCodesPanel();
+        return;
+      }
+      setCodesStatus('Unknown code.', 'error');
+    }
+
+    if (codesBackdrop) codesBackdrop.addEventListener('click', closeCodesPanel);
+    if (codesBtnCancel) codesBtnCancel.addEventListener('click', closeCodesPanel);
+    if (codesBtnSubmit) codesBtnSubmit.addEventListener('click', trySubmitCode);
+    if (codesInput) {
+      codesInput.addEventListener('keydown', (e) => {
+        if (e.code === 'Enter') {
+          e.preventDefault();
+          trySubmitCode();
+        }
+      });
+    }
 
     window.addEventListener('keydown', (e) => {
       if (e.code !== 'KeyE' || e.repeat) return;
       if (playerDead) return;
+      if (codesPanelOpen) {
+        e.preventDefault();
+        return;
+      }
+      if (inventoryPanelOpen) {
+        e.preventDefault();
+        return;
+      }
       marketStall.getWorldPosition(shopNpcPos);
       const px = player.position.x;
       const pz = player.position.z;
@@ -3125,6 +5757,16 @@
         dismountBoat();
         return;
       }
+      if (codesPanelOpen) {
+        e.preventDefault();
+        closeCodesPanel();
+        return;
+      }
+      if (inventoryPanelOpen) {
+        e.preventDefault();
+        closeInventoryPanel();
+        return;
+      }
       if (dialogueOpen) {
         e.preventDefault();
         closeGuideDialogue();
@@ -3138,7 +5780,27 @@
     window.addEventListener('keydown', (e) => {
       if (e.code !== 'KeyZ' || e.repeat) return;
       if (playerDead) return;
+      if (hotbarCombatSlotActive) return;
+      if (getActiveFruitForPowers() === 'court') return;
       if (tryStartPunch(true)) e.preventDefault();
+    });
+
+    window.addEventListener('keydown', (e) => {
+      if (e.code !== 'KeyC' || e.repeat) return;
+      if (playerDead) return;
+      stopFlameFlightIfWrongFruit();
+      stopFlameTornadoIfWrongFruit();
+      stopRubberFlurryIfWrongFruit();
+      if (getActiveFruitForPowers() !== 'rubber') return;
+      if (tryStartRubberFlurry()) e.preventDefault();
+    });
+
+    window.addEventListener('keydown', (e) => {
+      if (e.code !== 'KeyX' || e.repeat) return;
+      if (playerDead) return;
+      stopFlameTornadoIfWrongFruit();
+      if (getActiveFruitForPowers() !== 'flame') return;
+      if (trySpawnFlameTornado()) e.preventDefault();
     });
 
     renderer.domElement.addEventListener('pointerup', (e) => {
@@ -3153,10 +5815,33 @@
     updateShopUI();
     updateMissionsHUD();
 
+    const hudBtnCodes = document.getElementById('hud-btn-codes');
+    const hudBtnInventory = document.getElementById('hud-btn-inventory');
+    if (hudBtnCodes) hudBtnCodes.addEventListener('click', () => openCodesPanel());
+    if (hudBtnInventory) hudBtnInventory.addEventListener('click', () => openInventoryPanel());
+
     const up = new THREE.Vector3(0, 1, 0);
     const _forward = new THREE.Vector3();
     const _right = new THREE.Vector3();
     const _move = new THREE.Vector3();
+    const _flyDir = new THREE.Vector3();
+    const _faceDownWorld = new THREE.Vector3(0, -1, 0);
+    const _flightTravel = new THREE.Vector3();
+    const _flightRight = new THREE.Vector3();
+    const _flightBodyY = new THREE.Vector3();
+    const _flightBasisMat = new THREE.Matrix4();
+
+    function applyPlayerFaceDownFlightPose(flyDirVec) {
+      _flightTravel.copy(flyDirVec);
+      if (_flightTravel.lengthSq() < 1e-10) _flightTravel.set(0, 0, 1);
+      else _flightTravel.normalize();
+      _flightRight.crossVectors(_flightTravel, _faceDownWorld);
+      if (_flightRight.lengthSq() < 1e-8) _flightRight.set(1, 0, 0);
+      else _flightRight.normalize();
+      _flightBodyY.crossVectors(_faceDownWorld, _flightRight).normalize();
+      _flightBasisMat.makeBasis(_flightRight, _flightBodyY, _faceDownWorld);
+      player.quaternion.setFromRotationMatrix(_flightBasisMat);
+    }
 
     function syncCamTarget() {
       camTarget.copy(player.position);
@@ -3164,39 +5849,65 @@
     }
 
     function updateFistFireParticles(dt) {
-      const on = getEquippedFruit() === 'flame' && punchAnimT > 0;
+      const on = getActiveFruitForPowers() === 'flame' && punchAnimT > 0;
       fistFirePoints.visible = on;
       if (!on) return;
       const posA = fistFireGeo.attributes.position.array;
       const colA = fistFireGeo.attributes.color.array;
-      const spawnR = 0.1;
+      const spawnHot = 0.09;
+      const spawnEmber = 0.14;
       for (let i = 0; i < FIST_FIRE_N; i++) {
         fistFireLife[i] -= dt;
         const ix = i * 3;
         if (fistFireLife[i] <= 0) {
-          fistFireLife[i] = 0.16 + Math.random() * 0.26;
-          posA[ix] = (Math.random() - 0.5) * spawnR;
-          posA[ix + 1] = (Math.random() - 0.5) * spawnR * 0.65;
-          posA[ix + 2] = (Math.random() - 0.5) * spawnR * 0.55 + 0.05;
-          fistFireVel[i].set(
-            (Math.random() - 0.5) * 0.42,
-            0.62 + Math.random() * 0.72,
-            0.32 + Math.random() * 0.52
-          );
-          colA[ix] = 1;
-          colA[ix + 1] = 0.78 + Math.random() * 0.22;
-          colA[ix + 2] = 0.08 + Math.random() * 0.18;
+          const ember = Math.random() < 0.58;
+          fistFireType[i] = ember ? 1 : 0;
+          const r = ember ? spawnEmber : spawnHot;
+          posA[ix] = (Math.random() - 0.5) * r;
+          posA[ix + 1] = (Math.random() - 0.5) * r * 0.7;
+          posA[ix + 2] = (Math.random() - 0.5) * r * 0.6 + 0.06;
+          if (ember) {
+            fistFireLife[i] = 0.38 + Math.random() * 0.55;
+            fistFireVel[i].set(
+              (Math.random() - 0.5) * 0.55,
+              0.38 + Math.random() * 0.55,
+              0.18 + Math.random() * 0.42
+            );
+            colA[ix] = 0.95 + Math.random() * 0.05;
+            colA[ix + 1] = 0.28 + Math.random() * 0.22;
+            colA[ix + 2] = 0.02 + Math.random() * 0.08;
+          } else {
+            fistFireLife[i] = 0.07 + Math.random() * 0.14;
+            fistFireVel[i].set(
+              (Math.random() - 0.5) * 0.55,
+              0.85 + Math.random() * 1.05,
+              0.45 + Math.random() * 0.65
+            );
+            colA[ix] = 1;
+            colA[ix + 1] = 0.88 + Math.random() * 0.12;
+            colA[ix + 2] = 0.12 + Math.random() * 0.28;
+          }
         } else {
           posA[ix] += fistFireVel[i].x * dt;
           posA[ix + 1] += fistFireVel[i].y * dt;
           posA[ix + 2] += fistFireVel[i].z * dt;
-          fistFireVel[i].multiplyScalar(1 - dt * 1.35);
-          fistFireVel[i].y += dt * 0.42;
-          const maxL = 0.42;
-          const br = Math.min(1, fistFireLife[i] / maxL);
-          colA[ix] = 1;
-          colA[ix + 1] = Math.max(0.12, 0.22 + 0.72 * br);
-          colA[ix + 2] = Math.max(0, 0.45 * (1 - br));
+          const ember = fistFireType[i] === 1;
+          if (ember) fistFireVel[i].multiplyScalar(1 - dt * 0.55);
+          else fistFireVel[i].multiplyScalar(1 - dt * 1.5);
+          fistFireVel[i].y += dt * (ember ? 0.22 : 0.55);
+          fistFireVel[i].x += (Math.random() - 0.5) * dt * (ember ? 0.35 : 0.12);
+          fistFireVel[i].z += (Math.random() - 0.5) * dt * (ember ? 0.28 : 0.1);
+          const maxL = ember ? 0.93 : 0.21;
+          const tLife = Math.min(1, fistFireLife[i] / maxL);
+          if (ember) {
+            colA[ix] = Math.max(0.25, 0.45 + 0.55 * tLife);
+            colA[ix + 1] = Math.max(0.02, 0.08 + 0.22 * tLife);
+            colA[ix + 2] = Math.max(0, 0.04 * tLife);
+          } else {
+            colA[ix] = 1;
+            colA[ix + 1] = Math.max(0.15, 0.35 + 0.58 * tLife);
+            colA[ix + 2] = Math.max(0, 0.35 * (1 - tLife));
+          }
         }
       }
       fistFireGeo.attributes.position.needsUpdate = true;
@@ -3240,17 +5951,29 @@
       }
 
       updateEnemies(dt);
+      for (const en of enemies) {
+        if (en.burnFire) updateEnemyBurnFireParticles(en, dt);
+      }
+      updateFlameFireballs(dt);
       if (!playerInBoat) {
         resolvePlayerEnemyCollisions();
         resolvePlayerGuideCollision();
       }
 
+      stopFlameFlightIfWrongFruit();
+      stopFlameTornadoIfWrongFruit();
+      stopRubberFlurryIfWrongFruit();
+
+      updateFlameTornado(dt);
+
       if (punchCooldown > 0) punchCooldown = Math.max(0, punchCooldown - dt);
       if (heavyPunchCooldown > 0) {
         heavyPunchCooldown = Math.max(0, heavyPunchCooldown - dt);
+        const fHeavyUi = getActiveFruitForPowers();
+        const showHeavyPunchCd = fHeavyUi === 'rubber' || fHeavyUi === 'flame';
         const heavyPunchCdEl = document.getElementById('heavy-punch-cd');
         if (heavyPunchCdEl) {
-          if (heavyPunchCooldown > 0) {
+          if (showHeavyPunchCd && heavyPunchCooldown > 0) {
             heavyPunchCdEl.hidden = false;
             heavyPunchCdEl.textContent = `(cooldown ${heavyPunchCooldown.toFixed(1)}s)`;
           } else {
@@ -3260,7 +5983,66 @@
         }
       }
 
-      if (punchAnimT > 0) {
+      const tornadoCdEl = document.getElementById('flame-tornado-cd');
+      if (tornadoCdEl && getActiveFruitForPowers() === 'flame' && flameMasteryLevel >= FLAME_TORNADO_MIN_MASTERY) {
+        if (flameTornadoCooldown > 0) {
+          tornadoCdEl.hidden = false;
+          tornadoCdEl.textContent = `(cooldown ${flameTornadoCooldown.toFixed(1)}s)`;
+        } else {
+          tornadoCdEl.hidden = true;
+          tornadoCdEl.textContent = '';
+        }
+      } else if (tornadoCdEl) {
+        tornadoCdEl.hidden = true;
+        tornadoCdEl.textContent = '';
+      }
+
+      const rubberFlurryCdEl = document.getElementById('rubber-flurry-cd');
+      const rubberFlurryUnlocked =
+        getActiveFruitForPowers() === 'rubber' && rubberMasteryLevel >= RUBBER_FLURRY_MIN_MASTERY;
+      if (rubberFlurryUnlocked && rubberFlurryCooldownT > 0) {
+        rubberFlurryCooldownT = Math.max(0, rubberFlurryCooldownT - dt);
+      }
+      if (rubberFlurryCdEl) {
+        if (rubberFlurryUnlocked) {
+          if (rubberFlurryRemainingT > 0) {
+            rubberFlurryCdEl.hidden = false;
+            rubberFlurryCdEl.textContent = `(flurry ${rubberFlurryRemainingT.toFixed(1)}s)`;
+          } else if (rubberFlurryCooldownT > 0) {
+            rubberFlurryCdEl.hidden = false;
+            rubberFlurryCdEl.textContent = `(cooldown ${rubberFlurryCooldownT.toFixed(1)}s)`;
+          } else {
+            rubberFlurryCdEl.hidden = true;
+            rubberFlurryCdEl.textContent = '';
+          }
+        } else {
+          rubberFlurryCdEl.hidden = true;
+          rubberFlurryCdEl.textContent = '';
+        }
+      }
+
+      if (rubberFlurryRemainingT > 0 && rubberFlurryUnlocked) {
+        const prevFlurryRem = rubberFlurryRemainingT;
+        rubberFlurryRemainingT = Math.max(0, rubberFlurryRemainingT - dt);
+        rubberFlurryNextPunchT -= dt;
+        if (rubberFlurryNextPunchT <= 0 && rubberFlurryRemainingT > 0) {
+          rubberFlurryNextPunchT = RUBBER_FLURRY_PUNCH_INTERVAL;
+          if (rubberFlurryUnlocked) {
+            pendingPunchDamage = RUBBER_FLURRY_HIT_DAMAGE;
+            pendingPunchMaxDist = normalPunchRange;
+            activePunchReach = punchReachNormal;
+            tryPlayerFruitHits();
+          }
+          rubberFlurryPunchAnimT = RUBBER_FLURRY_ARM_WINDUP;
+        }
+        if (prevFlurryRem > 0 && rubberFlurryRemainingT <= 0) {
+          rubberFlurryCooldownT = RUBBER_FLURRY_COOLDOWN;
+          rubberFlurryPunchAnimT = 0;
+          resetPunchPose();
+        }
+      }
+
+      if (punchAnimT > 0 && rubberFlurryRemainingT <= 0) {
         punchAnimT += dt;
         const t = punchAnimT;
         if (t >= punchTotal) {
@@ -3292,7 +6074,27 @@
           playerArmRRig.rotation.x = -punchArmAngle * (1 - u);
           playerArmRRig.position.copy(playerArmRRigBasePos);
         }
+      } else if (rubberFlurryPunchAnimT > 0 && rubberFlurryUnlocked) {
+        const dur = RUBBER_FLURRY_ARM_WINDUP;
+        const phase = dur > 0 ? 1 - rubberFlurryPunchAnimT / dur : 1;
+        const u = Math.sin(Math.min(1, Math.max(0, phase)) * Math.PI);
+        rubberFlurryPunchAnimT = Math.max(0, rubberFlurryPunchAnimT - dt);
+        const rx = -punchArmAngle * 0.82 * u;
+        const reachZ = punchReachNormal * 0.72 * u;
+        playerArmRRig.rotation.x = rx;
+        playerArmRRig.position.z = playerArmRRigBasePos.z + reachZ;
+        playerArmL.rotation.x = rx;
+        playerArmL.position.z = playerArmLBasePos.z + reachZ;
+      } else if (rubberFlurryRemainingT > 0 && rubberFlurryUnlocked) {
+        const damp = Math.pow(0.9, dt * 60);
+        const lz = Math.min(1, dt * 12);
+        playerArmRRig.rotation.x *= damp;
+        playerArmRRig.position.z += (playerArmRRigBasePos.z - playerArmRRig.position.z) * lz;
+        playerArmL.rotation.x *= damp;
+        playerArmL.position.z += (playerArmLBasePos.z - playerArmL.position.z) * lz;
       }
+
+      updateCourtPunch(dt);
 
       let fwd = 0;
       let str = 0;
@@ -3334,45 +6136,76 @@
           boatWakeEmitAcc = 0;
         }
       } else {
-        if (fwd !== 0 || str !== 0) {
-          _forward.subVectors(camTarget, camera.position);
-          _forward.y = 0;
-          if (_forward.lengthSq() < 1e-8) _forward.set(0, 0, -1);
-          else _forward.normalize();
+        const flyingFlame =
+          flameFlightActive &&
+          getActiveFruitForPowers() === 'flame' &&
+          flameMasteryLevel >= FLAME_FLIGHT_MIN_MASTERY &&
+          !playerDead;
 
-          _right.crossVectors(_forward, up).normalize();
-
-          _move.set(0, 0, 0);
-          _move.addScaledVector(_forward, fwd);
-          _move.addScaledVector(_right, str);
-          _move.normalize().multiplyScalar(moveSpeed * dt);
-
+        if (flyingFlame) {
+          computeFlameFlightDir(_flyDir, flameFlightSteerYaw, flameFlightSteerPitch);
+          _move.copy(_flyDir).multiplyScalar(FLAME_FLIGHT_SPEED * dt * playerBossSlowMult);
           player.position.add(_move);
+          vy = 0;
+          const hxz = Math.hypot(_flyDir.x, _flyDir.z);
+          if (hxz > 0.06) flameFlightStoredYaw = Math.atan2(_flyDir.x, _flyDir.z);
+          applyPlayerFaceDownFlightPose(_flyDir);
 
-          clampPlayerToLandBounds();
+          resolvePlayerEnemyCollisions();
+          resolvePlayerGuideCollision();
+          resolvePlayerBoatSellerCollision();
+
+          if (player.position.y <= groundY + 0.02) {
+            syncOrbitCameraFromFlightSteer();
+            player.position.y = groundY;
+            flameFlightActive = false;
+            player.quaternion.identity();
+            player.rotation.set(0, flameFlightStoredYaw, 0);
+            vy = 0;
+          }
+        } else {
+          player.rotation.x = 0;
+
+          if (fwd !== 0 || str !== 0) {
+            _forward.subVectors(camTarget, camera.position);
+            _forward.y = 0;
+            if (_forward.lengthSq() < 1e-8) _forward.set(0, 0, -1);
+            else _forward.normalize();
+
+            _right.crossVectors(_forward, up).normalize();
+
+            _move.set(0, 0, 0);
+            _move.addScaledVector(_forward, fwd);
+            _move.addScaledVector(_right, str);
+            _move.normalize().multiplyScalar(moveSpeed * dt * playerBossSlowMult);
+
+            player.position.add(_move);
+
+            clampPlayerToLandBounds();
+            resolveStallCollisionXZ();
+            resolvePlayerEnemyCollisions();
+            resolvePlayerGuideCollision();
+            resolvePlayerBoatSellerCollision();
+            clampPlayerToLandBounds();
+            resolveStallCollisionXZ();
+
+            player.rotation.y = Math.atan2(_move.x, _move.z);
+          }
+
+          vy += gravity * dt;
+          player.position.y += vy * dt;
+          if (player.position.y < groundY) {
+            player.position.y = groundY;
+            vy = 0;
+          }
+
           resolveStallCollisionXZ();
           resolvePlayerEnemyCollisions();
           resolvePlayerGuideCollision();
           resolvePlayerBoatSellerCollision();
           clampPlayerToLandBounds();
           resolveStallCollisionXZ();
-
-          player.rotation.y = Math.atan2(_move.x, _move.z);
         }
-
-        vy += gravity * dt;
-        player.position.y += vy * dt;
-        if (player.position.y < groundY) {
-          player.position.y = groundY;
-          vy = 0;
-        }
-
-        resolveStallCollisionXZ();
-        resolvePlayerEnemyCollisions();
-        resolvePlayerGuideCollision();
-        resolvePlayerBoatSellerCollision();
-        clampPlayerToLandBounds();
-        resolveStallCollisionXZ();
       }
 
       for (const p of boatWakeParticles) {
@@ -3421,7 +6254,7 @@
       const nearBoatNow = nearGreenBoatSellerNow || nearGrayBoatSellerNow;
       const nearOwnBoatNow = hasBoat && playerBoat.visible && Math.hypot(player.position.x - playerBoat.position.x, player.position.z - playerBoat.position.z) <= boatEnterRadius;
 
-      const canHint = !shopOpen && !dialogueOpen;
+      const canHint = !shopOpen && !codesPanelOpen && !inventoryPanelOpen && !dialogueOpen;
       shopHint.classList.toggle('shop-hint--visible', canHint && nearShopNow);
       guideHint.classList.toggle('guide-hint--visible', canHint && nearGuideNow);
       if (grayQuestHint) grayQuestHint.classList.toggle('guide-hint--visible', canHint && nearGrayQuestNow);
@@ -3429,8 +6262,16 @@
       boatEnterHint.classList.toggle('boat-enter-hint--visible', canHint && nearOwnBoatNow && !playerInBoat);
 
       updateFistFireParticles(dt);
+      updateFlightLegFireParticles(dt);
       syncCamTarget();
-      updateCameraFromOrbit();
+      const useFlameFlightChaseCam =
+        flameFlightActive &&
+        getActiveFruitForPowers() === 'flame' &&
+        flameMasteryLevel >= FLAME_FLIGHT_MIN_MASTERY &&
+        !playerDead &&
+        !playerInBoat;
+      if (useFlameFlightChaseCam) updateFlightChaseCamera();
+      else updateCameraFromOrbit();
       renderer.render(scene, camera);
     }
 
